@@ -13,11 +13,11 @@
       
       <div class="app-description">
         <h2>Practice Mental Math on the Go</h2>
-        <p>Mental Math Trainer helps you develop powerful mental calculation skills through interactive lessons and practice exercises. The application follows the left-to-right calculation methods described in the book, allowing you to perform impressive calculations in your head without the need for paper, pencil, or calculator.</p>
+        <p>Mental Math Trainer helps you develop powerful mental calculation skills through interactive lessons and practice exercises. The application follows the calculation methods described in the book, allowing you to perform impressive calculations in your head without the need for paper, pencil, or calculator.</p>
         
         <p>With regular practice using this app, you'll be able to:</p>
         <ul>
-          <li>Add and subtract multi-digit numbers in your head</li>
+          <li>Do calculations with multi-digit numbers in your head</li>
           <li>Perform calculations faster than people using calculators</li>
           <li>Impress friends and colleagues with your mental math abilities</li>
           <li>Develop greater confidence with numbers in everyday situations</li>
@@ -30,7 +30,7 @@
         <h2>How to Use This Application</h2>
         <p>Start by reading through the chapters to learn the mental math techniques. Each chapter introduces specific methods for different types of calculations. After studying a technique, use the practice exercises to reinforce your skills.</p>
         
-        <p>Regular practice is the key to developing mental math proficiency. We recommend spending at least 10-15 minutes per day practicing these techniques.</p>
+        <p>Regular practice is the key to developing mental math proficiency. I recommend spending at least 10-15 minutes per day practicing these techniques.</p>
       </div>
     </div>
     
