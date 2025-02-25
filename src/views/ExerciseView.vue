@@ -1,7 +1,8 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { chapters } from '@/data/chapters'
+import { generateExercises } from '@/utils/exerciseGenerator'
 
 const route = useRoute()
 const router = useRouter()
@@ -23,64 +24,79 @@ const showSteps = ref(false)
 const exercisesCompleted = ref(0)
 const correctAnswers = ref(0)
 
+// Set up a collection of generated exercises
+const generatedExercises = ref([])
+const currentExerciseIndex = ref(0)
+
+onMounted(() => {
+  generateNewExercises()
+})
+
+// Clean up when component is unmounted
+onBeforeUnmount(() => {
+  resetState()
+})
+
+function resetState() {
+  // Clear all reactive references
+  generatedExercises.value = []
+  currentExerciseIndex.value = 0
+  currentExercise.value = null
+  userAnswer.value = ''
+  feedback.value = null
+  showSteps.value = false
+  exercisesCompleted.value = 0
+  correctAnswers.value = 0
+  
+  // Force garbage collection where possible
+  if (window.gc) window.gc();
+}
+
 function setDifficulty(level) {
   difficulty.value = level
-  generateExercise()
+  generateNewExercises()
 }
 
-function generateExercise() {
+function generateNewExercises() {
+  // Generate exercises using our utility
+  generatedExercises.value = generateExercises(chapterId.value, exerciseType.value, difficulty.value, 10)
+  currentExerciseIndex.value = 0
+  setCurrentExercise()
+  
+  // Reset state
   feedback.value = null
   userAnswer.value = ''
-  
-  if (exerciseType.value === 'addition') {
-    generateAdditionExercise()
-  } else if (exerciseType.value === 'subtraction') {
-    generateSubtractionExercise()
-  }
+  exercisesCompleted.value = 0
+  correctAnswers.value = 0
 }
 
-function generateAdditionExercise() {
-  let num1, num2
+function setCurrentExercise() {
+  const exercise = generatedExercises.value[currentExerciseIndex.value];
+  if (!exercise) return;
   
-  if (difficulty.value === 'easy') {
-    num1 = Math.floor(Math.random() * 90) + 10 // 10-99
-    num2 = Math.floor(Math.random() * 90) + 10 // 10-99
-  } else if (difficulty.value === 'medium') {
-    num1 = Math.floor(Math.random() * 900) + 100 // 100-999
-    num2 = Math.floor(Math.random() * 900) + 100 // 100-999
+  let num1, num2, operator;
+  
+  // Handle different operator formats
+  if (exercise.question.includes('+')) {
+    operator = '+';
+    [num1, num2] = exercise.question.split('+').map(part => parseInt(part.trim()));
+  } else if (exercise.question.includes('-')) {
+    operator = '-';
+    [num1, num2] = exercise.question.split('-').map(part => parseInt(part.trim()));
+  } else if (exercise.question.includes('×')) {
+    operator = '×';
+    [num1, num2] = exercise.question.split('×').map(part => parseInt(part.trim()));
   } else {
-    num1 = Math.floor(Math.random() * 9000) + 1000 // 1000-9999
-    num2 = Math.floor(Math.random() * 9000) + 1000 // 1000-9999
+    console.error('Unknown operator in question:', exercise.question);
+    return;
   }
   
   currentExercise.value = {
     num1,
     num2,
-    operator: '+',
-    correctAnswer: num1 + num2
-  }
-}
-
-function generateSubtractionExercise() {
-  let num1, num2
-  
-  if (difficulty.value === 'easy') {
-    num1 = Math.floor(Math.random() * 90) + 10 // 10-99
-    num2 = Math.floor(Math.random() * num1) + 1 // 1 to num1-1
-  } else if (difficulty.value === 'medium') {
-    num1 = Math.floor(Math.random() * 900) + 100 // 100-999
-    num2 = Math.floor(Math.random() * (num1 - 10)) + 10 // 10 to num1-1
-  } else {
-    num1 = Math.floor(Math.random() * 9000) + 1000 // 1000-9999
-    num2 = Math.floor(Math.random() * (num1 - 100)) + 100 // 100 to num1-1
-  }
-  
-  currentExercise.value = {
-    num1,
-    num2,
-    operator: '-',
-    correctAnswer: num1 - num2
-  }
+    operator,
+    correctAnswer: parseInt(exercise.answer)
+  };
 }
 
 function checkAnswer() {
@@ -99,16 +115,27 @@ function checkAnswer() {
       correct: true,
       message: 'Correct! Great job!'
     }
+    correctAnswers.value++
   } else {
     feedback.value = {
       correct: false,
       message: `Incorrect. The correct answer is ${currentExercise.value.correctAnswer}.`
     }
   }
+  
+  exercisesCompleted.value++
 }
 
 function nextExercise() {
-  generateExercise()
+  if (currentExerciseIndex.value < generatedExercises.value.length - 1) {
+    currentExerciseIndex.value++
+    setCurrentExercise()
+    feedback.value = null
+    userAnswer.value = ''
+  } else {
+    // Start over with new exercises
+    generateNewExercises()
+  }
 }
 
 function toggleSteps() {
@@ -116,14 +143,10 @@ function toggleSteps() {
 }
 
 function returnToChapter() {
-  router.push(`/chapters/${chapterId.value}`)
+  // Force a hard navigation by changing the window location
+  // This bypasses Vue Router's navigation system
+  window.location.href = `/chapters/${chapterId.value}`;
 }
-
-onMounted(() => {
-  if (exerciseConfig.value) {
-    generateExercise()
-  }
-})
 </script>
 
 <template>
