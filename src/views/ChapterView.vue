@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { chapters } from '@/data/chapters'
 
@@ -13,16 +13,122 @@ const activeSection = ref(null)
 onMounted(() => {
   if (chapter.value && chapter.value.sections.length > 0) {
     activeSection.value = chapter.value.sections[0].id
+    loadMathJax()
   }
 })
+
+watch(activeSection, () => {
+  nextTick(() => {
+    if (window.MathJax) {
+      window.MathJax.typesetPromise()
+    }
+  })
+})
+
+function loadMathJax() {
+  if (window.MathJax) {
+    window.MathJax.typesetPromise()
+    return
+  }
+
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js'
+  script.async = true
+  script.onload = () => {
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      options: {
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
+      }
+    }
+    window.MathJax.typesetPromise()
+  }
+  document.head.appendChild(script)
+}
 
 function setActiveSection(sectionId) {
   activeSection.value = sectionId
 }
 
 function startExercise(exerciseType) {
-  router.push(`/exercises/${chapterId.value}/${exerciseType}`)
+  // Reset any state if needed
+  nextTick(() => {
+    router.push(`/exercises/${chapterId.value}/${exerciseType}`)
+  })
 }
+
+function formatContent(content) {
+  if (!content) return ''
+  
+  let formattedContent = content
+  
+  // Format paragraphs with proper spacing
+  formattedContent = formattedContent.replace(
+    /<!-- paragraph -->([\s\S]*?)<!-- \/paragraph -->/g,
+    (match, p1) => {
+      return `<p class="book-paragraph">${p1.trim()}</p>`
+    }
+  )
+  
+  // Format section headings
+  formattedContent = formattedContent.replace(
+    /<!-- heading -->([\s\S]*?)<!-- \/heading -->/g,
+    (match, p1) => {
+      return `<h3 class="book-heading">${p1.trim()}</h3>`
+    }
+  )
+  
+  // Format vertical math problems
+  formattedContent = formattedContent.replace(
+    /<!-- math:vertical-start -->([\s\S]*?)<!-- math:vertical-end -->/g,
+    (match, p1) => {
+      return `<div class="math-vertical-problem">${p1}</div>`
+    }
+  )
+  
+  // Format math diagrams
+  formattedContent = formattedContent.replace(
+    /<!-- math:diagram-start -->([\s\S]*?)<!-- math:diagram-end -->/g,
+    (match, p1) => {
+      return `<div class="math-diagram">${p1}</div>`
+    }
+  )
+  
+  // Format math expressions
+  formattedContent = formattedContent.replace(
+    /<!-- math:expression-start -->([\s\S]*?)<!-- math:expression-end -->/g,
+    (match, p1) => {
+      return `<div class="math-expression">${p1}</div>`
+    }
+  )
+  
+  // Format number sequences
+  formattedContent = formattedContent.replace(
+    /<!-- math:sequence-start -->([\s\S]*?)<!-- math:sequence-end -->/g,
+    (match, p1) => {
+      return `<div class="number-sequence">${p1}</div>`
+    }
+  )
+  
+  // Format exercise rows
+  formattedContent = formattedContent.replace(
+    /<!-- math:exercise-start -->([\s\S]*?)<!-- math:exercise-end -->/g,
+    (match, p1) => {
+      return `<div class="exercise-row">${p1}</div>`
+    }
+  )
+  
+  return formattedContent
+}
+
+onBeforeUnmount(() => {
+  // Clean up any resources
+  activeSection.value = null
+})
 </script>
 
 <template>
@@ -43,7 +149,7 @@ function startExercise(exerciseType) {
         
         <h3>Practice</h3>
         <ul class="practice-list">
-          <li v-for="exerciseType in chapter.exercises.types" :key="exerciseType.id">
+          <li v-for="exerciseType in chapter.exercises?.types || []" :key="exerciseType.id">
             <a href="#" @click.prevent="startExercise(exerciseType.id)">
               {{ exerciseType.title }}
             </a>
@@ -87,57 +193,36 @@ function startExercise(exerciseType) {
   </div>
 </template>
 
-<script>
-function formatContent(content) {
-  // Replace newlines with <br>
-  let formatted = content.replace(/\n/g, '<br>');
-  
-  // Format math examples
-  // Example: 67 + 28 = 87 + 8 = 95
-  formatted = formatted.replace(/(\d+)\s*\+\s*(\d+)\s*=\s*(\d+)\s*\+\s*(\d+)\s*=\s*(\d+)/g, 
-    '<div class="math-example"><div class="math-row"><span>$1 + $2</span><span>=</span><span>$3 + $4</span><span>=</span><span>$5</span></div></div>');
-  
-  // Format math examples with notes
-  // Example: 84 + 57 = 134 + 7 = 141
-  //         (first add 50)   (then add 7)
-  formatted = formatted.replace(/(\d+)\s*\+\s*(\d+)\s*=\s*(\d+)\s*\+\s*(\d+)\s*=\s*(\d+)\s*\(first add (\d+)\)\s*\(then add (\d+)\)/g, 
-    '<div class="math-example"><div class="math-row"><span>$1 + $2</span><span>=</span><span>$3 + $4</span><span>=</span><span>$5</span></div><div class="math-notes"><span>(first add $6)</span><span>(then add $7)</span></div></div>');
-  
-  // Format single line math examples
-  // Example: 84 + 57 (50 + 7)
-  formatted = formatted.replace(/(\d+)\s*\+\s*(\d+)\s*\((\d+)\s*\+\s*(\d+)\)/g, 
-    '<div class="math-example"><div class="math-row"><span>$1</span><span>+ $2</span><span>($3 + $4)</span></div></div>');
-  
-  return formatted;
-}
-</script>
-
 <style scoped>
 .book-container {
-  width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0;
-  background-color: white;
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0;
 }
 
 .book-page {
   display: flex;
+  width: 100%;
+  max-width: 1200px;
   min-height: calc(100vh - 120px);
   border-top: 1px solid #e0e0e0;
+  background-color: #fff;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  border-radius: 2px;
 }
 
 .sidebar {
-  width: 220px;
-  padding: 2rem 1rem;
-  border-right: 1px solid #e0e0e0;
+  width: 250px;
   background-color: #f9f9f9;
+  border-right: 1px solid #e0e0e0;
+  padding: 1.5rem;
 }
 
-.sidebar h3 {
-  font-size: 1.2rem;
+h3 {
+  margin-top: 0;
   margin-bottom: 1rem;
-  color: #333;
+  font-size: 1.2rem;
+  color: #444;
 }
 
 .toc-list, .practice-list {
@@ -148,8 +233,12 @@ function formatContent(content) {
 
 .toc-list li, .practice-list li {
   padding: 0.5rem 0;
-  border-bottom: 1px solid #eee;
   cursor: pointer;
+  transition: color 0.3s ease;
+}
+
+.toc-list li:hover, .practice-list li a:hover {
+  color: #2c3e50;
 }
 
 .toc-list li.active {
@@ -157,77 +246,141 @@ function formatContent(content) {
   color: #2c3e50;
   border-left: 3px solid #2c3e50;
   padding-left: 0.5rem;
+  margin-left: -0.5rem;
 }
 
-.practice-list a {
-  color: #2c3e50;
+.practice-list li a {
+  color: #555;
   text-decoration: none;
+  display: block;
 }
 
 .content {
   flex: 1;
-  padding: 2rem 3rem;
-  line-height: 1.6;
+  padding: 2rem;
+  overflow-y: auto;
 }
 
 .chapter-title {
-  font-size: 1.8rem;
-  margin-bottom: 2rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid #e0e0e0;
+  font-size: 2rem;
   color: #2c3e50;
+  margin-bottom: 1.5rem;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 0.5rem;
 }
 
 .section-title {
   font-size: 1.5rem;
-  margin-bottom: 1.5rem;
   color: #2c3e50;
+  margin: 2rem 0 1rem;
 }
 
 .section-content {
   font-size: 1.1rem;
   line-height: 1.8;
   color: #333;
-}
-
-.section-content p {
-  margin-bottom: 1.5rem;
-}
-
-/* Math example styling */
-.math-example {
-  margin: 2rem 0;
-  text-align: center;
+  padding: 0 2rem;
   font-family: 'Georgia', serif;
+  max-width: 700px;
+  margin: 0 auto;
 }
 
-.math-row {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  font-size: 1.3rem;
-  margin-bottom: 0.5rem;
+.section-content :deep(.math-diagram) {
+  font-family: monospace;
+  white-space: pre;
+  margin: 1.5rem auto;
+  padding: 1rem;
+  background-color: #f9f9f9;
+  border-radius: 4px;
+  text-align: center;
+  font-size: 1.2rem;
+  max-width: 500px;
 }
 
-.math-notes {
-  display: flex;
-  justify-content: space-around;
-  font-size: 0.9rem;
+.section-content :deep(.math-explanation) {
   color: #666;
+  font-size: 0.9rem;
   font-style: italic;
+  display: inline-block;
+  margin: 0.5rem 1rem;
+}
+
+.section-content :deep(.math-problem) {
+  font-family: monospace;
+  white-space: pre;
+  margin: 1.5rem auto;
+  padding: 1rem;
+  text-align: right;
+  width: 120px;
+  font-size: 1.2rem;
+}
+
+.section-content :deep(.subtraction-line) {
+  border-top: 1px solid #000;
+  padding-top: 2px;
+}
+
+.section-content :deep(.math-expression) {
+  font-family: monospace;
+  text-align: center;
+  margin: 1.5rem auto;
+  font-size: 1.2rem;
+}
+
+.section-content :deep(.math-parenthetical) {
+  font-size: 0.9rem;
+  color: #555;
+}
+
+.section-content :deep(.number-sequence) {
+  font-family: monospace;
+  text-align: center;
+  margin: 1.5rem auto;
+  font-size: 1.2rem;
+  letter-spacing: 0.5rem;
+}
+
+.section-content :deep(.exercise-row) {
+  font-family: monospace;
+  white-space: pre;
+  margin: 0.5rem 0;
+  display: flex;
+  justify-content: space-between;
+  background-color: #f9f9f9;
+  padding: 0.5rem;
+  border-radius: 4px;
+}
+
+.section-content :deep(.math-vertical-problem) {
+  font-family: monospace;
+  white-space: pre;
+  margin: 1.5rem auto;
+  padding: 1rem;
+  text-align: right;
+  width: 200px;
+  font-size: 1.2rem;
+}
+
+.section-content :deep(.number-line) {
+  margin-bottom: 0.25rem;
+}
+
+.section-content :deep(.operation-line) {
+  margin-top: 0.25rem;
 }
 
 .page-navigation {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 3rem;
+  margin-top: 2rem;
   padding-top: 1rem;
-  border-top: 1px solid #e0e0e0;
+  border-top: 1px solid #eee;
 }
 
 .nav-btn {
+  border: none;
+  cursor: pointer;
   padding: 0.5rem 1rem;
   background-color: #f5f5f5;
   border: 1px solid #ddd;
@@ -265,5 +418,17 @@ function formatContent(content) {
     border-right: none;
     border-bottom: 1px solid #e0e0e0;
   }
+}
+
+.section-content :deep(.book-paragraph) {
+  margin: 1.5rem 0;
+  text-indent: 2rem;
+}
+
+.section-content :deep(.book-heading) {
+  font-size: 1.3rem;
+  font-weight: bold;
+  margin: 2rem 0 1rem;
+  color: #333;
 }
 </style> 

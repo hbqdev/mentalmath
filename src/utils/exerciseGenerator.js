@@ -154,4 +154,42 @@ export function generateExercise(type, difficultyLevel) {
   }
   
   return exerciseTypes[type](difficultyLevel);
+}
+
+// Main Exercise Generator Router
+import { 
+  generateMultiplyBy11Exercises,
+  generateSquaringExercises,
+  generateSpecialMultiplicationExercises
+} from './generators/chapter0Generator.js';
+
+import {
+  generateAdditionExercises,
+  generateSubtractionExercises
+} from './generators/chapter1Generator.js';
+
+/**
+ * Generate exercises based on chapter, exercise type, and difficulty
+ */
+export function generateExercises(chapterId, exerciseType, difficulty = 'easy', count = 10) {
+  // Chapter 0: Quick Tricks
+  if (chapterId === 0) {
+    if (exerciseType === 'multiply-by-11') {
+      return generateMultiplyBy11Exercises(difficulty, count);
+    } else if (exerciseType === 'squaring') {
+      return generateSquaringExercises(difficulty, count);
+    } else if (exerciseType === 'special-multiplication') {
+      return generateSpecialMultiplicationExercises(difficulty, count);
+    }
+  }
+  // Chapter 1: Addition and Subtraction
+  else if (chapterId === 1) {
+    if (exerciseType === 'left-to-right-addition') {
+      return generateAdditionExercises(difficulty, count);
+    } else if (exerciseType === 'left-to-right-subtraction') {
+      return generateSubtractionExercises(difficulty, count);
+    }
+  }
+  
+  return [];
 } 
