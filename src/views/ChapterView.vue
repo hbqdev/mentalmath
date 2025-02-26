@@ -66,6 +66,30 @@ function formatContent(content) {
   
   let formattedContent = content
   
+  // Format exercise titles separately from the exercise content
+  formattedContent = formattedContent.replace(
+    /EXERCISE: ([^\n]+)/g,
+    (match, p1) => {
+      return `<div class="exercise-title-container"><div class="exercise-title-line"></div><h3 class="exercise-title">${p1}</h3><div class="exercise-title-line"></div></div>`
+    }
+  )
+  
+  // Format exercise problems with proper alignment
+  formattedContent = formattedContent.replace(
+    /<!-- math:exercise-start -->([\s\S]*?)<!-- math:exercise-end -->/g,
+    (match, p1) => {
+      return `<div class="exercise-problems">${p1}</div>`
+    }
+  )
+  
+  // Format biographical sidebars
+  formattedContent = formattedContent.replace(
+    /<!-- bio-start -->([\s\S]*?)<!-- bio-end -->/g,
+    (match, p1) => {
+      return `<div class="biographical-sidebar">${p1}</div>`
+    }
+  )
+  
   // Format paragraphs with proper spacing
   formattedContent = formattedContent.replace(
     /<!-- paragraph -->([\s\S]*?)<!-- \/paragraph -->/g,
@@ -86,15 +110,58 @@ function formatContent(content) {
   formattedContent = formattedContent.replace(
     /<!-- math:vertical-start -->([\s\S]*?)<!-- math:vertical-end -->/g,
     (match, p1) => {
-      return `<div class="math-vertical-problem">${p1}</div>`
+      // Split the content by lines
+      const lines = p1.trim().split('\n');
+      
+      // Extract the top number (first line)
+      const topNumber = lines[0].trim();
+      
+      // Extract the operation and bottom number (second line)
+      const secondLine = lines[1].trim();
+      const operationMatch = secondLine.match(/^([+\-×÷])\s*(.*)/);
+      
+      if (operationMatch) {
+        const operation = operationMatch[1];
+        let bottomText = operationMatch[2].trim();
+        
+        // Check if there's an explanation in parentheses
+        const parts = bottomText.match(/^(\d+)(\s*\(.+\))?$/);
+        const mainNumber = parts ? parts[1] : bottomText;
+        const explanation = parts && parts[2] ? parts[2] : '';
+        
+        // Calculate padding to align numbers
+        const padding = ' '.repeat(operation.length + 1); // +1 for the space after operation
+        
+        // Format with proper alignment using pre-formatted text
+        return `
+          <div class="math-problem-container">
+            <pre class="math-vertical-problem">
+${padding}${topNumber}
+${operation} ${mainNumber}${explanation}
+${'─'.repeat(Math.max(topNumber.length + padding.length, mainNumber.length + explanation.length + padding.length))}
+</pre>
+          </div>
+        `;
+      }
+      
+      // Fallback if the parsing fails
+      return `<div class="math-problem-container"><div class="math-vertical-problem">${p1}</div></div>`;
     }
   )
   
-  // Format math diagrams
+  // Format math diagrams with better alignment
   formattedContent = formattedContent.replace(
     /<!-- math:diagram-start -->([\s\S]*?)<!-- math:diagram-end -->/g,
     (match, p1) => {
-      return `<div class="math-diagram">${p1}</div>`
+      // Process the content to format it properly
+      const lines = p1.trim().split('\n');
+      
+      // Format each line, preserving spaces but adding annotation styling
+      const formattedLines = lines.map(line => {
+        return line.replace(/\(([^)]+)\)/g, '<span class="diagram-annotation">($1)</span>');
+      });
+      
+      return `<div class="math-diagram">${formattedLines.join('\n')}</div>`;
     }
   )
   
@@ -111,14 +178,6 @@ function formatContent(content) {
     /<!-- math:sequence-start -->([\s\S]*?)<!-- math:sequence-end -->/g,
     (match, p1) => {
       return `<div class="number-sequence">${p1}</div>`
-    }
-  )
-  
-  // Format exercise rows
-  formattedContent = formattedContent.replace(
-    /<!-- math:exercise-start -->([\s\S]*?)<!-- math:exercise-end -->/g,
-    (match, p1) => {
-      return `<div class="exercise-row">${p1}</div>`
     }
   )
   
@@ -288,13 +347,27 @@ h3 {
 .section-content :deep(.math-diagram) {
   font-family: monospace;
   white-space: pre;
-  margin: 1.5rem auto;
+  margin: 1rem auto;
   padding: 1rem;
   background-color: #f9f9f9;
   border-radius: 4px;
   text-align: center;
   font-size: 1.2rem;
-  max-width: 500px;
+  line-height: 1.3;
+  display: block;
+  min-width: 80%;
+  max-width: 100%;
+  overflow-x: auto;
+}
+
+.section-content :deep(.diagram-annotation) {
+  font-size: 0.8rem;
+  color: #555;
+  font-style: italic;
+  font-family: Georgia, serif;
+  display: inline-block;
+  position: relative;
+  white-space: pre;
 }
 
 .section-content :deep(.math-explanation) {
@@ -351,14 +424,50 @@ h3 {
   border-radius: 4px;
 }
 
+.section-content :deep(.math-problem-container) {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
 .section-content :deep(.math-vertical-problem) {
   font-family: monospace;
+  font-size: 1.3rem;
+  line-height: 1.5;
   white-space: pre;
-  margin: 1.5rem auto;
-  padding: 1rem;
+  text-align: left;
+  margin: 0;
+}
+
+.section-content :deep(.math-vertical-problem .problem-content) {
+  position: relative;
+}
+
+.section-content :deep(.math-vertical-problem .top-row) {
   text-align: right;
-  width: 200px;
-  font-size: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+
+.section-content :deep(.math-vertical-problem .bottom-row) {
+  position: relative;
+  text-align: right;
+  margin-bottom: 0.2rem;
+}
+
+.section-content :deep(.math-vertical-problem .operation) {
+  position: absolute;
+  left: 0;
+}
+
+.section-content :deep(.math-vertical-problem .explanation-row) {
+  text-align: right;
+  margin-bottom: 0.5rem;
+  white-space: nowrap;
+}
+
+.section-content :deep(.math-vertical-problem .operation-line) {
+  height: 1px;
+  background-color: #000;
 }
 
 .section-content :deep(.number-line) {
@@ -430,5 +539,66 @@ h3 {
   font-weight: bold;
   margin: 2rem 0 1rem;
   color: #333;
+}
+
+.section-content :deep(.biographical-sidebar) {
+  background-color: #f2f2f2;
+  border: 1px solid #ddd;
+  padding: 1.5rem;
+  margin: 2rem 0;
+  font-family: Georgia, serif;
+}
+
+.section-content :deep(.biographical-sidebar) h3 {
+  font-size: 1.4rem;
+  margin-top: 0;
+  margin-bottom: 1rem;
+  color: #333;
+}
+
+.section-content :deep(.biographical-sidebar) p:first-of-type::first-letter {
+  float: left;
+  font-size: 3.5rem;
+  line-height: 0.8;
+  padding-right: 0.2rem;
+  padding-top: 0.1rem;
+  color: #666;
+}
+
+.section-content :deep(.exercise-title-container) {
+  text-align: center;
+  margin: 2rem 0 1rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.section-content :deep(.exercise-title-line) {
+  height: 1px;
+  background-color: #333;
+  flex: 1;
+  max-width: 200px;
+}
+
+.section-content :deep(.exercise-title) {
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #333;
+  margin: 0 1rem;
+  padding: 0;
+  text-transform: none;
+  letter-spacing: normal;
+  font-family: Georgia, serif;
+}
+
+.section-content :deep(.exercise-problems) {
+  font-family: monospace;
+  white-space: pre;
+  text-align: center;
+  margin: 1.5rem auto;
+  max-width: 700px;
+  font-size: 1.1rem;
+  line-height: 1.8;
 }
 </style> 
