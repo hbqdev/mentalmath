@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { chapters } from '@/data/chapters'
+import ChapterNavigation from '@/components/ChapterNavigation.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -15,6 +16,18 @@ function goToPage(event) {
   const sectionId = event.target.value
   setActiveSection(sectionId)
 }
+
+// Watch for route changes to reset component state
+watch(() => route.params.chapterId, () => {
+  if (chapter.value && chapter.value.sections.length > 0) {
+    activeSection.value = chapter.value.sections[0].id
+    nextTick(() => {
+      if (window.MathJax) {
+        window.MathJax.typesetPromise()
+      }
+    })
+  }
+}, { immediate: true })
 
 onMounted(() => {
   if (chapter.value && chapter.value.sections.length > 0) {
@@ -61,7 +74,8 @@ function setActiveSection(sectionId) {
 }
 
 function startExercise(exerciseType) {
-  // Reset any state if needed
+  // Reset state before navigation
+  activeSection.value = null
   nextTick(() => {
     router.push(`/exercises/${chapterId.value}/${exerciseType}`)
   })
@@ -318,78 +332,89 @@ ${'─'.repeat(Math.max(topNumber.length + padding.length, mainNumber.length + e
 }
 
 onBeforeUnmount(() => {
-  // Clean up any resources
+  // Clean up resources
   activeSection.value = null
+  
+  // Remove any MathJax elements that might be causing issues
+  const mathJaxElements = document.querySelectorAll('.MathJax, .MathJax_Display')
+  mathJaxElements.forEach(el => el.remove())
 })
 </script>
 
 <template>
-  <div v-if="chapter" class="book-container">
-    <div class="book-page">
-      <div class="sidebar">
-        <h3>Contents</h3>
-        <ul class="toc-list">
-          <li 
-            v-for="section in chapter.sections" 
-            :key="section.id"
-            :class="{ active: activeSection === section.id }"
-            @click="setActiveSection(section.id)"
-          >
-            {{ section.title }}
-          </li>
-        </ul>
-        
-        <h3>Practice</h3>
-        <ul class="practice-list">
-          <li v-for="exerciseType in chapter.exercises?.types || []" :key="exerciseType.id">
-            <a href="#" @click.prevent="startExercise(exerciseType.id)">
-              {{ exerciseType.title }}
-            </a>
-          </li>
-        </ul>
-      </div>
-
-      <div class="content">
-        <h1 class="chapter-title">Chapter {{ chapter.id }}: {{ chapter.title }}</h1>
-        
-        <div v-for="section in chapter.sections" :key="section.id" v-show="activeSection === section.id">
-          <h2 class="section-title">{{ section.title }}</h2>
-          <div class="section-content" v-html="formatContent(section.content)"></div>
-        </div>
-        
-        <div class="page-navigation">
-          <button 
-            class="nav-btn prev"
-            @click="setActiveSection(chapter.sections[Math.max(0, chapter.sections.findIndex(s => s.id === activeSection) - 1)].id)"
-            :disabled="chapter.sections.findIndex(s => s.id === activeSection) === 0"
-          >
-            Previous
-          </button>
+  <div class="chapter-view" v-if="chapter">
+    <h1>Chapter {{ chapter.id }}: {{ chapter.title }}</h1>
+    
+    <!-- Add the chapter navigation component -->
+    <ChapterNavigation />
+    
+    <div class="book-container">
+      <div class="book-page">
+        <div class="sidebar">
+          <h3>Contents</h3>
+          <ul class="toc-list">
+            <li 
+              v-for="section in chapter.sections" 
+              :key="section.id"
+              :class="{ active: activeSection === section.id }"
+              @click="setActiveSection(section.id)"
+            >
+              {{ section.title }}
+            </li>
+          </ul>
           
-          <!-- Add page selector dropdown -->
-          <div class="page-selector">
-            <select :value="activeSection" @change="goToPage($event)">
-              <option 
-                v-for="section in chapter.sections" 
-                :key="section.id" 
-                :value="section.id"
-              >
-                {{ section.title }}
-              </option>
-            </select>
+          <h3>Practice</h3>
+          <ul class="practice-list">
+            <li v-for="exerciseType in chapter.exercises?.types || []" :key="exerciseType.id">
+              <a href="#" @click.prevent="startExercise(exerciseType.id)">
+                {{ exerciseType.title }}
+              </a>
+            </li>
+          </ul>
+        </div>
+
+        <div class="content">
+          <h1 class="chapter-title">Chapter {{ chapter.id }}: {{ chapter.title }}</h1>
+          
+          <div v-for="section in chapter.sections" :key="section.id" v-show="activeSection === section.id">
+            <h2 class="section-title">{{ section.title }}</h2>
+            <div class="section-content" v-html="formatContent(section.content)"></div>
           </div>
           
-          <span class="page-number">
-            Page {{ chapter.sections.findIndex(s => s.id === activeSection) + 1 }} of {{ chapter.sections.length }}
-          </span>
-          
-          <button 
-            class="nav-btn next"
-            @click="setActiveSection(chapter.sections[Math.min(chapter.sections.length - 1, chapter.sections.findIndex(s => s.id === activeSection) + 1)].id)"
-            :disabled="chapter.sections.findIndex(s => s.id === activeSection) === chapter.sections.length - 1"
-          >
-            Next
-          </button>
+          <div class="page-navigation">
+            <button 
+              class="nav-btn prev"
+              @click="setActiveSection(chapter.sections[Math.max(0, chapter.sections.findIndex(s => s.id === activeSection) - 1)].id)"
+              :disabled="chapter.sections.findIndex(s => s.id === activeSection) === 0"
+            >
+              Previous
+            </button>
+            
+            <!-- Add page selector dropdown -->
+            <div class="page-selector">
+              <select :value="activeSection" @change="goToPage($event)">
+                <option 
+                  v-for="section in chapter.sections" 
+                  :key="section.id" 
+                  :value="section.id"
+                >
+                  {{ section.title }}
+                </option>
+              </select>
+            </div>
+            
+            <span class="page-number">
+              Page {{ chapter.sections.findIndex(s => s.id === activeSection) + 1 }} of {{ chapter.sections.length }}
+            </span>
+            
+            <button 
+              class="nav-btn next"
+              @click="setActiveSection(chapter.sections[Math.min(chapter.sections.length - 1, chapter.sections.findIndex(s => s.id === activeSection) + 1)].id)"
+              :disabled="chapter.sections.findIndex(s => s.id === activeSection) === chapter.sections.length - 1"
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
     </div>
