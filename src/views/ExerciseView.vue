@@ -1,8 +1,9 @@
 <script setup>
-import { ref, computed, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { chapters } from '@/data/chapters'
 import { generateExercises } from '@/utils/exerciseGenerator'
+import ChapterNavigation from '@/components/ChapterNavigation.vue'
 
 const route = useRoute()
 const router = useRouter()
@@ -37,6 +38,19 @@ onBeforeUnmount(() => {
   resetState()
 })
 
+// Watch for route changes to reset component state
+watch(
+  () => [route.params.chapterId, route.params.exerciseType],
+  (newVal, oldVal) => {
+    if (newVal[0] !== oldVal[0] || newVal[1] !== oldVal[1]) {
+      resetState()
+      nextTick(() => {
+        generateNewExercises()
+      })
+    }
+  }
+)
+
 function resetState() {
   // Clear all reactive references
   generatedExercises.value = []
@@ -47,6 +61,7 @@ function resetState() {
   showSteps.value = false
   exercisesCompleted.value = 0
   correctAnswers.value = 0
+  difficulty.value = 'easy'
   
   // Force garbage collection where possible
   if (window.gc) window.gc();
@@ -143,14 +158,18 @@ function toggleSteps() {
 }
 
 function returnToChapter() {
-  // Force a hard navigation by changing the window location
-  // This bypasses Vue Router's navigation system
-  window.location.href = `/chapters/${chapterId.value}`;
+  resetState()
+  router.push(`/chapters/${chapterId.value}`)
 }
 </script>
 
 <template>
-  <div v-if="exerciseConfig" class="exercise-view">
+  <div class="exercise-view" v-if="chapter && exerciseConfig">
+    <h1>{{ exerciseConfig.title }}</h1>
+    
+    <!-- Add the chapter navigation component -->
+    <ChapterNavigation />
+    
     <div class="exercise-header">
       <h1>{{ exerciseConfig.title }}</h1>
       <p>{{ exerciseConfig.description }}</p>
