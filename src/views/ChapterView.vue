@@ -10,6 +10,12 @@ const chapterId = computed(() => parseInt(route.params.chapterId))
 const chapter = computed(() => chapters.find(c => c.id === chapterId.value))
 const activeSection = ref(null)
 
+// Add a function to handle direct page navigation
+function goToPage(event) {
+  const sectionId = event.target.value
+  setActiveSection(sectionId)
+}
+
 onMounted(() => {
   if (chapter.value && chapter.value.sections.length > 0) {
     activeSection.value = chapter.value.sections[0].id
@@ -82,6 +88,76 @@ function formatContent(content) {
     }
   )
   
+  // Format multiplication tables
+  formattedContent = formattedContent.replace(
+    /<!-- math:table-start -->([\s\S]*?)<!-- math:table-end -->/g,
+    (match, p1) => {
+      // Convert the table text to HTML table
+      const rows = p1.trim().split('\n');
+      let tableHtml = '<div class="math-table-container"><table class="math-table">';
+      
+      // Process header row
+      const headerRow = rows[0].split('\t');
+      tableHtml += '<tr>';
+      
+      // Special handling for the first header which spans multiple columns
+      if (headerRow[0].includes('Numbers that add to')) {
+        tableHtml += `<th colspan="2">${headerRow[0]}</th>`;
+        
+        // Add remaining headers
+        for (let i = 1; i < headerRow.length; i++) {
+          if (headerRow[i].trim()) {
+            tableHtml += `<th>${headerRow[i].trim()}</th>`;
+          }
+        }
+      } else {
+        // Standard header processing
+        headerRow.forEach(cell => {
+          tableHtml += `<th>${cell.trim()}</th>`;
+        });
+      }
+      tableHtml += '</tr>';
+      
+      // Add subheader row if it exists (for "from 10" and "from 100")
+      if (rows.length > 1 && rows[1].includes('from')) {
+        const subheaderRow = rows[1].split('\t');
+        tableHtml += '<tr>';
+        
+        // Add empty cells for the first two columns
+        tableHtml += '<th></th><th></th>';
+        
+        // Add remaining subheaders
+        for (let i = 2; i < subheaderRow.length; i++) {
+          tableHtml += `<th>${subheaderRow[i].trim()}</th>`;
+        }
+        tableHtml += '</tr>';
+        
+        // Process data rows
+        for (let i = 2; i < rows.length; i++) {
+          const cells = rows[i].split('\t');
+          tableHtml += '<tr>';
+          cells.forEach(cell => {
+            tableHtml += `<td>${cell.trim()}</td>`;
+          });
+          tableHtml += '</tr>';
+        }
+      } else {
+        // Process data rows without subheader
+        for (let i = 1; i < rows.length; i++) {
+          const cells = rows[i].split('\t');
+          tableHtml += '<tr>';
+          cells.forEach(cell => {
+            tableHtml += `<td>${cell.trim()}</td>`;
+          });
+          tableHtml += '</tr>';
+        }
+      }
+      
+      tableHtml += '</table></div>';
+      return tableHtml;
+    }
+  )
+  
   // Format biographical sidebars
   formattedContent = formattedContent.replace(
     /<!-- bio-start -->([\s\S]*?)<!-- bio-end -->/g,
@@ -149,19 +225,76 @@ ${'─'.repeat(Math.max(topNumber.length + padding.length, mainNumber.length + e
     }
   )
   
-  // Format math diagrams with better alignment
+  // Format math diagrams with arrows
   formattedContent = formattedContent.replace(
-    /<!-- math:diagram-start -->([\s\S]*?)<!-- math:diagram-end -->/g,
+    /<!-- math:diagram-arrows-start -->([\s\S]*?)<!-- math:diagram-arrows-end -->/g,
     (match, p1) => {
-      // Process the content to format it properly
+      // Parse the diagram data
       const lines = p1.trim().split('\n');
+      const diagramData = {};
       
-      // Format each line, preserving spaces but adding annotation styling
-      const formattedLines = lines.map(line => {
-        return line.replace(/\(([^)]+)\)/g, '<span class="diagram-annotation">($1)</span>');
+      lines.forEach(line => {
+        if (line.includes(':')) {
+          const [key, value] = line.split(':');
+          diagramData[key.trim()] = value.trim();
+        }
       });
       
-      return `<div class="math-diagram">${formattedLines.join('\n')}</div>`;
+      // Extract values with defaults if missing
+      const baseValue = diagramData.base || '13²';
+      
+      let topOffset = '+3';
+      let topValue = '16';
+      if (diagramData.top_offset) {
+        const parts = diagramData.top_offset.split(',');
+        topOffset = parts[0];
+        topValue = parts[1];
+      }
+      
+      let bottomOffset = '-3';
+      let bottomValue = '10';
+      if (diagramData.bottom_offset) {
+        const parts = diagramData.bottom_offset.split(',');
+        bottomOffset = parts[0];
+        bottomValue = parts[1];
+      }
+      
+      const resultValue = diagramData.result || '160 + 3² = 169';
+      
+      // Create the SVG with the parsed values
+      return `<div class="math-diagram-arrows">
+        <svg viewBox="0 0 500 100" class="diagram-svg">
+          <!-- Base value -->
+          <text x="70" y="50" class="diagram-text">${baseValue}</text>
+          
+          <!-- Top arrow -->
+          <text x="120" y="30" class="diagram-label">${topOffset}</text>
+          <line x1="95" y1="45" x2="170" y2="30" class="diagram-arrow" />
+          <polygon points="170,30 160,27 162,35" class="diagram-arrowhead" />
+          
+          <!-- Top value -->
+          <text x="190" y="30" class="diagram-text">${topValue}</text>
+          
+          <!-- Arrow from top value to result -->
+          <line x1="205" y1="35" x2="280" y2="45" class="diagram-arrow" />
+          <polygon points="280,45 270,42 272,50" class="diagram-arrowhead" />
+          
+          <!-- Bottom arrow -->
+          <text x="120" y="70" class="diagram-label">${bottomOffset}</text>
+          <line x1="95" y1="55" x2="170" y2="70" class="diagram-arrow" />
+          <polygon points="170,70 160,73 162,65" class="diagram-arrowhead" />
+          
+          <!-- Bottom value -->
+          <text x="190" y="70" class="diagram-text">${bottomValue}</text>
+          
+          <!-- Arrow from bottom value to result -->
+          <line x1="205" y1="65" x2="280" y2="55" class="diagram-arrow" />
+          <polygon points="280,55 270,58 272,50" class="diagram-arrowhead" />
+          
+          <!-- Result -->
+          <text x="370" y="50" class="diagram-text">${resultValue}</text>
+        </svg>
+      </div>`;
     }
   )
   
@@ -232,9 +365,24 @@ onBeforeUnmount(() => {
           >
             Previous
           </button>
+          
+          <!-- Add page selector dropdown -->
+          <div class="page-selector">
+            <select :value="activeSection" @change="goToPage($event)">
+              <option 
+                v-for="section in chapter.sections" 
+                :key="section.id" 
+                :value="section.id"
+              >
+                {{ section.title }}
+              </option>
+            </select>
+          </div>
+          
           <span class="page-number">
             Page {{ chapter.sections.findIndex(s => s.id === activeSection) + 1 }} of {{ chapter.sections.length }}
           </span>
+          
           <button 
             class="nav-btn next"
             @click="setActiveSection(chapter.sections[Math.min(chapter.sections.length - 1, chapter.sections.findIndex(s => s.id === activeSection) + 1)].id)"
@@ -600,5 +748,90 @@ h3 {
   max-width: 700px;
   font-size: 1.1rem;
   line-height: 1.8;
+}
+
+.section-content :deep(.math-table-container) {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+  overflow-x: auto;
+}
+
+.section-content :deep(.math-table) {
+  border-collapse: collapse;
+  font-family: monospace;
+  font-size: 1.1rem;
+}
+
+.section-content :deep(.math-table td) {
+  border: 1px solid #ddd;
+  padding: 0.5rem 0.8rem;
+  text-align: center;
+}
+
+.section-content :deep(.math-table tr:first-child) {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.section-content :deep(.math-table tr td:first-child) {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+
+.section-content :deep(.math-diagram-arrows) {
+  display: flex;
+  justify-content: center;
+  margin: 2rem 0;
+}
+
+.section-content :deep(.diagram-svg) {
+  width: 100%;
+  max-width: 500px;
+  height: auto;
+}
+
+.section-content :deep(.diagram-text) {
+  font-family: Georgia, serif;
+  font-size: 18px;
+  font-weight: bold;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.section-content :deep(.diagram-label) {
+  font-family: Georgia, serif;
+  font-size: 16px;
+  text-anchor: middle;
+  dominant-baseline: middle;
+}
+
+.section-content :deep(.diagram-arrow) {
+  stroke: #000;
+  stroke-width: 2;
+  fill: none;
+}
+
+.section-content :deep(.diagram-arrowhead) {
+  fill: #000;
+}
+
+/* Add styles for the page selector */
+.page-selector {
+  margin: 0 1rem;
+}
+
+.page-selector select {
+  padding: 0.5rem;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  background-color: #f5f5f5;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.page-selector select:focus {
+  outline: none;
+  border-color: #007bff;
 }
 </style> 
