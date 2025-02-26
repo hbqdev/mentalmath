@@ -157,7 +157,7 @@ export function generateExercise(type, difficultyLevel) {
 }
 
 // Main Exercise Generator Router
-import { 
+import {
   generateMultiplyBy11Exercises,
   generateSquaringExercises,
   generateSpecialMultiplicationExercises
@@ -167,6 +167,11 @@ import {
   generateAdditionExercises,
   generateSubtractionExercises
 } from './generators/chapter1Generator.js';
+
+import {
+  generateChapter2SquaringExercises,
+  generateDistributiveExercises
+} from './generators/chapter2Generator.js';
 
 /**
  * Generate exercises based on chapter, exercise type, and difficulty
@@ -190,6 +195,14 @@ export function generateExercises(chapterId, exerciseType, difficulty = 'easy', 
       return generateSubtractionExercises(difficulty, count);
     }
   }
+  // Chapter 2: Squaring and Distributive Property
+  else if (chapterId === 2) {
+    if (exerciseType === 'squaring') {
+      return generateChapter2SquaringExercises(difficulty, count);
+    } else if (exerciseType === 'distributive') {
+      return generateDistributiveExercises(difficulty, count);
+    }
+  }
   
   return [];
-} 
+}
