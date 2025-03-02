@@ -46,7 +46,7 @@ X 7
 <!-- paragraph -->First, multiply 40 X 7 = 280. (Note that 40 X 7 is just like 4 X 7, with a friendly zero attached.) Next, multiply 2 X 7 = 14. Then add 280 plus 14 (left to right, of course) to arrive at 294, the correct answer. We illustrate this procedure below.<!-- /paragraph -->
 
 <!-- math:vertical-start -->
-42 (40 + 2)
+  42 (40 + 2)
 X 7 
 40 X 7 = 280
 2 X 7 = 14
@@ -65,7 +65,7 @@ X 4
 <!-- paragraph -->Your first step is to break down the problem into small multiplication tasks that you can perform mentally with ease. Since 48 = 40 + 8, multiply 40 X 4 = 160, then add 8 X 4 = 32. The answer is 192. (Note: If you are wondering why this process works, see the Why These Tricks Work section at the end of the chapter.)<!-- /paragraph -->
 
 <!-- math:vertical-start -->
-48 (40 + 8)
+  48 (40 + 8)
 X 4 
 40 X 4 = 160
 8 X 4 = 32
@@ -75,7 +75,7 @@ Answer: 192
 <!-- paragraph -->Here are two more mental multiplication problems that you should be able to solve fairly quickly. First calculate 62 X 3. Then do 71 X 9. Try doing them in your head before looking at how we did it.<!-- /paragraph -->
 
 <!-- math:vertical-start -->
-62 (60 + 2)
+  62 (60 + 2)
 X 3 
 60 X 3 = 180
 2 X 3 = 6
@@ -83,7 +83,7 @@ Answer: 186
 <!-- math:vertical-end -->
 
 <!-- math:vertical-start -->
-71 (70 + 1)
+  71 (70 + 1)
 X 9 
 70 X 9 = 630
 1 X 9 = 9
@@ -93,7 +93,7 @@ Answer: 639
 <!-- paragraph -->These two examples are especially simple because the numbers being added essentially do not overlap at all. When doing 180 + 6, you can practically hear the answer: One hundred eighty . . . six! Another especially easy type of mental multiplication problem involves numbers that begin with five. When the five is multiplied by an even digit, the first product will be a multiple of 100, which makes the resulting addition problem a snap.<!-- /paragraph -->
 
 <!-- math:vertical-start -->
-58 (50 + 8)
+  58 (50 + 8)
 X 4 
 50 X 4 = 200
 8 X 4 = 32
@@ -103,7 +103,7 @@ Answer: 232
 <!-- paragraph -->Try your hand at the following problem:<!-- /paragraph -->
 
 <!-- math:vertical-start -->
-87 (80 + 7)
+  87 (80 + 7)
 X 5 
 80 X 5 = 400
 7 X 5 = 35
@@ -115,7 +115,7 @@ Answer: 435
 <!-- paragraph -->The following two problems are a little harder.<!-- /paragraph -->
 
 <!-- math:vertical-start -->
-38 (30 + 8)
+  38 (30 + 8)
 X 9 
 30 X 9 = 270
 8 X 9 = 72
@@ -123,7 +123,7 @@ Answer: 342
 <!-- math:vertical-end -->
 
 <!-- math:vertical-start -->
-67 (60 + 7)
+  67 (60 + 7)
 X 8 
 60 X 8 = 480
 7 X 8 = 56

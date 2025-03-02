@@ -178,14 +178,14 @@ Answer: 7221
 <!-- paragraph -->Consider the subtraction problem<!-- /paragraph -->
 
 <!-- math:vertical-start -->
-1241
+  1241 
 - 587
 <!-- math:vertical-end -->
 
 <!-- paragraph -->Most people would not like to do this problem in their head (or even on paper!), but let's simplify it. Instead of subtracting 587, subtract 600. Since 1200 - 600 = 600, we have that<!-- /paragraph -->
 
 <!-- math:vertical-start -->
-1241
+  1241
 - 600
   641
 <!-- math:vertical-end -->
@@ -193,7 +193,7 @@ Answer: 7221
 <!-- paragraph -->But we have subtracted 13 too much. (We will explain how to quickly determine the 13 in Chapter 1.) Thus, our painful-looking subtraction problem becomes the easy addition problem<!-- /paragraph -->
 
 <!-- math:vertical-start -->
- 641
+  641
 + 13
  654
 <!-- math:vertical-end -->
