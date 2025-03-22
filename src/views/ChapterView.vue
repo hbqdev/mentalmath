@@ -3,13 +3,16 @@ import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { chapters } from '@/data/chapters'
 import ChapterNavigation from '@/components/ChapterNavigation.vue'
+import { ContentLoader } from '@/content/ContentLoader'
 
 const route = useRoute()
 const router = useRouter()
 
 const chapterId = computed(() => parseInt(route.params.chapterId))
-const chapter = computed(() => chapters.find(c => c.id === chapterId.value))
+const chapter = ref(null)
 const activeSection = ref(null)
+const contentLoader = new ContentLoader()
+const isLoading = ref(true)
 
 // Add a function to handle direct page navigation
 function goToPage(event) {
@@ -17,23 +20,65 @@ function goToPage(event) {
   setActiveSection(sectionId)
 }
 
-// Watch for route changes to reset component state
-watch(() => route.params.chapterId, () => {
-  if (chapter.value && chapter.value.sections.length > 0) {
-    activeSection.value = chapter.value.sections[0].id
+// Load chapter from docx file
+async function loadChapterFromFile() {
+  isLoading.value = true
+  try {
+    // Only load chapter0.docx for now since that's what we have
+    if (chapterId.value === 0) {
+      const fileUrl = '/chapter0.docx' // Assuming the file is in the public folder
+      const response = await fetch(fileUrl)
+      const fileBlob = await response.blob()
+
+      // Load the document using ContentLoader
+      const chapters = await contentLoader.loadDocument(fileBlob, 'docx')
+
+      // Set the current chapter
+      chapter.value = chapters.find(c => c.id === chapterId.value) ||
+                      chapters[0] // Default to first chapter if ID not found
+
+      // If no chapters were found, revert to original method
+      if (!chapter.value) {
+        chapter.value = chapters.find(c => c.id === chapterId.value)
+      }
+
+      // Initialize the active section
+      if (chapter.value && chapter.value.sections.length > 0) {
+        activeSection.value = chapter.value.sections[0].id
+      }
+    } else {
+      // Fallback to existing JSON data for other chapters
+      chapter.value = chapters.find(c => c.id === chapterId.value)
+      if (chapter.value && chapter.value.sections.length > 0) {
+        activeSection.value = chapter.value.sections[0].id
+      }
+    }
+  } catch (error) {
+    console.error('Error loading chapter from file:', error)
+    // Fallback to existing JSON data
+    chapter.value = chapters.find(c => c.id === chapterId.value)
+    if (chapter.value && chapter.value.sections.length > 0) {
+      activeSection.value = chapter.value.sections[0].id
+    }
+  } finally {
+    isLoading.value = false
+
+    // Initialize MathJax after content is loaded
     nextTick(() => {
       if (window.MathJax) {
         window.MathJax.typesetPromise()
       }
     })
   }
+}
+
+// Watch for route changes to reset component state
+watch(() => route.params.chapterId, () => {
+  loadChapterFromFile()
 }, { immediate: true })
 
 onMounted(() => {
-  if (chapter.value && chapter.value.sections.length > 0) {
-    activeSection.value = chapter.value.sections[0].id
-    loadMathJax()
-  }
+  loadChapterFromFile()
 })
 
 watch(activeSection, () => {
@@ -83,9 +128,9 @@ function startExercise(exerciseType) {
 
 function formatContent(content) {
   if (!content) return ''
-  
+
   let formattedContent = content
-  
+
   // Format exercise titles separately from the exercise content
   formattedContent = formattedContent.replace(
     /EXERCISE: ([^\n]+)/g,
@@ -93,7 +138,7 @@ function formatContent(content) {
       return `<div class="exercise-title-container"><div class="exercise-title-line"></div><h3 class="exercise-title">${p1}</h3><div class="exercise-title-line"></div></div>`
     }
   )
-  
+
   // Format exercise problems with proper alignment
   formattedContent = formattedContent.replace(
     /<!-- math:exercise-start -->([\s\S]*?)<!-- math:exercise-end -->/g,
@@ -101,7 +146,7 @@ function formatContent(content) {
       return `<div class="exercise-problems">${p1}</div>`
     }
   )
-  
+
   // Format multiplication tables
   formattedContent = formattedContent.replace(
     /<!-- math:table-start -->([\s\S]*?)<!-- math:table-end -->/g,
@@ -109,15 +154,15 @@ function formatContent(content) {
       // Convert the table text to HTML table
       const rows = p1.trim().split('\n');
       let tableHtml = '<div class="math-table-container"><table class="math-table">';
-      
+
       // Process header row
       const headerRow = rows[0].split('\t');
       tableHtml += '<tr>';
-      
+
       // Special handling for the first header which spans multiple columns
       if (headerRow[0].includes('Numbers that add to')) {
         tableHtml += `<th colspan="2">${headerRow[0]}</th>`;
-        
+
         // Add remaining headers
         for (let i = 1; i < headerRow.length; i++) {
           if (headerRow[i].trim()) {
@@ -131,21 +176,21 @@ function formatContent(content) {
         });
       }
       tableHtml += '</tr>';
-      
+
       // Add subheader row if it exists (for "from 10" and "from 100")
       if (rows.length > 1 && rows[1].includes('from')) {
         const subheaderRow = rows[1].split('\t');
         tableHtml += '<tr>';
-        
+
         // Add empty cells for the first two columns
         tableHtml += '<th></th><th></th>';
-        
+
         // Add remaining subheaders
         for (let i = 2; i < subheaderRow.length; i++) {
           tableHtml += `<th>${subheaderRow[i].trim()}</th>`;
         }
         tableHtml += '</tr>';
-        
+
         // Process data rows
         for (let i = 2; i < rows.length; i++) {
           const cells = rows[i].split('\t');
@@ -166,12 +211,12 @@ function formatContent(content) {
           tableHtml += '</tr>';
         }
       }
-      
+
       tableHtml += '</table></div>';
       return tableHtml;
     }
   )
-  
+
   // Format biographical sidebars
   formattedContent = formattedContent.replace(
     /<!-- bio-start -->([\s\S]*?)<!-- bio-end -->/g,
@@ -179,7 +224,7 @@ function formatContent(content) {
       return `<div class="biographical-sidebar">${p1}</div>`
     }
   )
-  
+
   // Format paragraphs with proper spacing
   formattedContent = formattedContent.replace(
     /<!-- paragraph -->([\s\S]*?)<!-- \/paragraph -->/g,
@@ -187,7 +232,7 @@ function formatContent(content) {
       return `<p class="book-paragraph">${p1.trim()}</p>`
     }
   )
-  
+
   // Format section headings
   formattedContent = formattedContent.replace(
     /<!-- heading -->([\s\S]*?)<!-- \/heading -->/g,
@@ -195,33 +240,33 @@ function formatContent(content) {
       return `<h3 class="book-heading">${p1.trim()}</h3>`
     }
   )
-  
+
   // Format vertical math problems
   formattedContent = formattedContent.replace(
     /<!-- math:vertical-start -->([\s\S]*?)<!-- math:vertical-end -->/g,
     (match, p1) => {
       // Split the content by lines
       const lines = p1.trim().split('\n');
-      
+
       // Extract the top number (first line)
       const topNumber = lines[0].trim();
-      
+
       // Extract the operation and bottom number (second line)
       const secondLine = lines[1].trim();
       const operationMatch = secondLine.match(/^([+\-×÷])\s*(.*)/);
-      
+
       if (operationMatch) {
         const operation = operationMatch[1];
         let bottomText = operationMatch[2].trim();
-        
+
         // Check if there's an explanation in parentheses
         const parts = bottomText.match(/^(\d+)(\s*\(.+\))?$/);
         const mainNumber = parts ? parts[1] : bottomText;
         const explanation = parts && parts[2] ? parts[2] : '';
-        
+
         // Calculate padding to align numbers
         const padding = ' '.repeat(operation.length + 1); // +1 for the space after operation
-        
+
         // Format with proper alignment using pre-formatted text
         return `
           <div class="math-problem-container">
@@ -233,12 +278,12 @@ ${'─'.repeat(Math.max(topNumber.length + padding.length, mainNumber.length + e
           </div>
         `;
       }
-      
+
       // Fallback if the parsing fails
       return `<div class="math-problem-container"><div class="math-vertical-problem">${p1}</div></div>`;
     }
   )
-  
+
   // Format math diagrams with arrows
   formattedContent = formattedContent.replace(
     /<!-- math:diagram-arrows-start -->([\s\S]*?)<!-- math:diagram-arrows-end -->/g,
@@ -246,17 +291,17 @@ ${'─'.repeat(Math.max(topNumber.length + padding.length, mainNumber.length + e
       // Parse the diagram data
       const lines = p1.trim().split('\n');
       const diagramData = {};
-      
+
       lines.forEach(line => {
         if (line.includes(':')) {
           const [key, value] = line.split(':');
           diagramData[key.trim()] = value.trim();
         }
       });
-      
+
       // Extract values with defaults if missing
       const baseValue = diagramData.base || '13²';
-      
+
       let topOffset = '+3';
       let topValue = '16';
       if (diagramData.top_offset) {
@@ -264,7 +309,7 @@ ${'─'.repeat(Math.max(topNumber.length + padding.length, mainNumber.length + e
         topOffset = parts[0];
         topValue = parts[1];
       }
-      
+
       let bottomOffset = '-3';
       let bottomValue = '10';
       if (diagramData.bottom_offset) {
@@ -272,46 +317,46 @@ ${'─'.repeat(Math.max(topNumber.length + padding.length, mainNumber.length + e
         bottomOffset = parts[0];
         bottomValue = parts[1];
       }
-      
+
       const resultValue = diagramData.result || '160 + 3² = 169';
-      
+
       // Create the SVG with the parsed values
       return `<div class="math-diagram-arrows">
         <svg viewBox="0 0 500 100" class="diagram-svg">
           <!-- Base value -->
           <text x="70" y="50" class="diagram-text">${baseValue}</text>
-          
+
           <!-- Top arrow -->
           <text x="120" y="30" class="diagram-label">${topOffset}</text>
           <line x1="95" y1="45" x2="170" y2="30" class="diagram-arrow" />
           <polygon points="170,30 160,27 162,35" class="diagram-arrowhead" />
-          
+
           <!-- Top value -->
           <text x="190" y="30" class="diagram-text">${topValue}</text>
-          
+
           <!-- Arrow from top value to result -->
           <line x1="205" y1="35" x2="280" y2="45" class="diagram-arrow" />
           <polygon points="280,45 270,42 272,50" class="diagram-arrowhead" />
-          
+
           <!-- Bottom arrow -->
           <text x="120" y="70" class="diagram-label">${bottomOffset}</text>
           <line x1="95" y1="55" x2="170" y2="70" class="diagram-arrow" />
           <polygon points="170,70 160,73 162,65" class="diagram-arrowhead" />
-          
+
           <!-- Bottom value -->
           <text x="190" y="70" class="diagram-text">${bottomValue}</text>
-          
+
           <!-- Arrow from bottom value to result -->
           <line x1="205" y1="65" x2="280" y2="55" class="diagram-arrow" />
           <polygon points="280,55 270,58 272,50" class="diagram-arrowhead" />
-          
+
           <!-- Result -->
           <text x="370" y="50" class="diagram-text">${resultValue}</text>
         </svg>
       </div>`;
     }
   )
-  
+
   // Format math expressions
   formattedContent = formattedContent.replace(
     /<!-- math:expression-start -->([\s\S]*?)<!-- math:expression-end -->/g,
@@ -319,7 +364,7 @@ ${'─'.repeat(Math.max(topNumber.length + padding.length, mainNumber.length + e
       return `<div class="math-expression">${p1}</div>`
     }
   )
-  
+
   // Format number sequences
   formattedContent = formattedContent.replace(
     /<!-- math:sequence-start -->([\s\S]*?)<!-- math:sequence-end -->/g,
@@ -327,14 +372,14 @@ ${'─'.repeat(Math.max(topNumber.length + padding.length, mainNumber.length + e
       return `<div class="number-sequence">${p1}</div>`
     }
   )
-  
+
   return formattedContent
 }
 
 onBeforeUnmount(() => {
   // Clean up resources
   activeSection.value = null
-  
+
   // Remove any MathJax elements that might be causing issues
   const mathJaxElements = document.querySelectorAll('.MathJax, .MathJax_Display')
   mathJaxElements.forEach(el => el.remove())
@@ -342,86 +387,93 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="chapter-view" v-if="chapter">
-    <h1>Chapter {{ chapter.id }}: {{ chapter.title }}</h1>
-    
-    <!-- Add the chapter navigation component -->
-    <ChapterNavigation />
-    
-    <div class="book-container">
-      <div class="book-page">
-        <div class="sidebar">
-          <h3>Contents</h3>
-          <ul class="toc-list">
-            <li 
-              v-for="section in chapter.sections" 
-              :key="section.id"
-              :class="{ active: activeSection === section.id }"
-              @click="setActiveSection(section.id)"
-            >
-              {{ section.title }}
-            </li>
-          </ul>
-          
-          <h3>Practice</h3>
-          <ul class="practice-list">
-            <li v-for="exerciseType in chapter.exercises?.types || []" :key="exerciseType.id">
-              <a href="#" @click.prevent="startExercise(exerciseType.id)">
-                {{ exerciseType.title }}
-              </a>
-            </li>
-          </ul>
-        </div>
+  <div class="chapter-view">
+    <div v-if="isLoading" class="loading">
+      <p>Loading chapter content...</p>
+    </div>
 
-        <div class="content">
-          <h1 class="chapter-title">Chapter {{ chapter.id }}: {{ chapter.title }}</h1>
-          
-          <div v-for="section in chapter.sections" :key="section.id" v-show="activeSection === section.id">
-            <h2 class="section-title">{{ section.title }}</h2>
-            <div class="section-content" v-html="formatContent(section.content)"></div>
+    <div v-else-if="!chapter" class="error-message">
+      <p>Chapter not found. Please select a valid chapter.</p>
+      <router-link to="/" class="return-home">Return to Home</router-link>
+    </div>
+
+    <div v-else class="chapter-content">
+      <h1>Chapter {{ chapter.id }}: {{ chapter.title }}</h1>
+
+      <!-- Add the chapter navigation component -->
+      <ChapterNavigation />
+
+      <div class="book-container">
+        <div class="book-page">
+          <div class="sidebar">
+            <h3>Contents</h3>
+            <ul class="toc-list">
+              <li
+                v-for="section in chapter.sections"
+                :key="section.id"
+                :class="{ active: activeSection === section.id }"
+                @click="setActiveSection(section.id)"
+              >
+                {{ section.title }}
+              </li>
+            </ul>
+
+            <h3>Practice</h3>
+            <ul class="practice-list">
+              <li v-for="exerciseType in chapter.exercises?.types || []" :key="exerciseType.id">
+                <a href="#" @click.prevent="startExercise(exerciseType.id)">
+                  {{ exerciseType.title }}
+                </a>
+              </li>
+            </ul>
           </div>
-          
-          <div class="page-navigation">
-            <button 
-              class="nav-btn prev"
-              @click="setActiveSection(chapter.sections[Math.max(0, chapter.sections.findIndex(s => s.id === activeSection) - 1)].id)"
-              :disabled="chapter.sections.findIndex(s => s.id === activeSection) === 0"
-            >
-              Previous
-            </button>
-            
-            <!-- Add page selector dropdown -->
-            <div class="page-selector">
-              <select :value="activeSection" @change="goToPage($event)">
-                <option 
-                  v-for="section in chapter.sections" 
-                  :key="section.id" 
-                  :value="section.id"
-                >
-                  {{ section.title }}
-                </option>
-              </select>
+
+          <div class="content">
+            <h1 class="chapter-title">Chapter {{ chapter.id }}: {{ chapter.title }}</h1>
+
+            <div v-for="section in chapter.sections" :key="section.id" v-show="activeSection === section.id">
+              <h2 class="section-title">{{ section.title }}</h2>
+              <div class="section-content" v-html="formatContent(section.content)"></div>
             </div>
-            
-            <span class="page-number">
-              Page {{ chapter.sections.findIndex(s => s.id === activeSection) + 1 }} of {{ chapter.sections.length }}
-            </span>
-            
-            <button 
-              class="nav-btn next"
-              @click="setActiveSection(chapter.sections[Math.min(chapter.sections.length - 1, chapter.sections.findIndex(s => s.id === activeSection) + 1)].id)"
-              :disabled="chapter.sections.findIndex(s => s.id === activeSection) === chapter.sections.length - 1"
-            >
-              Next
-            </button>
+
+            <div class="page-navigation">
+              <button
+                class="nav-btn prev"
+                @click="setActiveSection(chapter.sections[Math.max(0, chapter.sections.findIndex(s => s.id === activeSection) - 1)].id)"
+                :disabled="chapter.sections.findIndex(s => s.id === activeSection) === 0"
+              >
+                Previous
+              </button>
+
+              <!-- Add page selector dropdown -->
+              <div class="page-selector">
+                <select :value="activeSection" @change="goToPage($event)">
+                  <option
+                    v-for="section in chapter.sections"
+                    :key="section.id"
+                    :value="section.id"
+                  >
+                    {{ section.title }}
+                  </option>
+                </select>
+              </div>
+
+              <span class="page-number">
+                Page {{ chapter.sections.findIndex(s => s.id === activeSection) + 1 }} of {{ chapter.sections.length }}
+              </span>
+
+              <button
+                class="nav-btn next"
+                @click="setActiveSection(chapter.sections[Math.min(chapter.sections.length - 1, chapter.sections.findIndex(s => s.id === activeSection) + 1)].id)"
+                :disabled="chapter.sections.findIndex(s => s.id === activeSection) === chapter.sections.length - 1"
+              >
+                Next
+              </button>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <div v-else class="not-found">
-    <h1>Chapter not found</h1>
-    <router-link to="/">Return to Home</router-link>
   </div>
 </template>
 
@@ -685,16 +737,32 @@ h3 {
   color: #777;
 }
 
-.not-found {
+.loading {
   text-align: center;
-  padding: 3rem;
+  padding: 2rem;
+  font-size: 1.2rem;
+}
+
+.error-message {
+  text-align: center;
+  padding: 2rem;
+}
+
+.return-home {
+  display: inline-block;
+  margin-top: 1rem;
+  padding: 0.5rem 1rem;
+  background-color: #2c3e50;
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
 }
 
 @media (max-width: 768px) {
   .book-page {
     flex-direction: column;
   }
-  
+
   .sidebar {
     width: 100%;
     border-right: none;
@@ -859,4 +927,4 @@ h3 {
   outline: none;
   border-color: #007bff;
 }
-</style> 
+</style>
