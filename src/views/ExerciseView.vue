@@ -3,7 +3,7 @@ import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { chapters } from '@/data/chapters'
 import { generateExercises } from '@/utils/exerciseGenerator'
-import ChapterNavigation from '@/components/ChapterNavigation.vue'
+//import ChapterNavigation from '@/components/ChapterNavigation.vue'
 
 const route = useRoute()
 const router = useRouter()
