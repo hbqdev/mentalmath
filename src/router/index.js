@@ -29,7 +29,23 @@ const router = createRouter({
       name: 'exercise',
       component: ExerciseView
     }
-  ]
+  ],
+  // Add this scrollBehavior to reset scroll position on navigation
+  scrollBehavior(to, from, savedPosition) {
+    if (savedPosition) {
+      return savedPosition
+    } else {
+      return { top: 0 }
+    }
+  }
+})
+
+// Add a global navigation guard to help with state cleanup
+router.beforeEach((to, from, next) => {
+  // Force any pending Vue updates to complete
+  setTimeout(() => {
+    next()
+  }, 0)
 })
 
 export default router

@@ -1,269 +1,255 @@
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { chapters } from '@/data/chapters'
+import { getChapterPages, getImageUrl } from '@/utils/chapterLoader'
+import ChapterNavigation from '@/components/ChapterNavigation.vue'
 
 const route = useRoute()
 const router = useRouter()
 
 const chapterId = computed(() => parseInt(route.params.chapterId))
-const chapter = computed(() => chapters.find(c => c.id === chapterId.value))
-const activeSection = ref(null)
+const chapter = ref(null)
+const activePage = ref(1)
+const chapterPages = ref([])
+
+const isLoading = ref(true)
+
+// Function to handle page selection
+function goToPage(event) {
+  const pageId = parseInt(event.target.value)
+  setActivePage(pageId)
+}
+
+// Load chapter data and pages
+async function loadChapter() {
+  isLoading.value = true
+  try {
+    // Load chapter from the chapters array
+    chapter.value = chapters.find((c) => c.id === chapterId.value)
+
+    // Dynamically load pages for this chapter
+    chapterPages.value = getChapterPages(chapterId.value)
+
+    // Check sessionStorage for saved page number
+    const savedPage = sessionStorage.getItem(`chapter${chapterId.value}Page`)
+
+    // Initialize to the saved page if available, otherwise first page
+    if (savedPage && parseInt(savedPage) > 0) {
+      // Make sure the saved page exists in the current chapter
+      const pageNumber = parseInt(savedPage)
+      if (chapterPages.value.find((p) => p.id === pageNumber)) {
+        activePage.value = pageNumber
+      } else {
+        // If page doesn't exist, default to first page
+        activePage.value = chapterPages.value.length > 0 ? chapterPages.value[0].id : 1
+      }
+    } else {
+      // No saved page, use first page
+      activePage.value = chapterPages.value.length > 0 ? chapterPages.value[0].id : 1
+    }
+  } catch (error) {
+    console.error('Error loading chapter:', error)
+    chapter.value = null
+    chapterPages.value = []
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// Watch for route changes to reset component state
+watch(
+  () => route.params.chapterId,
+  () => {
+    loadChapter()
+  },
+  { immediate: true },
+)
 
 onMounted(() => {
-  if (chapter.value && chapter.value.sections.length > 0) {
-    activeSection.value = chapter.value.sections[0].id
-  }
+  loadChapter()
 })
 
-function setActiveSection(sectionId) {
-  activeSection.value = sectionId
+function setActivePage(pageId) {
+  activePage.value = pageId
+  // Save current page to session storage
+  sessionStorage.setItem(`chapter${chapterId.value}Page`, pageId.toString())
 }
 
 function startExercise(exerciseType) {
-  router.push(`/exercises/${chapterId.value}/${exerciseType}`)
+  // No need to reset page state anymore
+  nextTick(() => {
+    router.push(`/exercises/${chapterId.value}/${exerciseType}`)
+  })
 }
+
+// Go to previous page
+function prevPage() {
+  if (chapterPages.value.length > 0) {
+    const currentIndex = chapterPages.value.findIndex((p) => p.id === activePage.value)
+    if (currentIndex > 0) {
+      setActivePage(chapterPages.value[currentIndex - 1].id)
+    }
+  }
+}
+
+// Go to next page
+function nextPage() {
+  if (chapterPages.value.length > 0) {
+    const currentIndex = chapterPages.value.findIndex((p) => p.id === activePage.value)
+    if (currentIndex < chapterPages.value.length - 1) {
+      setActivePage(chapterPages.value[currentIndex + 1].id)
+    }
+  }
+}
+
+// Get the current page object
+const currentPage = computed(() => {
+  return chapterPages.value.find((p) => p.id === activePage.value)
+})
 </script>
 
 <template>
-  <div v-if="chapter" class="book-container">
-    <div class="book-page">
-      <div class="sidebar">
-        <h3>Contents</h3>
-        <ul class="toc-list">
-          <li 
-            v-for="section in chapter.sections" 
-            :key="section.id"
-            :class="{ active: activeSection === section.id }"
-            @click="setActiveSection(section.id)"
-          >
-            {{ section.title }}
-          </li>
-        </ul>
-        
-        <h3>Practice</h3>
-        <ul class="practice-list">
-          <li v-for="exerciseType in chapter.exercises.types" :key="exerciseType.id">
-            <a href="#" @click.prevent="startExercise(exerciseType.id)">
-              {{ exerciseType.title }}
-            </a>
-          </li>
-        </ul>
+  <div class="chapter-view">
+    <div v-if="isLoading" class="loading">Loading chapter content...</div>
+
+    <div v-else-if="!chapter" class="error">
+      <h1>Chapter not found</h1>
+      <p>Sorry, the requested chapter could not be found.</p>
+      <router-link to="/" class="btn">Return to Home</router-link>
+    </div>
+
+    <div v-else class="chapter-content">
+      <h1>Chapter {{ chapter.id }}: {{ chapter.title }}</h1>
+
+      <!-- Add the chapter navigation component -->
+      <ChapterNavigation />
+
+      <!-- Page navigation controls -->
+      <div class="page-navigation">
+        <button
+          @click="prevPage"
+          :disabled="!chapterPages.length || activePage === chapterPages[0].id"
+        >
+          Previous Page
+        </button>
+        <select v-model="activePage" @change="goToPage">
+          <option v-for="page in chapterPages" :key="page.id" :value="page.id">
+            Page {{ page.id }}
+          </option>
+        </select>
+        <button
+          @click="nextPage"
+          :disabled="
+            !chapterPages.length || activePage === chapterPages[chapterPages.length - 1].id
+          "
+        >
+          Next Page
+        </button>
       </div>
 
-      <div class="content">
-        <h1 class="chapter-title">Chapter {{ chapter.id }}: {{ chapter.title }}</h1>
-        
-        <div v-for="section in chapter.sections" :key="section.id" v-show="activeSection === section.id">
-          <h2 class="section-title">{{ section.title }}</h2>
-          <div class="section-content" v-html="formatContent(section.content)"></div>
-        </div>
-        
-        <div class="page-navigation">
-          <button 
-            class="nav-btn prev"
-            @click="setActiveSection(chapter.sections[Math.max(0, chapter.sections.findIndex(s => s.id === activeSection) - 1)].id)"
-            :disabled="chapter.sections.findIndex(s => s.id === activeSection) === 0"
+      <!-- Display the current page image -->
+      <div class="page-container">
+        <img
+          v-if="currentPage"
+          :src="getImageUrl(currentPage.path)"
+          :alt="`Chapter ${chapter.id} - Page ${activePage}`"
+          class="chapter-page-image"
+        />
+        <p v-else class="no-pages">No pages found for this chapter.</p>
+      </div>
+
+      <!-- Exercise links if available -->
+      <div v-if="chapter.exercises && chapter.exercises.types.length > 0" class="exercises-section">
+        <h2>Practice Exercises</h2>
+        <div class="exercise-links">
+          <button
+            v-for="exercise in chapter.exercises.types"
+            :key="exercise.id"
+            @click="startExercise(exercise.id)"
+            class="exercise-link"
           >
-            Previous
-          </button>
-          <span class="page-number">
-            Page {{ chapter.sections.findIndex(s => s.id === activeSection) + 1 }} of {{ chapter.sections.length }}
-          </span>
-          <button 
-            class="nav-btn next"
-            @click="setActiveSection(chapter.sections[Math.min(chapter.sections.length - 1, chapter.sections.findIndex(s => s.id === activeSection) + 1)].id)"
-            :disabled="chapter.sections.findIndex(s => s.id === activeSection) === chapter.sections.length - 1"
-          >
-            Next
+            {{ exercise.title }}
           </button>
         </div>
       </div>
     </div>
   </div>
-  <div v-else class="not-found">
-    <h1>Chapter not found</h1>
-    <router-link to="/">Return to Home</router-link>
-  </div>
 </template>
 
-<script>
-function formatContent(content) {
-  // Replace newlines with <br>
-  let formatted = content.replace(/\n/g, '<br>');
-  
-  // Format math examples
-  // Example: 67 + 28 = 87 + 8 = 95
-  formatted = formatted.replace(/(\d+)\s*\+\s*(\d+)\s*=\s*(\d+)\s*\+\s*(\d+)\s*=\s*(\d+)/g, 
-    '<div class="math-example"><div class="math-row"><span>$1 + $2</span><span>=</span><span>$3 + $4</span><span>=</span><span>$5</span></div></div>');
-  
-  // Format math examples with notes
-  // Example: 84 + 57 = 134 + 7 = 141
-  //         (first add 50)   (then add 7)
-  formatted = formatted.replace(/(\d+)\s*\+\s*(\d+)\s*=\s*(\d+)\s*\+\s*(\d+)\s*=\s*(\d+)\s*\(first add (\d+)\)\s*\(then add (\d+)\)/g, 
-    '<div class="math-example"><div class="math-row"><span>$1 + $2</span><span>=</span><span>$3 + $4</span><span>=</span><span>$5</span></div><div class="math-notes"><span>(first add $6)</span><span>(then add $7)</span></div></div>');
-  
-  // Format single line math examples
-  // Example: 84 + 57 (50 + 7)
-  formatted = formatted.replace(/(\d+)\s*\+\s*(\d+)\s*\((\d+)\s*\+\s*(\d+)\)/g, 
-    '<div class="math-example"><div class="math-row"><span>$1</span><span>+ $2</span><span>($3 + $4)</span></div></div>');
-  
-  return formatted;
-}
-</script>
-
 <style scoped>
-.book-container {
+.chapter-view {
   width: 100%;
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0;
-  background-color: white;
+  max-width: 100%;
+  padding: 0 1rem;
 }
 
-.book-page {
-  display: flex;
-  min-height: calc(100vh - 120px);
-  border-top: 1px solid #e0e0e0;
-}
-
-.sidebar {
-  width: 220px;
-  padding: 2rem 1rem;
-  border-right: 1px solid #e0e0e0;
-  background-color: #f9f9f9;
-}
-
-.sidebar h3 {
-  font-size: 1.2rem;
-  margin-bottom: 1rem;
-  color: #333;
-}
-
-.toc-list, .practice-list {
-  list-style: none;
-  padding: 0;
-  margin: 0 0 2rem 0;
-}
-
-.toc-list li, .practice-list li {
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #eee;
-  cursor: pointer;
-}
-
-.toc-list li.active {
-  font-weight: bold;
-  color: #2c3e50;
-  border-left: 3px solid #2c3e50;
-  padding-left: 0.5rem;
-}
-
-.practice-list a {
-  color: #2c3e50;
-  text-decoration: none;
-}
-
-.content {
-  flex: 1;
-  padding: 2rem 3rem;
-  line-height: 1.6;
-}
-
-.chapter-title {
-  font-size: 1.8rem;
-  margin-bottom: 2rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid #e0e0e0;
-  color: #2c3e50;
-}
-
-.section-title {
-  font-size: 1.5rem;
-  margin-bottom: 1.5rem;
-  color: #2c3e50;
-}
-
-.section-content {
-  font-size: 1.1rem;
-  line-height: 1.8;
-  color: #333;
-}
-
-.section-content p {
-  margin-bottom: 1.5rem;
-}
-
-/* Math example styling */
-.math-example {
-  margin: 2rem 0;
+.loading,
+.error,
+.no-pages {
   text-align: center;
-  font-family: 'Georgia', serif;
+  padding: 2rem;
 }
 
-.math-row {
+.chapter-content {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  gap: 1rem;
-  font-size: 1.3rem;
-  margin-bottom: 0.5rem;
-}
-
-.math-notes {
-  display: flex;
-  justify-content: space-around;
-  font-size: 0.9rem;
-  color: #666;
-  font-style: italic;
 }
 
 .page-navigation {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-top: 3rem;
-  padding-top: 1rem;
-  border-top: 1px solid #e0e0e0;
+  width: 100%;
+  max-width: 600px;
+  margin: 1rem 0;
 }
 
-.nav-btn {
-  padding: 0.5rem 1rem;
-  background-color: #f5f5f5;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 0.9rem;
-  transition: all 0.2s ease;
+.page-container {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  margin: 1rem 0;
 }
 
-.nav-btn:hover:not(:disabled) {
-  background-color: #e5e5e5;
+.chapter-page-image {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
 }
 
-.nav-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.page-number {
-  font-size: 0.9rem;
-  color: #777;
-}
-
-.not-found {
+.exercises-section {
+  margin: 2rem 0;
   text-align: center;
-  padding: 3rem;
 }
 
-@media (max-width: 768px) {
-  .book-page {
-    flex-direction: column;
-  }
-  
-  .sidebar {
-    width: 100%;
-    border-right: none;
-    border-bottom: 1px solid #e0e0e0;
+.exercise-links {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.exercise-link {
+  padding: 0.75rem 1.5rem;
+  background-color: #2c3e50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.exercise-link:hover {
+  background-color: #1a2533;
+}
+
+/* Responsive adjustments for larger screens */
+@media (min-width: 1200px) {
+  .chapter-page-image {
+    max-height: 80vh;
   }
 }
-</style> 
+</style>
