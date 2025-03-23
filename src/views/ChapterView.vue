@@ -34,12 +34,11 @@ async function loadChapterFromFile() {
       const chapters = await contentLoader.loadDocument(fileBlob, 'docx')
 
       // Set the current chapter
-      chapter.value = chapters.find(c => c.id === chapterId.value) ||
-                      chapters[0] // Default to first chapter if ID not found
+      chapter.value = chapters.find((c) => c.id === chapterId.value) || chapters[0] // Default to first chapter if ID not found
 
       // If no chapters were found, revert to original method
       if (!chapter.value) {
-        chapter.value = chapters.find(c => c.id === chapterId.value)
+        chapter.value = chapters.find((c) => c.id === chapterId.value)
       }
 
       // Initialize the active section
@@ -48,7 +47,7 @@ async function loadChapterFromFile() {
       }
     } else {
       // Fallback to existing JSON data for other chapters
-      chapter.value = chapters.find(c => c.id === chapterId.value)
+      chapter.value = chapters.find((c) => c.id === chapterId.value)
       if (chapter.value && chapter.value.sections.length > 0) {
         activeSection.value = chapter.value.sections[0].id
       }
@@ -56,7 +55,7 @@ async function loadChapterFromFile() {
   } catch (error) {
     console.error('Error loading chapter from file:', error)
     // Fallback to existing JSON data
-    chapter.value = chapters.find(c => c.id === chapterId.value)
+    chapter.value = chapters.find((c) => c.id === chapterId.value)
     if (chapter.value && chapter.value.sections.length > 0) {
       activeSection.value = chapter.value.sections[0].id
     }
@@ -65,17 +64,19 @@ async function loadChapterFromFile() {
 
     // Initialize MathJax after content is loaded
     nextTick(() => {
-      if (window.MathJax) {
-        window.MathJax.typesetPromise()
-      }
+      loadMathJax()
     })
   }
 }
 
 // Watch for route changes to reset component state
-watch(() => route.params.chapterId, () => {
-  loadChapterFromFile()
-}, { immediate: true })
+watch(
+  () => route.params.chapterId,
+  () => {
+    loadChapterFromFile()
+  },
+  { immediate: true },
+)
 
 onMounted(() => {
   loadChapterFromFile()
@@ -83,9 +84,7 @@ onMounted(() => {
 
 watch(activeSection, () => {
   nextTick(() => {
-    if (window.MathJax) {
-      window.MathJax.typesetPromise()
-    }
+    loadMathJax()
   })
 })
 
@@ -101,13 +100,19 @@ function loadMathJax() {
   script.onload = () => {
     window.MathJax = {
       tex: {
-        inlineMath: [['$', '$'], ['\\(', '\\)']],
-        displayMath: [['$$', '$$'], ['\\[', '\\]']],
-        processEscapes: true
+        inlineMath: [
+          ['$', '$'],
+          ['\\(', '\\)'],
+        ],
+        displayMath: [
+          ['$$', '$$'],
+          ['\\[', '\\]'],
+        ],
+        processEscapes: true,
       },
       options: {
-        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre']
-      }
+        skipHtmlTags: ['script', 'noscript', 'style', 'textarea', 'pre'],
+      },
     }
     window.MathJax.typesetPromise()
   }
@@ -132,19 +137,16 @@ function formatContent(content) {
   let formattedContent = content
 
   // Format exercise titles separately from the exercise content
-  formattedContent = formattedContent.replace(
-    /EXERCISE: ([^\n]+)/g,
-    (match, p1) => {
-      return `<div class="exercise-title-container"><div class="exercise-title-line"></div><h3 class="exercise-title">${p1}</h3><div class="exercise-title-line"></div></div>`
-    }
-  )
+  formattedContent = formattedContent.replace(/EXERCISE: ([^\n]+)/g, (match, p1) => {
+    return `<div class="exercise-title-container"><div class="exercise-title-line"></div><h3 class="exercise-title">${p1}</h3><div class="exercise-title-line"></div></div>`
+  })
 
   // Format exercise problems with proper alignment
   formattedContent = formattedContent.replace(
     /<!-- math:exercise-start -->([\s\S]*?)<!-- math:exercise-end -->/g,
     (match, p1) => {
       return `<div class="exercise-problems">${p1}</div>`
-    }
+    },
   )
 
   // Format multiplication tables
@@ -152,69 +154,69 @@ function formatContent(content) {
     /<!-- math:table-start -->([\s\S]*?)<!-- math:table-end -->/g,
     (match, p1) => {
       // Convert the table text to HTML table
-      const rows = p1.trim().split('\n');
-      let tableHtml = '<div class="math-table-container"><table class="math-table">';
+      const rows = p1.trim().split('\n')
+      let tableHtml = '<div class="math-table-container"><table class="math-table">'
 
       // Process header row
-      const headerRow = rows[0].split('\t');
-      tableHtml += '<tr>';
+      const headerRow = rows[0].split('\t')
+      tableHtml += '<tr>'
 
       // Special handling for the first header which spans multiple columns
       if (headerRow[0].includes('Numbers that add to')) {
-        tableHtml += `<th colspan="2">${headerRow[0]}</th>`;
+        tableHtml += `<th colspan="2">${headerRow[0]}</th>`
 
         // Add remaining headers
         for (let i = 1; i < headerRow.length; i++) {
           if (headerRow[i].trim()) {
-            tableHtml += `<th>${headerRow[i].trim()}</th>`;
+            tableHtml += `<th>${headerRow[i].trim()}</th>`
           }
         }
       } else {
         // Standard header processing
-        headerRow.forEach(cell => {
-          tableHtml += `<th>${cell.trim()}</th>`;
-        });
+        headerRow.forEach((cell) => {
+          tableHtml += `<th>${cell.trim()}</th>`
+        })
       }
-      tableHtml += '</tr>';
+      tableHtml += '</tr>'
 
       // Add subheader row if it exists (for "from 10" and "from 100")
       if (rows.length > 1 && rows[1].includes('from')) {
-        const subheaderRow = rows[1].split('\t');
-        tableHtml += '<tr>';
+        const subheaderRow = rows[1].split('\t')
+        tableHtml += '<tr>'
 
         // Add empty cells for the first two columns
-        tableHtml += '<th></th><th></th>';
+        tableHtml += '<th></th><th></th>'
 
         // Add remaining subheaders
         for (let i = 2; i < subheaderRow.length; i++) {
-          tableHtml += `<th>${subheaderRow[i].trim()}</th>`;
+          tableHtml += `<th>${subheaderRow[i].trim()}</th>`
         }
-        tableHtml += '</tr>';
+        tableHtml += '</tr>'
 
         // Process data rows
         for (let i = 2; i < rows.length; i++) {
-          const cells = rows[i].split('\t');
-          tableHtml += '<tr>';
-          cells.forEach(cell => {
-            tableHtml += `<td>${cell.trim()}</td>`;
-          });
-          tableHtml += '</tr>';
+          const cells = rows[i].split('\t')
+          tableHtml += '<tr>'
+          cells.forEach((cell) => {
+            tableHtml += `<td>${cell.trim()}</td>`
+          })
+          tableHtml += '</tr>'
         }
       } else {
         // Process data rows without subheader
         for (let i = 1; i < rows.length; i++) {
-          const cells = rows[i].split('\t');
-          tableHtml += '<tr>';
-          cells.forEach(cell => {
-            tableHtml += `<td>${cell.trim()}</td>`;
-          });
-          tableHtml += '</tr>';
+          const cells = rows[i].split('\t')
+          tableHtml += '<tr>'
+          cells.forEach((cell) => {
+            tableHtml += `<td>${cell.trim()}</td>`
+          })
+          tableHtml += '</tr>'
         }
       }
 
-      tableHtml += '</table></div>';
-      return tableHtml;
-    }
+      tableHtml += '</table></div>'
+      return tableHtml
+    },
   )
 
   // Format biographical sidebars
@@ -222,7 +224,7 @@ function formatContent(content) {
     /<!-- bio-start -->([\s\S]*?)<!-- bio-end -->/g,
     (match, p1) => {
       return `<div class="biographical-sidebar">${p1}</div>`
-    }
+    },
   )
 
   // Format paragraphs with proper spacing
@@ -230,7 +232,7 @@ function formatContent(content) {
     /<!-- paragraph -->([\s\S]*?)<!-- \/paragraph -->/g,
     (match, p1) => {
       return `<p class="book-paragraph">${p1.trim()}</p>`
-    }
+    },
   )
 
   // Format section headings
@@ -238,7 +240,7 @@ function formatContent(content) {
     /<!-- heading -->([\s\S]*?)<!-- \/heading -->/g,
     (match, p1) => {
       return `<h3 class="book-heading">${p1.trim()}</h3>`
-    }
+    },
   )
 
   // Format vertical math problems
@@ -246,26 +248,26 @@ function formatContent(content) {
     /<!-- math:vertical-start -->([\s\S]*?)<!-- math:vertical-end -->/g,
     (match, p1) => {
       // Split the content by lines
-      const lines = p1.trim().split('\n');
+      const lines = p1.trim().split('\n')
 
       // Extract the top number (first line)
-      const topNumber = lines[0].trim();
+      const topNumber = lines[0].trim()
 
       // Extract the operation and bottom number (second line)
-      const secondLine = lines[1].trim();
-      const operationMatch = secondLine.match(/^([+\-×÷])\s*(.*)/);
+      const secondLine = lines[1].trim()
+      const operationMatch = secondLine.match(/^([+\-×÷])\s*(.*)/)
 
       if (operationMatch) {
-        const operation = operationMatch[1];
-        let bottomText = operationMatch[2].trim();
+        const operation = operationMatch[1]
+        let bottomText = operationMatch[2].trim()
 
         // Check if there's an explanation in parentheses
-        const parts = bottomText.match(/^(\d+)(\s*\(.+\))?$/);
-        const mainNumber = parts ? parts[1] : bottomText;
-        const explanation = parts && parts[2] ? parts[2] : '';
+        const parts = bottomText.match(/^(\d+)(\s*\(.+\))?$/)
+        const mainNumber = parts ? parts[1] : bottomText
+        const explanation = parts && parts[2] ? parts[2] : ''
 
         // Calculate padding to align numbers
-        const padding = ' '.repeat(operation.length + 1); // +1 for the space after operation
+        const padding = ' '.repeat(operation.length + 1) // +1 for the space after operation
 
         // Format with proper alignment using pre-formatted text
         return `
@@ -276,12 +278,12 @@ ${operation} ${mainNumber}${explanation}
 ${'─'.repeat(Math.max(topNumber.length + padding.length, mainNumber.length + explanation.length + padding.length))}
 </pre>
           </div>
-        `;
+        `
       }
 
       // Fallback if the parsing fails
-      return `<div class="math-problem-container"><div class="math-vertical-problem">${p1}</div></div>`;
-    }
+      return `<div class="math-problem-container"><div class="math-vertical-problem">${p1}</div></div>`
+    },
   )
 
   // Format math diagrams with arrows
@@ -289,36 +291,36 @@ ${'─'.repeat(Math.max(topNumber.length + padding.length, mainNumber.length + e
     /<!-- math:diagram-arrows-start -->([\s\S]*?)<!-- math:diagram-arrows-end -->/g,
     (match, p1) => {
       // Parse the diagram data
-      const lines = p1.trim().split('\n');
-      const diagramData = {};
+      const lines = p1.trim().split('\n')
+      const diagramData = {}
 
-      lines.forEach(line => {
+      lines.forEach((line) => {
         if (line.includes(':')) {
-          const [key, value] = line.split(':');
-          diagramData[key.trim()] = value.trim();
+          const [key, value] = line.split(':')
+          diagramData[key.trim()] = value.trim()
         }
-      });
+      })
 
       // Extract values with defaults if missing
-      const baseValue = diagramData.base || '13²';
+      const baseValue = diagramData.base || '13²'
 
-      let topOffset = '+3';
-      let topValue = '16';
+      let topOffset = '+3'
+      let topValue = '16'
       if (diagramData.top_offset) {
-        const parts = diagramData.top_offset.split(',');
-        topOffset = parts[0];
-        topValue = parts[1];
+        const parts = diagramData.top_offset.split(',')
+        topOffset = parts[0]
+        topValue = parts[1]
       }
 
-      let bottomOffset = '-3';
-      let bottomValue = '10';
+      let bottomOffset = '-3'
+      let bottomValue = '10'
       if (diagramData.bottom_offset) {
-        const parts = diagramData.bottom_offset.split(',');
-        bottomOffset = parts[0];
-        bottomValue = parts[1];
+        const parts = diagramData.bottom_offset.split(',')
+        bottomOffset = parts[0]
+        bottomValue = parts[1]
       }
 
-      const resultValue = diagramData.result || '160 + 3² = 169';
+      const resultValue = diagramData.result || '160 + 3² = 169'
 
       // Create the SVG with the parsed values
       return `<div class="math-diagram-arrows">
@@ -353,8 +355,8 @@ ${'─'.repeat(Math.max(topNumber.length + padding.length, mainNumber.length + e
           <!-- Result -->
           <text x="370" y="50" class="diagram-text">${resultValue}</text>
         </svg>
-      </div>`;
-    }
+      </div>`
+    },
   )
 
   // Format math expressions
@@ -362,7 +364,7 @@ ${'─'.repeat(Math.max(topNumber.length + padding.length, mainNumber.length + e
     /<!-- math:expression-start -->([\s\S]*?)<!-- math:expression-end -->/g,
     (match, p1) => {
       return `<div class="math-expression">${p1}</div>`
-    }
+    },
   )
 
   // Format number sequences
@@ -370,7 +372,7 @@ ${'─'.repeat(Math.max(topNumber.length + padding.length, mainNumber.length + e
     /<!-- math:sequence-start -->([\s\S]*?)<!-- math:sequence-end -->/g,
     (match, p1) => {
       return `<div class="number-sequence">${p1}</div>`
-    }
+    },
   )
 
   return formattedContent
@@ -382,7 +384,7 @@ onBeforeUnmount(() => {
 
   // Remove any MathJax elements that might be causing issues
   const mathJaxElements = document.querySelectorAll('.MathJax, .MathJax_Display')
-  mathJaxElements.forEach(el => el.remove())
+  mathJaxElements.forEach((el) => el.remove())
 })
 </script>
 
@@ -431,7 +433,11 @@ onBeforeUnmount(() => {
           <div class="content">
             <h1 class="chapter-title">Chapter {{ chapter.id }}: {{ chapter.title }}</h1>
 
-            <div v-for="section in chapter.sections" :key="section.id" v-show="activeSection === section.id">
+            <div
+              v-for="section in chapter.sections"
+              :key="section.id"
+              v-show="activeSection === section.id"
+            >
               <h2 class="section-title">{{ section.title }}</h2>
               <div class="section-content" v-html="formatContent(section.content)"></div>
             </div>
@@ -439,8 +445,14 @@ onBeforeUnmount(() => {
             <div class="page-navigation">
               <button
                 class="nav-btn prev"
-                @click="setActiveSection(chapter.sections[Math.max(0, chapter.sections.findIndex(s => s.id === activeSection) - 1)].id)"
-                :disabled="chapter.sections.findIndex(s => s.id === activeSection) === 0"
+                @click="
+                  setActiveSection(
+                    chapter.sections[
+                      Math.max(0, chapter.sections.findIndex((s) => s.id === activeSection) - 1)
+                    ].id,
+                  )
+                "
+                :disabled="chapter.sections.findIndex((s) => s.id === activeSection) === 0"
               >
                 Previous
               </button>
@@ -448,24 +460,33 @@ onBeforeUnmount(() => {
               <!-- Add page selector dropdown -->
               <div class="page-selector">
                 <select :value="activeSection" @change="goToPage($event)">
-                  <option
-                    v-for="section in chapter.sections"
-                    :key="section.id"
-                    :value="section.id"
-                  >
+                  <option v-for="section in chapter.sections" :key="section.id" :value="section.id">
                     {{ section.title }}
                   </option>
                 </select>
               </div>
 
               <span class="page-number">
-                Page {{ chapter.sections.findIndex(s => s.id === activeSection) + 1 }} of {{ chapter.sections.length }}
+                Page {{ chapter.sections.findIndex((s) => s.id === activeSection) + 1 }} of
+                {{ chapter.sections.length }}
               </span>
 
               <button
                 class="nav-btn next"
-                @click="setActiveSection(chapter.sections[Math.min(chapter.sections.length - 1, chapter.sections.findIndex(s => s.id === activeSection) + 1)].id)"
-                :disabled="chapter.sections.findIndex(s => s.id === activeSection) === chapter.sections.length - 1"
+                @click="
+                  setActiveSection(
+                    chapter.sections[
+                      Math.min(
+                        chapter.sections.length - 1,
+                        chapter.sections.findIndex((s) => s.id === activeSection) + 1,
+                      )
+                    ].id,
+                  )
+                "
+                :disabled="
+                  chapter.sections.findIndex((s) => s.id === activeSection) ===
+                  chapter.sections.length - 1
+                "
               >
                 Next
               </button>
@@ -509,19 +530,22 @@ h3 {
   color: #444;
 }
 
-.toc-list, .practice-list {
+.toc-list,
+.practice-list {
   list-style: none;
   padding: 0;
   margin: 0 0 2rem 0;
 }
 
-.toc-list li, .practice-list li {
+.toc-list li,
+.practice-list li {
   padding: 0.5rem 0;
   cursor: pointer;
   transition: color 0.3s ease;
 }
 
-.toc-list li:hover, .practice-list li a:hover {
+.toc-list li:hover,
+.practice-list li a:hover {
   color: #2c3e50;
 }
 
