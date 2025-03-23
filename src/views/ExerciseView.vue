@@ -22,6 +22,9 @@ const exercisesCompleted = ref(0)
 const correctAnswers = ref(0)
 const answerInput = ref(null)
 
+// Add new display types
+const displayType = ref('normal') // 'normal', 'fraction', 'division', 'divisibilityTest'
+
 onMounted(() => {
   loadChapterData()
   // Automatically generate exercises when the component mounts
@@ -90,17 +93,79 @@ function setCurrentExercise() {
     operator,
     isExponent = false,
     exponent = ''
+  let numerator1, denominator1, numerator2, denominator2
+  let isDivisibilityTest = false
+
+  // Reset display type to default
+  displayType.value = 'normal'
 
   // Handle different question formats
   if (exercise.question.includes('×')) {
-    operator = '×'
-    ;[num1, num2] = exercise.question.split('×').map((part) => parseInt(part.trim()))
+    // Check if it's fraction multiplication
+    if (exercise.question.includes('/')) {
+      displayType.value = 'fraction'
+      const fractions = exercise.question.split('×')
+      const frac1 = fractions[0].trim().split('/')
+      const frac2 = fractions[1].trim().split('/')
+
+      numerator1 = parseInt(frac1[0])
+      denominator1 = parseInt(frac1[1])
+      numerator2 = parseInt(frac2[0])
+      denominator2 = parseInt(frac2[1])
+      operator = '×'
+    } else {
+      operator = '×'
+      ;[num1, num2] = exercise.question.split('×').map((part) => parseInt(part.trim()))
+    }
   } else if (exercise.question.includes('+')) {
-    operator = '+'
-    ;[num1, num2] = exercise.question.split('+').map((part) => parseInt(part.trim()))
+    // Check if it's a fraction addition
+    if (exercise.question.includes('/')) {
+      displayType.value = 'fraction'
+      const fractions = exercise.question.split('+')
+      const frac1 = fractions[0].trim().split('/')
+      const frac2 = fractions[1].trim().split('/')
+
+      numerator1 = parseInt(frac1[0])
+      denominator1 = parseInt(frac1[1])
+      numerator2 = parseInt(frac2[0])
+      denominator2 = parseInt(frac2[1])
+      operator = '+'
+    } else {
+      operator = '+'
+      ;[num1, num2] = exercise.question.split('+').map((part) => parseInt(part.trim()))
+    }
   } else if (exercise.question.includes('-')) {
-    operator = '-'
-    ;[num1, num2] = exercise.question.split('-').map((part) => parseInt(part.trim()))
+    // Check if it's a fraction subtraction
+    if (exercise.question.includes('/')) {
+      displayType.value = 'fraction'
+      const fractions = exercise.question.split('-')
+      const frac1 = fractions[0].trim().split('/')
+      const frac2 = fractions[1].trim().split('/')
+
+      numerator1 = parseInt(frac1[0])
+      denominator1 = parseInt(frac1[1])
+      numerator2 = parseInt(frac2[0])
+      denominator2 = parseInt(frac2[1])
+      operator = '-'
+    } else {
+      operator = '-'
+      ;[num1, num2] = exercise.question.split('-').map((part) => parseInt(part.trim()))
+    }
+  } else if (exercise.question.includes('÷')) {
+    // Division problems
+    displayType.value = 'division'
+    operator = '÷'
+    ;[num1, num2] = exercise.question.split('÷').map((part) => parseInt(part.trim()))
+  } else if (exercise.question.includes('divisible by')) {
+    // Divisibility test problems
+    displayType.value = 'divisibilityTest'
+    isDivisibilityTest = true
+    // Extract the number and divisor from question like "Is 123 divisible by 3?"
+    const match = exercise.question.match(/Is (\d+) divisible by (\d+)\?/)
+    if (match) {
+      num1 = parseInt(match[1])
+      num2 = parseInt(match[2])
+    }
   } else if (exercise.question.includes('²')) {
     // Handle square exercises
     isExponent = true
@@ -113,8 +178,18 @@ function setCurrentExercise() {
     exponent = '3'
     num1 = parseInt(exercise.question.replace('³', '').trim())
     num2 = null
+  } else if (exercise.question.includes('/')) {
+    // Handle single fraction (for simplification or decimalization)
+    displayType.value = 'singleFraction'
+    const parts = exercise.question.split('/')
+    numerator1 = parseInt(parts[0].trim())
+    denominator1 = parseInt(parts[1].trim())
+    // No operator or second fraction
+    operator = null
+    numerator2 = null
+    denominator2 = null
   } else {
-    console.error('Unknown operator in question:', exercise.question)
+    console.error('Unknown question format:', exercise.question)
     return
   }
 
@@ -124,7 +199,13 @@ function setCurrentExercise() {
     operator,
     isExponent,
     exponent,
-    correctAnswer: parseInt(exercise.answer),
+    displayType: displayType.value,
+    isDivisibilityTest,
+    numerator1,
+    denominator1,
+    numerator2,
+    denominator2,
+    correctAnswer: exercise.answer,
   }
 
   // Focus the input field after a short delay
@@ -136,17 +217,61 @@ function setCurrentExercise() {
 }
 
 function checkAnswer() {
-  const userNum = parseInt(userAnswer.value)
+  if (!currentExercise.value) return
 
-  if (isNaN(userNum)) {
+  let isCorrect = false
+  const userInput = userAnswer.value.trim()
+
+  if (currentExercise.value.isDivisibilityTest) {
+    // For divisibility tests, accept yes/no or y/n (case insensitive)
+    const normalizedUserInput = userInput.toLowerCase()
+    const normalizedCorrectAnswer = currentExercise.value.correctAnswer.toLowerCase()
+
+    isCorrect =
+      normalizedUserInput === normalizedCorrectAnswer ||
+      normalizedUserInput === normalizedCorrectAnswer[0] // First letter only (y/n)
+  } else if (
+    currentExercise.value.displayType === 'singleFraction' ||
+    currentExercise.value.displayType === 'fraction'
+  ) {
+    // For fractions, handle various answer formats
+    // Correct answer might be "3/4" or "0.75" or "3 / 4" etc.
+    const normalizedUserInput = userInput.replace(/\s+/g, '')
+    const normalizedCorrectAnswer = currentExercise.value.correctAnswer.replace(/\s+/g, '')
+
+    isCorrect = normalizedUserInput === normalizedCorrectAnswer
+  } else if (currentExercise.value.displayType === 'division') {
+    // For division, correct answer might include "remainder" text
+    // Accept various formats: "5 r 2", "5 remainder 2", etc.
+    const normalizedUserInput = userInput.toLowerCase().replace(/\s+/g, ' ')
+    const normalizedCorrectAnswer = currentExercise.value.correctAnswer.toLowerCase()
+
+    isCorrect =
+      normalizedUserInput === normalizedCorrectAnswer ||
+      normalizedUserInput.replace('remainder', 'r') ===
+        normalizedCorrectAnswer.replace('remainder', 'r')
+  } else {
+    // For normal arithmetic, parse as number
+    const userNum = parseInt(userInput)
+    const correctNum = parseInt(currentExercise.value.correctAnswer)
+    isCorrect = !isNaN(userNum) && userNum === correctNum
+  }
+
+  if (
+    isNaN(parseInt(userInput)) &&
+    !currentExercise.value.isDivisibilityTest &&
+    currentExercise.value.displayType !== 'singleFraction' &&
+    currentExercise.value.displayType !== 'fraction' &&
+    !userInput.includes('/')
+  ) {
     feedback.value = {
       correct: false,
-      message: 'Please enter a valid number.',
+      message: 'Please enter a valid answer.',
     }
     return
   }
 
-  if (userNum === currentExercise.value.correctAnswer) {
+  if (isCorrect) {
     feedback.value = {
       correct: true,
       message: 'Correct! Great job!',
@@ -196,15 +321,13 @@ function returnToChapter() {
       <div class="exercise-box">
         <div v-if="currentExercise" class="exercise-content">
           <div class="question">
-            <div class="numbers">
-              <!-- For regular operations (multiplication, addition, subtraction) -->
+            <!-- For normal operations (multiplication, addition, subtraction) -->
+            <div v-if="currentExercise.displayType === 'normal'" class="numbers">
               <template v-if="!currentExercise.isExponent">
                 <span class="number">{{ currentExercise.num1 }}</span>
                 <span class="operator">{{ currentExercise.operator }}</span>
                 <span class="number">{{ currentExercise.num2 }}</span>
               </template>
-
-              <!-- For exponents (squares, cubes) - using proper HTML superscript -->
               <template v-else>
                 <div class="exponent-container">
                   <span class="number">{{ currentExercise.num1 }}</span>
@@ -213,11 +336,53 @@ function returnToChapter() {
               </template>
             </div>
 
+            <!-- For division operations -->
+            <div v-else-if="currentExercise.displayType === 'division'" class="numbers">
+              <span class="number">{{ currentExercise.num1 }}</span>
+              <span class="operator">÷</span>
+              <span class="number">{{ currentExercise.num2 }}</span>
+            </div>
+
+            <!-- For divisibility tests -->
+            <div
+              v-else-if="currentExercise.displayType === 'divisibilityTest'"
+              class="divisibility-test"
+            >
+              <p>Is {{ currentExercise.num1 }} divisible by {{ currentExercise.num2 }}?</p>
+            </div>
+
+            <!-- For fractions (addition, subtraction, multiplication, division) -->
+            <div v-else-if="currentExercise.displayType === 'fraction'" class="fraction-operation">
+              <div class="fraction">
+                <div class="numerator">{{ currentExercise.numerator1 }}</div>
+                <div class="fraction-line"></div>
+                <div class="denominator">{{ currentExercise.denominator1 }}</div>
+              </div>
+              <span class="operator">{{ currentExercise.operator }}</span>
+              <div class="fraction">
+                <div class="numerator">{{ currentExercise.numerator2 }}</div>
+                <div class="fraction-line"></div>
+                <div class="denominator">{{ currentExercise.denominator2 }}</div>
+              </div>
+            </div>
+
+            <!-- For single fractions (simplification or decimalization) -->
+            <div
+              v-else-if="currentExercise.displayType === 'singleFraction'"
+              class="single-fraction"
+            >
+              <div class="fraction">
+                <div class="numerator">{{ currentExercise.numerator1 }}</div>
+                <div class="fraction-line"></div>
+                <div class="denominator">{{ currentExercise.denominator1 }}</div>
+              </div>
+            </div>
+
             <div class="answer-section">
               <input
                 type="text"
                 v-model="userAnswer"
-                placeholder="Your answer"
+                :placeholder="currentExercise.isDivisibilityTest ? 'Yes or No' : 'Your answer'"
                 @keyup.enter="checkAnswer"
                 :disabled="!!feedback"
                 ref="answerInput"
@@ -424,6 +589,48 @@ h1 {
 }
 
 .start-section {
+  text-align: center;
+}
+
+/* New styles for fractions and division */
+.fraction-operation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.single-fraction {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 2rem;
+}
+
+.fraction {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.numerator,
+.denominator {
+  padding: 0.25rem 0.5rem;
+  font-weight: bold;
+  font-size: 1.8rem;
+}
+
+.fraction-line {
+  width: 100%;
+  height: 2px;
+  background-color: #000;
+  margin: 0.25rem 0;
+}
+
+.divisibility-test {
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
   text-align: center;
 }
 </style>
