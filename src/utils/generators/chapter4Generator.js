@@ -561,7 +561,6 @@ export function generateSubtractingFractionsExercises(difficulty, count) {
       // Find equivalent in denom1
       const lcm = findLCM(denom1, denom2)
       const num2Equiv = num2 * (lcm / denom2)
-      const maxNum1 = lcm / denom1
 
       // Ensure num1 (after conversion) > num2 (after conversion)
       num1 = Math.floor(Math.random() * (denom1 - 1)) + 1
