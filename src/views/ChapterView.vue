@@ -3,7 +3,6 @@ import { ref, computed, onMounted, onBeforeUnmount, watch, nextTick } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { chapters } from '@/data/chapters'
 import ChapterNavigation from '@/components/ChapterNavigation.vue'
-import { ContentLoader } from '@/content/ContentLoader'
 
 const route = useRoute()
 const router = useRouter()
@@ -11,7 +10,7 @@ const router = useRouter()
 const chapterId = computed(() => parseInt(route.params.chapterId))
 const chapter = ref(null)
 const activeSection = ref(null)
-const contentLoader = new ContentLoader()
+
 const isLoading = ref(true)
 
 // Add a function to handle direct page navigation
@@ -20,45 +19,20 @@ function goToPage(event) {
   setActiveSection(sectionId)
 }
 
-// Load chapter from docx file
-async function loadChapterFromFile() {
+// Load chapter data
+async function loadChapter() {
   isLoading.value = true
   try {
-    // Only load chapter0.docx for now since that's what we have
-    if (chapterId.value === 0) {
-      const fileUrl = '/chapter0.docx' // Assuming the file is in the public folder
-      const response = await fetch(fileUrl)
-      const fileBlob = await response.blob()
-
-      // Load the document using ContentLoader
-      const chapters = await contentLoader.loadDocument(fileBlob, 'docx')
-
-      // Set the current chapter
-      chapter.value = chapters.find((c) => c.id === chapterId.value) || chapters[0] // Default to first chapter if ID not found
-
-      // If no chapters were found, revert to original method
-      if (!chapter.value) {
-        chapter.value = chapters.find((c) => c.id === chapterId.value)
-      }
-
-      // Initialize the active section
-      if (chapter.value && chapter.value.sections.length > 0) {
-        activeSection.value = chapter.value.sections[0].id
-      }
-    } else {
-      // Fallback to existing JSON data for other chapters
-      chapter.value = chapters.find((c) => c.id === chapterId.value)
-      if (chapter.value && chapter.value.sections.length > 0) {
-        activeSection.value = chapter.value.sections[0].id
-      }
-    }
-  } catch (error) {
-    console.error('Error loading chapter from file:', error)
-    // Fallback to existing JSON data
+    // Load chapter from the chapters array
     chapter.value = chapters.find((c) => c.id === chapterId.value)
+
+    // Initialize the active section
     if (chapter.value && chapter.value.sections.length > 0) {
       activeSection.value = chapter.value.sections[0].id
     }
+  } catch (error) {
+    console.error('Error loading chapter:', error)
+    chapter.value = null
   } finally {
     isLoading.value = false
 
@@ -73,13 +47,13 @@ async function loadChapterFromFile() {
 watch(
   () => route.params.chapterId,
   () => {
-    loadChapterFromFile()
+    loadChapter()
   },
   { immediate: true },
 )
 
 onMounted(() => {
-  loadChapterFromFile()
+  loadChapter()
 })
 
 watch(activeSection, () => {
