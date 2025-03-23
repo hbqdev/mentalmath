@@ -186,6 +186,19 @@ import {
   generateTwoDigitCubeExercises,
 } from './generators/chapter3Generator'
 
+// Import Chapter 4 generators
+import {
+  generateOneDigitDivisionExercises,
+  generateTwoDigitDivisionExercises,
+  generateDecimalizationExercises,
+  generateDivisibilityTestsExercises,
+  generateMultiplyingFractionsExercises,
+  generateDividingFractionsExercises,
+  generateSimplifyingFractionsExercises,
+  generateAddingFractionsExercises,
+  generateSubtractingFractionsExercises,
+} from './generators/chapter4Generator'
+
 /**
  * Generate exercises based on chapter and exercise type with mixed difficulty levels
  */
@@ -249,6 +262,28 @@ export function generateExercises(chapterId, exerciseType, count = 10) {
       return generateMixedDifficulty(generateThreeDigitSquareExercises, count)
     } else if (exerciseType === 'two-digit-cubes') {
       return generateMixedDifficulty(generateTwoDigitCubeExercises, count)
+    }
+  }
+  // Chapter 4: Division
+  else if (chapterId === 4) {
+    if (exerciseType === 'one-digit-division') {
+      return generateMixedDifficulty(generateOneDigitDivisionExercises, count)
+    } else if (exerciseType === 'two-digit-division') {
+      return generateMixedDifficulty(generateTwoDigitDivisionExercises, count)
+    } else if (exerciseType === 'decimalization') {
+      return generateMixedDifficulty(generateDecimalizationExercises, count)
+    } else if (exerciseType === 'divisibility-tests') {
+      return generateMixedDifficulty(generateDivisibilityTestsExercises, count)
+    } else if (exerciseType === 'multiplying-fractions') {
+      return generateMixedDifficulty(generateMultiplyingFractionsExercises, count)
+    } else if (exerciseType === 'dividing-fractions') {
+      return generateMixedDifficulty(generateDividingFractionsExercises, count)
+    } else if (exerciseType === 'simplifying-fractions') {
+      return generateMixedDifficulty(generateSimplifyingFractionsExercises, count)
+    } else if (exerciseType === 'adding-fractions') {
+      return generateMixedDifficulty(generateAddingFractionsExercises, count)
+    } else if (exerciseType === 'subtracting-fractions') {
+      return generateMixedDifficulty(generateSubtractingFractionsExercises, count)
     }
   }
   // Add other chapters here...
