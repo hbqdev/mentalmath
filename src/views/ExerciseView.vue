@@ -11,25 +11,20 @@ const router = useRouter()
 const chapterId = computed(() => parseInt(route.params.chapterId))
 const exerciseType = computed(() => route.params.exerciseType)
 
-const chapter = computed(() => chapters.find(c => c.id === chapterId.value))
-const exerciseConfig = computed(() => {
-  if (!chapter.value) return null
-  return chapter.value.exercises.types.find(t => t.id === exerciseType.value)
-})
-
-const difficulty = ref('easy')
+const chapter = ref(null)
+const exerciseInfo = ref(null)
+const generatedExercises = ref([])
+const currentExerciseIndex = ref(0)
 const currentExercise = ref(null)
 const userAnswer = ref('')
 const feedback = ref(null)
-const showSteps = ref(false)
 const exercisesCompleted = ref(0)
 const correctAnswers = ref(0)
-
-// Set up a collection of generated exercises
-const generatedExercises = ref([])
-const currentExerciseIndex = ref(0)
+const answerInput = ref(null)
 
 onMounted(() => {
+  loadChapterData()
+  // Automatically generate exercises when the component mounts
   generateNewExercises()
 })
 
@@ -45,10 +40,11 @@ watch(
     if (newVal[0] !== oldVal[0] || newVal[1] !== oldVal[1]) {
       resetState()
       nextTick(() => {
-        generateNewExercises()
+        loadChapterData()
+        generateNewExercises() // Generate new exercises when route changes
       })
     }
-  }
+  },
 )
 
 function resetState() {
@@ -58,26 +54,26 @@ function resetState() {
   currentExercise.value = null
   userAnswer.value = ''
   feedback.value = null
-  showSteps.value = false
   exercisesCompleted.value = 0
   correctAnswers.value = 0
-  difficulty.value = 'easy'
-  
+
   // Force garbage collection where possible
-  if (window.gc) window.gc();
+  if (window.gc) window.gc()
 }
 
-function setDifficulty(level) {
-  difficulty.value = level
-  generateNewExercises()
+function loadChapterData() {
+  chapter.value = chapters.find((c) => c.id === chapterId.value)
+  if (chapter.value && chapter.value.exercises) {
+    exerciseInfo.value = chapter.value.exercises.types.find((t) => t.id === exerciseType.value)
+  }
 }
 
 function generateNewExercises() {
-  // Generate exercises using our utility
-  generatedExercises.value = generateExercises(chapterId.value, exerciseType.value, difficulty.value, 10)
+  // Generate exercises using our utility - no difficulty parameter now
+  generatedExercises.value = generateExercises(chapterId.value, exerciseType.value, 10)
   currentExerciseIndex.value = 0
   setCurrentExercise()
-  
+
   // Reset state
   feedback.value = null
   userAnswer.value = ''
@@ -86,58 +82,83 @@ function generateNewExercises() {
 }
 
 function setCurrentExercise() {
-  const exercise = generatedExercises.value[currentExerciseIndex.value];
-  if (!exercise) return;
-  
-  let num1, num2, operator;
-  
-  // Handle different operator formats
-  if (exercise.question.includes('+')) {
-    operator = '+';
-    [num1, num2] = exercise.question.split('+').map(part => parseInt(part.trim()));
+  const exercise = generatedExercises.value[currentExerciseIndex.value]
+  if (!exercise) return
+
+  let num1,
+    num2,
+    operator,
+    isExponent = false,
+    exponent = ''
+
+  // Handle different question formats
+  if (exercise.question.includes('×')) {
+    operator = '×'
+    ;[num1, num2] = exercise.question.split('×').map((part) => parseInt(part.trim()))
+  } else if (exercise.question.includes('+')) {
+    operator = '+'
+    ;[num1, num2] = exercise.question.split('+').map((part) => parseInt(part.trim()))
   } else if (exercise.question.includes('-')) {
-    operator = '-';
-    [num1, num2] = exercise.question.split('-').map(part => parseInt(part.trim()));
-  } else if (exercise.question.includes('×')) {
-    operator = '×';
-    [num1, num2] = exercise.question.split('×').map(part => parseInt(part.trim()));
+    operator = '-'
+    ;[num1, num2] = exercise.question.split('-').map((part) => parseInt(part.trim()))
+  } else if (exercise.question.includes('²')) {
+    // Handle square exercises
+    isExponent = true
+    exponent = '2'
+    num1 = parseInt(exercise.question.replace('²', '').trim())
+    num2 = null
+  } else if (exercise.question.includes('³')) {
+    // Handle cube exercises
+    isExponent = true
+    exponent = '3'
+    num1 = parseInt(exercise.question.replace('³', '').trim())
+    num2 = null
   } else {
-    console.error('Unknown operator in question:', exercise.question);
-    return;
+    console.error('Unknown operator in question:', exercise.question)
+    return
   }
-  
+
   currentExercise.value = {
     num1,
     num2,
     operator,
-    correctAnswer: parseInt(exercise.answer)
-  };
+    isExponent,
+    exponent,
+    correctAnswer: parseInt(exercise.answer),
+  }
+
+  // Focus the input field after a short delay
+  nextTick(() => {
+    if (answerInput.value) {
+      answerInput.value.focus()
+    }
+  })
 }
 
 function checkAnswer() {
   const userNum = parseInt(userAnswer.value)
-  
+
   if (isNaN(userNum)) {
     feedback.value = {
       correct: false,
-      message: 'Please enter a valid number.'
+      message: 'Please enter a valid number.',
     }
     return
   }
-  
+
   if (userNum === currentExercise.value.correctAnswer) {
     feedback.value = {
       correct: true,
-      message: 'Correct! Great job!'
+      message: 'Correct! Great job!',
     }
     correctAnswers.value++
   } else {
     feedback.value = {
       correct: false,
-      message: `Incorrect. The correct answer is ${currentExercise.value.correctAnswer}.`
+      message: `Incorrect. The correct answer is ${currentExercise.value.correctAnswer}.`,
     }
   }
-  
+
   exercisesCompleted.value++
 }
 
@@ -148,80 +169,99 @@ function nextExercise() {
     feedback.value = null
     userAnswer.value = ''
   } else {
-    // Start over with new exercises
-    generateNewExercises()
+    // End of exercises, show results
+    currentExercise.value = null
   }
 }
 
-function toggleSteps() {
-  showSteps.value = !showSteps.value
-}
-
 function returnToChapter() {
-  resetState()
+  // Navigate back to the chapter (the saved page state will be restored by ChapterView)
   router.push(`/chapters/${chapterId.value}`)
 }
 </script>
 
 <template>
-  <div class="exercise-view" v-if="chapter && exerciseConfig">
-    <h1>{{ exerciseConfig.title }}</h1>
-    
-    <!-- Add the chapter navigation component -->
-    <ChapterNavigation />
-    
-    <div class="exercise-header">
-      <h1>{{ exerciseConfig.title }}</h1>
-      <p>{{ exerciseConfig.description }}</p>
-      
-      <div class="difficulty-selector">
-        <span>Difficulty:</span>
-        <button 
-          v-for="level in exerciseConfig.difficulty" 
-          :key="level"
-          :class="{ active: difficulty === level }"
-          @click="setDifficulty(level)"
-        >
-          {{ level.charAt(0).toUpperCase() + level.slice(1) }}
-        </button>
+  <div class="exercise-view">
+    <div v-if="!chapter || !exerciseInfo" class="loading">Loading exercise...</div>
+
+    <div v-else class="exercise-container">
+      <h1>{{ exerciseInfo.title }}</h1>
+      <p class="description">{{ exerciseInfo.description }}</p>
+
+      <!-- Generate button for manually generating new exercises -->
+      <div class="generate-section">
+        <button @click="generateNewExercises" class="btn btn-primary generate-btn">Generate</button>
+      </div>
+
+      <div class="exercise-box">
+        <div v-if="currentExercise" class="exercise-content">
+          <div class="question">
+            <div class="numbers">
+              <!-- For regular operations (multiplication, addition, subtraction) -->
+              <template v-if="!currentExercise.isExponent">
+                <span class="number">{{ currentExercise.num1 }}</span>
+                <span class="operator">{{ currentExercise.operator }}</span>
+                <span class="number">{{ currentExercise.num2 }}</span>
+              </template>
+
+              <!-- For exponents (squares, cubes) - using proper HTML superscript -->
+              <template v-else>
+                <div class="exponent-container">
+                  <span class="number">{{ currentExercise.num1 }}</span>
+                  <sup class="exponent">{{ currentExercise.exponent }}</sup>
+                </div>
+              </template>
+            </div>
+
+            <div class="answer-section">
+              <input
+                type="text"
+                v-model="userAnswer"
+                placeholder="Your answer"
+                @keyup.enter="checkAnswer"
+                :disabled="!!feedback"
+                ref="answerInput"
+                class="answer-input"
+              />
+
+              <button @click="checkAnswer" :disabled="!!feedback" class="btn check-btn">
+                Check
+              </button>
+            </div>
+
+            <div
+              v-if="feedback"
+              class="feedback"
+              :class="{ correct: feedback.correct, incorrect: !feedback.correct }"
+            >
+              {{ feedback.message }}
+            </div>
+
+            <div class="exercise-nav">
+              <button v-if="feedback" @click="nextExercise" class="btn next-btn">
+                {{ currentExerciseIndex < generatedExercises.length - 1 ? 'Next' : 'See Results' }}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div v-else-if="exercisesCompleted > 0" class="results">
+          <h2>Results</h2>
+          <p>You got {{ correctAnswers }} out of {{ exercisesCompleted }} correct.</p>
+          <p>Score: {{ Math.round((correctAnswers / exercisesCompleted) * 100) }}%</p>
+
+          <button @click="generateNewExercises" class="btn generate-btn">Practice Again</button>
+        </div>
+
+        <div v-else class="start-section">
+          <p>Click "Generate" to start practicing.</p>
+        </div>
+      </div>
+
+      <div class="bottom-nav">
+        <button @click="returnToChapter" class="btn return-btn">Return to Chapter</button>
       </div>
     </div>
-    
-    <div v-if="currentExercise" class="exercise-container">
-      <div class="problem">
-        <div class="number">{{ currentExercise.num1 }}</div>
-        <div class="operator">{{ currentExercise.operator }}</div>
-        <div class="number">{{ currentExercise.num2 }}</div>
-      </div>
-      
-      <div class="answer-section">
-        <input 
-          v-model="userAnswer" 
-          type="number" 
-          placeholder="Your answer"
-          :disabled="feedback !== null"
-          @keyup.enter="checkAnswer"
-        >
-        <button 
-          v-if="feedback === null" 
-          @click="checkAnswer" 
-          class="check-btn"
-        >
-          Check
-        </button>
-      </div>
-      
-      <div v-if="feedback" class="feedback" :class="{ correct: feedback.correct }">
-        <p>{{ feedback.message }}</p>
-        <button @click="nextExercise" class="next-btn">Next Exercise</button>
-      </div>
-    </div>
-    
-    <button @click="returnToChapter" class="return-btn">Return to Chapter</button>
-  </div>
-  <div v-else class="not-found">
-    <h1>Exercise not found</h1>
-    <router-link to="/">Return to Home</router-link>
   </div>
 </template>
 
@@ -229,135 +269,161 @@ function returnToChapter() {
 .exercise-view {
   max-width: 800px;
   margin: 0 auto;
-  background-color: white;
-  padding: 2rem;
-  border: 1px solid #eee;
-  border-radius: 5px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-}
-
-.exercise-header {
-  margin-bottom: 2rem;
-  text-align: center;
-}
-
-.exercise-header h1 {
-  font-size: 2rem;
-  margin-bottom: 0.5rem;
-}
-
-.difficulty-selector {
-  margin-top: 1.5rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-}
-
-.difficulty-selector button {
-  padding: 0.5rem 1rem;
-  background-color: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.difficulty-selector button.active {
-  background-color: #2c3e50;
-  color: white;
-  border-color: #2c3e50;
+  padding: 1rem;
 }
 
 .exercise-container {
-  margin: 2rem 0;
-  padding: 2rem;
-  border: 1px solid #eee;
-  border-radius: 5px;
-  background-color: #f9f9f9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
-.problem {
+h1 {
+  margin-bottom: 0.5rem;
+}
+
+.description {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.generate-section {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.exercise-box {
+  width: 100%;
+  background-color: #f8f9fa;
+  border-radius: 8px;
+  padding: 2rem;
+  margin-bottom: 1.5rem;
+}
+
+.question {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
+}
+
+.numbers {
   font-size: 2rem;
+  margin-bottom: 2rem;
+  display: flex;
+  align-items: center;
 }
 
 .number {
   font-weight: bold;
 }
 
+.operator {
+  margin: 0 1rem;
+}
+
+.exponent-container {
+  display: inline-flex;
+  align-items: flex-start;
+}
+
+.exponent {
+  font-size: 1.2rem;
+  font-weight: bold;
+  line-height: 1;
+  margin-left: 2px;
+}
+
 .answer-section {
   display: flex;
-  justify-content: center;
-  gap: 1rem;
-  margin-bottom: 1.5rem;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
 }
 
-.answer-section input {
-  padding: 0.75rem;
-  font-size: 1.2rem;
-  border: 1px solid #ddd;
+.answer-input {
+  padding: 0.5rem;
+  border: 1px solid #ced4da;
   border-radius: 4px;
-  width: 150px;
-  text-align: center;
-}
-
-.check-btn {
-  padding: 0.75rem 1.5rem;
-  background-color: #42b883;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
   font-size: 1rem;
 }
 
-.feedback {
-  text-align: center;
-  padding: 1rem;
+.btn {
+  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border: none;
   border-radius: 4px;
-  background-color: #f8d7da;
-  color: #721c24;
-  margin-bottom: 1.5rem;
+  font-weight: 500;
 }
 
-.feedback.correct {
+.btn-primary {
+  background-color: #2c3e50;
+  color: white;
+}
+
+.check-btn {
+  background-color: #4caf50;
+  color: white;
+}
+
+.next-btn {
+  background-color: #007bff;
+  color: white;
+}
+
+.return-btn {
+  background-color: #6c757d;
+  color: white;
+}
+
+.generate-btn {
+  background-color: #2c3e50;
+  color: white;
+}
+
+.feedback {
+  margin: 1rem 0;
+  padding: 1rem;
+  border-radius: 4px;
+  text-align: center;
+}
+
+.correct {
   background-color: #d4edda;
   color: #155724;
 }
 
-.next-btn {
+.incorrect {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+.exercise-nav {
   margin-top: 1rem;
-  padding: 0.5rem 1rem;
-  background-color: #2c3e50;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
 }
 
-.return-btn {
-  display: block;
-  margin: 0 auto;
-  padding: 0.75rem 1.5rem;
-  background-color: #6c757d;
-  color: white;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-.return-btn:hover {
-  background-color: #5a6268;
-}
-
-.not-found {
+.results {
   text-align: center;
-  padding: 3rem;
 }
-</style> 
+
+.results h2 {
+  margin-bottom: 1rem;
+}
+
+.results p {
+  margin-bottom: 0.5rem;
+}
+
+.bottom-nav {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+.loading {
+  text-align: center;
+  padding: 2rem;
+}
+
+.start-section {
+  text-align: center;
+}
+</style>

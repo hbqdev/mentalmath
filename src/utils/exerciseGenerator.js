@@ -2,129 +2,129 @@
  * Generates a random integer between min and max (inclusive)
  */
 function getRandomInt(min, max) {
-  min = Math.ceil(min);
-  max = Math.floor(max);
-  return Math.floor(Math.random() * (max - min + 1)) + min;
+  min = Math.ceil(min)
+  max = Math.floor(max)
+  return Math.floor(Math.random() * (max - min + 1)) + min
 }
 
 /**
  * Generates a random number with the specified number of digits
  */
 function generateRandomNumber(digitCount, maxValue) {
-  const min = Math.pow(10, digitCount - 1);
-  const max = Math.min(Math.pow(10, digitCount) - 1, maxValue);
-  return getRandomInt(min, max);
+  const min = Math.pow(10, digitCount - 1)
+  const max = Math.min(Math.pow(10, digitCount) - 1, maxValue)
+  return getRandomInt(min, max)
 }
 
 /**
  * Generates an addition exercise based on difficulty
  */
 export function generateAdditionExercise(difficulty) {
-  const { digitCount, maxValue } = difficulty;
-  
-  const num1 = generateRandomNumber(digitCount, maxValue);
-  const num2 = generateRandomNumber(digitCount, maxValue);
-  
+  const { digitCount, maxValue } = difficulty
+
+  const num1 = generateRandomNumber(digitCount, maxValue)
+  const num2 = generateRandomNumber(digitCount, maxValue)
+
   return {
     num1,
     num2,
     operation: '+',
     correctAnswer: num1 + num2,
-    steps: generateAdditionSteps(num1, num2)
-  };
+    steps: generateAdditionSteps(num1, num2),
+  }
 }
 
 /**
  * Generates a subtraction exercise based on difficulty
  */
 export function generateSubtractionExercise(difficulty) {
-  const { digitCount, maxValue, minResult = 0 } = difficulty;
-  
-  const num1 = generateRandomNumber(digitCount, maxValue);
-  let num2;
-  
+  const { digitCount, maxValue, minResult = 0 } = difficulty
+
+  const num1 = generateRandomNumber(digitCount, maxValue)
+  let num2
+
   // Ensure the result is not negative or less than minResult
   do {
-    num2 = generateRandomNumber(digitCount, num1);
-  } while (num1 - num2 < minResult);
-  
+    num2 = generateRandomNumber(digitCount, num1)
+  } while (num1 - num2 < minResult)
+
   return {
     num1,
     num2,
     operation: '-',
     correctAnswer: num1 - num2,
-    steps: generateSubtractionSteps(num1, num2)
-  };
+    steps: generateSubtractionSteps(num1, num2),
+  }
 }
 
 /**
  * Generates step-by-step explanation for addition
  */
 function generateAdditionSteps(num1, num2) {
-  const steps = [];
-  const num1Str = num1.toString();
-  const num2Str = num2.toString();
-  
+  const steps = []
+  const num1Str = num1.toString()
+  const num2Str = num2.toString()
+
   // Pad the shorter number with leading zeros
-  const maxLength = Math.max(num1Str.length, num2Str.length);
-  const paddedNum1 = num1Str.padStart(maxLength, '0');
-  const paddedNum2 = num2Str.padStart(maxLength, '0');
-  
-  let runningTotal = 0;
-  
+  const maxLength = Math.max(num1Str.length, num2Str.length)
+  const paddedNum1 = num1Str.padStart(maxLength, '0')
+  const paddedNum2 = num2Str.padStart(maxLength, '0')
+
+  let runningTotal = 0
+
   // Process each place value from left to right
   for (let i = 0; i < maxLength; i++) {
-    const placeValue = Math.pow(10, maxLength - i - 1);
-    const digit1 = parseInt(paddedNum1[i]);
-    const digit2 = parseInt(paddedNum2[i]);
-    
-    const placeSum = digit1 * placeValue + digit2 * placeValue;
-    runningTotal += placeSum;
-    
-    const placeValueName = getPlaceValueName(maxLength - i - 1);
-    
+    const placeValue = Math.pow(10, maxLength - i - 1)
+    const digit1 = parseInt(paddedNum1[i])
+    const digit2 = parseInt(paddedNum2[i])
+
+    const placeSum = digit1 * placeValue + digit2 * placeValue
+    runningTotal += placeSum
+
+    const placeValueName = getPlaceValueName(maxLength - i - 1)
+
     steps.push({
       description: `Add the ${placeValueName}: ${digit1 * placeValue} + ${digit2 * placeValue} = ${placeSum}`,
-      runningTotal
-    });
+      runningTotal,
+    })
   }
-  
-  return steps;
+
+  return steps
 }
 
 /**
  * Generates step-by-step explanation for subtraction
  */
 function generateSubtractionSteps(num1, num2) {
-  const steps = [];
-  const num1Str = num1.toString();
-  const num2Str = num2.toString();
-  
+  const steps = []
+  const num1Str = num1.toString()
+  const num2Str = num2.toString()
+
   // Pad the shorter number with leading zeros
-  const maxLength = Math.max(num1Str.length, num2Str.length);
-  const paddedNum1 = num1Str.padStart(maxLength, '0');
-  const paddedNum2 = num2Str.padStart(maxLength, '0');
-  
-  let runningTotal = 0;
-  
+  const maxLength = Math.max(num1Str.length, num2Str.length)
+  const paddedNum1 = num1Str.padStart(maxLength, '0')
+  const paddedNum2 = num2Str.padStart(maxLength, '0')
+
+  let runningTotal = 0
+
   // Process each place value from left to right
   for (let i = 0; i < maxLength; i++) {
-    const placeValue = Math.pow(10, maxLength - i - 1);
-    const digit1 = parseInt(paddedNum1[i]);
-    const digit2 = parseInt(paddedNum2[i]);
-    
-    const placeDiff = (digit1 - digit2) * placeValue;
-    runningTotal += placeDiff;
-    
-    const placeValueName = getPlaceValueName(maxLength - i - 1);
-    
+    const placeValue = Math.pow(10, maxLength - i - 1)
+    const digit1 = parseInt(paddedNum1[i])
+    const digit2 = parseInt(paddedNum2[i])
+
+    const placeDiff = (digit1 - digit2) * placeValue
+    runningTotal += placeDiff
+
+    const placeValueName = getPlaceValueName(maxLength - i - 1)
+
     steps.push({
       description: `Subtract the ${placeValueName}: ${digit1 * placeValue} - ${digit2 * placeValue} = ${placeDiff}`,
-      runningTotal
-    });
+      runningTotal,
+    })
   }
-  
-  return steps;
+
+  return steps
 }
 
 /**
@@ -132,11 +132,16 @@ function generateSubtractionSteps(num1, num2) {
  */
 function getPlaceValueName(exponent) {
   switch (exponent) {
-    case 0: return 'ones';
-    case 1: return 'tens';
-    case 2: return 'hundreds';
-    case 3: return 'thousands';
-    default: return `10^${exponent}`;
+    case 0:
+      return 'ones'
+    case 1:
+      return 'tens'
+    case 2:
+      return 'hundreds'
+    case 3:
+      return 'thousands'
+    default:
+      return `10^${exponent}`
   }
 }
 
@@ -146,63 +151,107 @@ function getPlaceValueName(exponent) {
 export function generateExercise(type, difficultyLevel) {
   const exerciseTypes = {
     addition: generateAdditionExercise,
-    subtraction: generateSubtractionExercise
-  };
-  
-  if (!exerciseTypes[type]) {
-    throw new Error(`Unknown exercise type: ${type}`);
+    subtraction: generateSubtractionExercise,
   }
-  
-  return exerciseTypes[type](difficultyLevel);
+
+  if (!exerciseTypes[type]) {
+    throw new Error(`Unknown exercise type: ${type}`)
+  }
+
+  return exerciseTypes[type](difficultyLevel)
 }
 
 // Main Exercise Generator Router
 import {
   generateMultiplyBy11Exercises,
   generateSquaringExercises,
-  generateSpecialMultiplicationExercises
-} from './generators/chapter0Generator.js';
+  generateSpecialMultiplicationExercises,
+} from './generators/chapter0Generator.js'
 
 import {
   generateAdditionExercises,
-  generateSubtractionExercises
-} from './generators/chapter1Generator.js';
+  generateSubtractionExercises,
+} from './generators/chapter1Generator.js'
 
 import {
   generateChapter2SquaringExercises,
-  generateDistributiveExercises
-} from './generators/chapter2Generator.js';
+  generateDistributiveExercises,
+} from './generators/chapter2Generator.js'
+
+import {
+  generateAdditionMethodExercises,
+  generateSubtractionMethodExercises,
+  generateFactoringMethodExercises,
+  generateThreeDigitSquareExercises,
+  generateTwoDigitCubeExercises,
+} from './generators/chapter3Generator'
 
 /**
- * Generate exercises based on chapter, exercise type, and difficulty
+ * Generate exercises based on chapter and exercise type with mixed difficulty levels
  */
-export function generateExercises(chapterId, exerciseType, difficulty = 'easy', count = 10) {
+export function generateExercises(chapterId, exerciseType, count = 10) {
+  // Get a random difficulty level for each exercise
+  function getRandomDifficulty() {
+    const difficulties = ['easy', 'medium', 'hard']
+    const index = Math.floor(Math.random() * difficulties.length)
+    return difficulties[index]
+  }
+
+  // Generate exercises with mixed difficulty levels
+  function generateMixedDifficulty(generatorFn, count) {
+    const exercises = []
+
+    // For each exercise, randomly select a difficulty level
+    for (let i = 0; i < count; i++) {
+      const difficulty = getRandomDifficulty()
+      const exercise = generatorFn(difficulty, 1)[0] // Generate one exercise of this difficulty
+      exercises.push(exercise)
+    }
+
+    return exercises
+  }
+
   // Chapter 0: Quick Tricks
   if (chapterId === 0) {
     if (exerciseType === 'multiply-by-11') {
-      return generateMultiplyBy11Exercises(difficulty, count);
+      return generateMixedDifficulty(generateMultiplyBy11Exercises, count)
     } else if (exerciseType === 'squaring') {
-      return generateSquaringExercises(difficulty, count);
+      return generateMixedDifficulty(generateSquaringExercises, count)
     } else if (exerciseType === 'special-multiplication') {
-      return generateSpecialMultiplicationExercises(difficulty, count);
+      return generateMixedDifficulty(generateSpecialMultiplicationExercises, count)
     }
   }
   // Chapter 1: Addition and Subtraction
   else if (chapterId === 1) {
     if (exerciseType === 'left-to-right-addition') {
-      return generateAdditionExercises(difficulty, count);
+      return generateMixedDifficulty(generateAdditionExercises, count)
     } else if (exerciseType === 'left-to-right-subtraction') {
-      return generateSubtractionExercises(difficulty, count);
+      return generateMixedDifficulty(generateSubtractionExercises, count)
     }
   }
-  // Chapter 2: Squaring and Distributive Property
+  // Chapter 2: Multiplication
   else if (chapterId === 2) {
     if (exerciseType === 'squaring') {
-      return generateChapter2SquaringExercises(difficulty, count);
+      return generateMixedDifficulty(generateChapter2SquaringExercises, count)
     } else if (exerciseType === 'distributive') {
-      return generateDistributiveExercises(difficulty, count);
+      return generateMixedDifficulty(generateDistributiveExercises, count)
     }
   }
-  
-  return [];
+  // Chapter 3: Intermediate Multiplication
+  else if (chapterId === 3) {
+    if (exerciseType === 'addition-method') {
+      return generateMixedDifficulty(generateAdditionMethodExercises, count)
+    } else if (exerciseType === 'subtraction-method') {
+      return generateMixedDifficulty(generateSubtractionMethodExercises, count)
+    } else if (exerciseType === 'factoring-method') {
+      return generateMixedDifficulty(generateFactoringMethodExercises, count)
+    } else if (exerciseType === 'three-digit-squares') {
+      return generateMixedDifficulty(generateThreeDigitSquareExercises, count)
+    } else if (exerciseType === 'two-digit-cubes') {
+      return generateMixedDifficulty(generateTwoDigitCubeExercises, count)
+    }
+  }
+  // Add other chapters here...
+
+  return []
 }
