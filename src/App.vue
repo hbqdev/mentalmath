@@ -1,12 +1,45 @@
 <script setup>
 import { RouterLink, RouterView } from 'vue-router'
+import { watch } from 'vue'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+
+// Global navigation handler to ensure clean state between routes
+watch(
+  () => route.path,
+  () => {
+    // Clean up MathJax elements on every navigation
+    cleanupMathJax()
+  }
+)
+
+function cleanupMathJax() {
+  // Remove any MathJax elements that might be causing issues
+  const mathJaxElements = document.querySelectorAll('.MathJax, .MathJax_Display, .MJX-TEX')
+  mathJaxElements.forEach(el => el.remove())
+  
+  // Reset MathJax state if it exists
+  if (window.MathJax && window.MathJax.typesetClear) {
+    window.MathJax.typesetClear()
+  }
+}
+
+// Handle logo click to ensure clean navigation to home
+function goHome() {
+  cleanupMathJax()
+  // Force a small delay to ensure cleanup completes
+  setTimeout(() => {
+    window.location.href = '/'
+  }, 10)
+}
 </script>
 
 <template>
   <div class="app-container">
     <header>
       <div class="logo">
-        <RouterLink to="/">Mental Math Trainer</RouterLink>
+        <a href="/" @click.prevent="goHome">Mental Math Trainer</a>
       </div>
       <nav>
         <RouterLink to="/">Home</RouterLink>
