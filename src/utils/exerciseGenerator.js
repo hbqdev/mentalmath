@@ -199,6 +199,31 @@ import {
   generateSubtractingFractionsExercises,
 } from './generators/chapter4Generator'
 
+// Add to your imports
+import {
+  generatePercentageCalculationExercises,
+  generateFractionDecimalConversionExercises,
+  generateAdditionGuesstimationExercises,
+  generateSubtractionGuesstimationExercises,
+} from './generators/chapter5Generator.js'
+
+// Import Chapter 6 generators
+import {
+  generateColumnAdditionExercises,
+  generateModSumsExercises,
+  generatePaperSubtractionExercises,
+  generateSquareRootExercises,
+  generateCrissCrossMultiplicationExercises,
+} from './generators/chapter6Generator.js'
+
+// Add to your imports section
+import {
+  generateNumberToWordExercises,
+  generateWordToNumberExercises,
+  generateMemoryChainExercises,
+  generateDigitSoundExercises,
+} from './generators/chapter7Generator.js'
+
 /**
  * Generate exercises based on chapter and exercise type with mixed difficulty levels
  */
@@ -284,6 +309,54 @@ export function generateExercises(chapterId, exerciseType, count = 10) {
       return generateMixedDifficulty(generateAddingFractionsExercises, count)
     } else if (exerciseType === 'subtracting-fractions') {
       return generateMixedDifficulty(generateSubtractingFractionsExercises, count)
+    }
+  }
+  // Chapter 5: Good Enough: The Art of 'Guesstimation'
+  else if (chapterId === 5) {
+    switch (exerciseType) {
+      case 'percentage-calculation':
+        return generateMixedDifficulty(generatePercentageCalculationExercises, count)
+      case 'fraction-decimal-conversion':
+        return generateMixedDifficulty(generateFractionDecimalConversionExercises, count)
+      case 'addition-guesstimation':
+        return generateMixedDifficulty(generateAdditionGuesstimationExercises, count)
+      case 'subtraction-guesstimation':
+        return generateMixedDifficulty(generateSubtractionGuesstimationExercises, count)
+      default:
+        return []
+    }
+  }
+  // Chapter 6: New Chapter
+  else if (chapterId === 6) {
+    switch (exerciseType) {
+      case 'column-addition':
+        return generateMixedDifficulty(generateColumnAdditionExercises, count)
+      case 'mod-sums':
+        return generateMixedDifficulty(generateModSumsExercises, count)
+      case 'paper-subtraction':
+        return generateMixedDifficulty(generatePaperSubtractionExercises, count)
+      case 'square-root-calculation':
+        return generateMixedDifficulty(generateSquareRootExercises, count)
+      case 'criss-cross-multiplication':
+        return generateMixedDifficulty(generateCrissCrossMultiplicationExercises, count)
+      default:
+        return []
+    }
+  }
+  // Chapter 7: Memorizing Numbers
+  else if (chapterId === 7) {
+    switch (exerciseType) {
+      case 'number-to-word':
+        return generateNumberToWordExercises('medium', count)
+      case 'word-to-number':
+        return generateWordToNumberExercises('medium', count)
+      case 'memory-chain':
+        return generateMemoryChainExercises('medium', count)
+      case 'digit-sound':
+        return generateDigitSoundExercises('medium', count)
+      default:
+        console.error('Unknown exercise type for chapter 7:', exerciseType)
+        return []
     }
   }
   // Add other chapters here...

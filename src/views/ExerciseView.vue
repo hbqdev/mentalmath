@@ -88,6 +88,15 @@ function setCurrentExercise() {
   const exercise = generatedExercises.value[currentExerciseIndex.value]
   if (!exercise) return
 
+  // Special handling for Chapter 7 exercises
+  if (chapterId.value === 7) {
+    currentExercise.value = {
+      ...exercise,
+      displayType: exercise.type, // Use the exercise type directly
+    }
+    return
+  }
+
   let num1,
     num2,
     operator,
@@ -152,10 +161,24 @@ function setCurrentExercise() {
       ;[num1, num2] = exercise.question.split('-').map((part) => parseInt(part.trim()))
     }
   } else if (exercise.question.includes('÷')) {
-    // Division problems
-    displayType.value = 'division'
-    operator = '÷'
-    ;[num1, num2] = exercise.question.split('÷').map((part) => parseInt(part.trim()))
+    // Check if it's a fraction division problem (containing both ÷ and /)
+    if (exercise.question.includes('/')) {
+      displayType.value = 'fraction'
+      const parts = exercise.question.split('÷')
+      const frac1 = parts[0].trim().split('/')
+      const frac2 = parts[1].trim().split('/')
+
+      numerator1 = parseInt(frac1[0])
+      denominator1 = parseInt(frac1[1])
+      numerator2 = parseInt(frac2[0])
+      denominator2 = parseInt(frac2[1])
+      operator = '÷'
+    } else {
+      // Regular division problems (not fractions)
+      displayType.value = 'division'
+      operator = '÷'
+      ;[num1, num2] = exercise.question.split('÷').map((part) => parseInt(part.trim()))
+    }
   } else if (exercise.question.includes('divisible by')) {
     // Divisibility test problems
     displayType.value = 'divisibilityTest'
@@ -188,6 +211,48 @@ function setCurrentExercise() {
     operator = null
     numerator2 = null
     denominator2 = null
+  } else if (exercise.question.includes('% of')) {
+    // Percentage calculation
+    displayType.value = 'percentage'
+    const parts = exercise.question.split('% of')
+    const percentage = parseFloat(parts[0])
+    const number = parseInt(parts[1].trim())
+
+    num1 = percentage
+    num2 = number
+    operator = '% of'
+  } else if (exercise.question.includes('Convert')) {
+    // Fraction-decimal conversion
+    displayType.value = 'conversion'
+    const match = exercise.question.match(/Convert (.*) to a (.*)/)
+    if (match) {
+      num1 = match[1] // The value to convert
+      num2 = match[2] // The target format (decimal or fraction)
+    }
+  } else if (exercise.question.includes('Calculate the square root of')) {
+    // Square root calculation
+    displayType.value = 'squareRoot'
+    num1 = parseInt(exercise.question.replace('Calculate the square root of', '').trim())
+    num2 = null
+  } else if (exercise.displayFormat === 'squareRoot') {
+    displayType.value = 'squareRoot'
+    num1 = exercise.question.replace('√', '')
+  } else if (exercise.question.includes('number-to-word')) {
+    displayType.value = 'number-to-word'
+    num1 = parseInt(exercise.question.split('number-to-word ')[1])
+  } else if (exercise.question.includes('word-to-number')) {
+    displayType.value = 'word-to-number'
+    num1 = exercise.question.split('word-to-number ')[1]
+  } else if (exercise.question.includes('memory-chain')) {
+    displayType.value = 'memory-chain'
+    const [sequence, hint] = exercise.question.split('memory-chain ')
+    num1 = sequence
+    num2 = hint
+  } else if (exercise.question.includes('digit-sound')) {
+    displayType.value = 'digit-sound'
+    const sounds = exercise.question.split('digit-sound ')[1]
+    num1 = sounds
+    num2 = null
   } else {
     console.error('Unknown question format:', exercise.question)
     return
@@ -222,6 +287,69 @@ function checkAnswer() {
   let isCorrect = false
   const userInput = userAnswer.value.trim()
 
+  // Special handling for Chapter 7 exercises
+  if (chapterId.value === 7) {
+    if (currentExercise.value.type === 'number-to-word') {
+      isCorrect = currentExercise.value.verifyAnswer(userInput)
+      if (isCorrect) {
+        feedback.value = {
+          correct: true,
+          message: 'Correct! Great job!',
+        }
+      } else {
+        feedback.value = {
+          correct: false,
+          message: `Incorrect. Try another word using the phonetic code. ${currentExercise.value.hint || ''}`,
+        }
+      }
+    } else if (currentExercise.value.type === 'word-to-number') {
+      isCorrect = userInput === currentExercise.value.correctAnswer
+      if (isCorrect) {
+        feedback.value = {
+          correct: true,
+          message: 'Correct! Great job!',
+        }
+      } else {
+        feedback.value = {
+          correct: false,
+          message: `Incorrect. The word "${currentExercise.value.word}" converts to ${currentExercise.value.correctAnswer} using the phonetic code.`,
+        }
+      }
+    } else if (currentExercise.value.type === 'memory-chain') {
+      isCorrect = currentExercise.value.verifyAnswer(userInput)
+      if (isCorrect) {
+        feedback.value = {
+          correct: true,
+          message: 'Correct! Your sentence correctly represents the number sequence!',
+        }
+      } else {
+        feedback.value = {
+          correct: false,
+          message: `Incorrect. Try creating another sentence that represents ${currentExercise.value.sequence}. ${currentExercise.value.hint || ''}`,
+        }
+      }
+    } else if (currentExercise.value.type === 'digit-sound') {
+      isCorrect = userInput === currentExercise.value.correctAnswer
+      if (isCorrect) {
+        feedback.value = {
+          correct: true,
+          message: `Correct! The sounds "${currentExercise.value.sounds}" correspond to the digit ${currentExercise.value.correctAnswer}.`,
+        }
+      } else {
+        feedback.value = {
+          correct: false,
+          message: `Incorrect. The sounds "${currentExercise.value.sounds}" correspond to the digit ${currentExercise.value.correctAnswer}.`,
+        }
+      }
+    }
+
+    if (isCorrect) {
+      correctAnswers.value++
+    }
+    exercisesCompleted.value++
+    return
+  }
+
   if (currentExercise.value.isDivisibilityTest) {
     // For divisibility tests, accept yes/no or y/n (case insensitive)
     const normalizedUserInput = userInput.toLowerCase()
@@ -250,6 +378,32 @@ function checkAnswer() {
       normalizedUserInput === normalizedCorrectAnswer ||
       normalizedUserInput.replace('remainder', 'r') ===
         normalizedCorrectAnswer.replace('remainder', 'r')
+  } else if (currentExercise.value.displayType === 'percentage') {
+    // For percentage calculations, allow for small rounding differences
+    const userNum = parseFloat(userInput.replace(/[^\d.-]/g, ''))
+    const correctNum = parseFloat(currentExercise.value.correctAnswer.replace(/[^\d.-]/g, ''))
+    isCorrect = !isNaN(userNum) && Math.abs(userNum - correctNum) < 0.1
+  } else if (currentExercise.value.displayType === 'conversion') {
+    // For conversions, normalize input
+    const normalizedUserInput = userInput.replace(/\s+/g, '').toLowerCase()
+    const normalizedCorrectAnswer = currentExercise.value.correctAnswer
+      .replace(/\s+/g, '')
+      .toLowerCase()
+
+    // Special handling for recurring decimals
+    if (normalizedCorrectAnswer.includes('...')) {
+      const correctBase = normalizedCorrectAnswer.replace('...', '')
+      isCorrect =
+        normalizedUserInput.startsWith(correctBase) ||
+        normalizedUserInput === normalizedCorrectAnswer
+    } else {
+      isCorrect = normalizedUserInput === normalizedCorrectAnswer
+    }
+  } else if (currentExercise.value.displayType === 'squareRoot') {
+    // For square root calculations, accept approximate answers
+    const userNum = parseFloat(userInput)
+    const correctNum = Math.sqrt(currentExercise.value.num1)
+    isCorrect = !isNaN(userNum) && Math.abs(userNum - correctNum) < 0.1
   } else {
     // For normal arithmetic, parse as number
     const userNum = parseInt(userInput)
@@ -321,60 +475,163 @@ function returnToChapter() {
       <div class="exercise-box">
         <div v-if="currentExercise" class="exercise-content">
           <div class="question">
-            <!-- For normal operations (multiplication, addition, subtraction) -->
-            <div v-if="currentExercise.displayType === 'normal'" class="numbers">
-              <template v-if="!currentExercise.isExponent">
-                <span class="number">{{ currentExercise.num1 }}</span>
-                <span class="operator">{{ currentExercise.operator }}</span>
-                <span class="number">{{ currentExercise.num2 }}</span>
-              </template>
-              <template v-else>
-                <div class="exponent-container">
-                  <span class="number">{{ currentExercise.num1 }}</span>
-                  <sup class="exponent">{{ currentExercise.exponent }}</sup>
+            <!-- For Chapter 7 exercises -->
+            <div v-if="chapterId === 7" class="chapter7-exercises">
+              <!-- Number to Word -->
+              <div v-if="currentExercise.type === 'number-to-word'" class="number-word-conversion">
+                <p>Convert this number to a memorable word using the phonetic code:</p>
+                <div class="number">{{ currentExercise.number }}</div>
+                <div class="hint" v-if="currentExercise.hint">
+                  <small>{{ currentExercise.hint }}</small>
                 </div>
-              </template>
-            </div>
-
-            <!-- For division operations -->
-            <div v-else-if="currentExercise.displayType === 'division'" class="numbers">
-              <span class="number">{{ currentExercise.num1 }}</span>
-              <span class="operator">÷</span>
-              <span class="number">{{ currentExercise.num2 }}</span>
-            </div>
-
-            <!-- For divisibility tests -->
-            <div
-              v-else-if="currentExercise.displayType === 'divisibilityTest'"
-              class="divisibility-test"
-            >
-              <p>Is {{ currentExercise.num1 }} divisible by {{ currentExercise.num2 }}?</p>
-            </div>
-
-            <!-- For fractions (addition, subtraction, multiplication, division) -->
-            <div v-else-if="currentExercise.displayType === 'fraction'" class="fraction-operation">
-              <div class="fraction">
-                <div class="numerator">{{ currentExercise.numerator1 }}</div>
-                <div class="fraction-line"></div>
-                <div class="denominator">{{ currentExercise.denominator1 }}</div>
               </div>
-              <span class="operator">{{ currentExercise.operator }}</span>
-              <div class="fraction">
-                <div class="numerator">{{ currentExercise.numerator2 }}</div>
-                <div class="fraction-line"></div>
-                <div class="denominator">{{ currentExercise.denominator2 }}</div>
+
+              <!-- Word to Number -->
+              <div
+                v-else-if="currentExercise.type === 'word-to-number'"
+                class="word-number-conversion"
+              >
+                <p>Convert this word back to its number:</p>
+                <div class="word">{{ currentExercise.word }}</div>
+              </div>
+
+              <!-- Memory Chain -->
+              <div v-else-if="currentExercise.type === 'memory-chain'" class="memory-chain">
+                <p>Create a memorable sentence for this number sequence:</p>
+                <div class="sequence">{{ currentExercise.sequence }}</div>
+                <div class="hint" v-if="currentExercise.hint">
+                  <small>{{ currentExercise.hint }}</small>
+                </div>
+              </div>
+
+              <!-- Digit Sound Association -->
+              <div v-else-if="currentExercise.type === 'digit-sound'" class="digit-sound">
+                <p>What digit corresponds to these consonant sounds?</p>
+                <div class="sounds">{{ currentExercise.sounds }}</div>
+                <div class="hint">
+                  <small>Enter the single digit (0-9) that matches these sounds.</small>
+                </div>
               </div>
             </div>
 
-            <!-- For single fractions (simplification or decimalization) -->
-            <div
-              v-else-if="currentExercise.displayType === 'singleFraction'"
-              class="single-fraction"
-            >
-              <div class="fraction">
-                <div class="numerator">{{ currentExercise.numerator1 }}</div>
-                <div class="fraction-line"></div>
-                <div class="denominator">{{ currentExercise.denominator1 }}</div>
+            <!-- For other chapter exercises -->
+            <div v-else>
+              <!-- For normal operations (multiplication, addition, subtraction) -->
+              <div v-if="currentExercise.displayType === 'normal'" class="numbers">
+                <template v-if="!currentExercise.isExponent">
+                  <span class="number">{{ currentExercise.num1 }}</span>
+                  <span class="operator">{{ currentExercise.operator }}</span>
+                  <span class="number">{{ currentExercise.num2 }}</span>
+                </template>
+                <template v-else>
+                  <div class="exponent-container">
+                    <span class="number">{{ currentExercise.num1 }}</span>
+                    <sup class="exponent">{{ currentExercise.exponent }}</sup>
+                  </div>
+                </template>
+              </div>
+
+              <!-- For division operations -->
+              <div v-else-if="currentExercise.displayType === 'division'" class="numbers">
+                <span class="number">{{ currentExercise.num1 }}</span>
+                <span class="operator">÷</span>
+                <span class="number">{{ currentExercise.num2 }}</span>
+              </div>
+
+              <!-- For divisibility tests -->
+              <div
+                v-else-if="currentExercise.displayType === 'divisibilityTest'"
+                class="divisibility-test"
+              >
+                <p>Is {{ currentExercise.num1 }} divisible by {{ currentExercise.num2 }}?</p>
+              </div>
+
+              <!-- For fractions (addition, subtraction, multiplication, division) -->
+              <div
+                v-else-if="currentExercise.displayType === 'fraction'"
+                class="fraction-operation"
+              >
+                <div class="fraction">
+                  <div class="numerator">{{ currentExercise.numerator1 }}</div>
+                  <div class="fraction-line"></div>
+                  <div class="denominator">{{ currentExercise.denominator1 }}</div>
+                </div>
+                <span class="operator">{{ currentExercise.operator }}</span>
+                <div class="fraction">
+                  <div class="numerator">{{ currentExercise.numerator2 }}</div>
+                  <div class="fraction-line"></div>
+                  <div class="denominator">{{ currentExercise.denominator2 }}</div>
+                </div>
+              </div>
+
+              <!-- For single fractions (simplification or decimalization) -->
+              <div
+                v-else-if="currentExercise.displayType === 'singleFraction'"
+                class="single-fraction"
+              >
+                <div class="fraction">
+                  <div class="numerator">{{ currentExercise.numerator1 }}</div>
+                  <div class="fraction-line"></div>
+                  <div class="denominator">{{ currentExercise.denominator1 }}</div>
+                </div>
+              </div>
+
+              <!-- For percentage calculations -->
+              <div
+                v-else-if="currentExercise.displayType === 'percentage'"
+                class="percentage-calculation"
+              >
+                <div class="percentage-formula">
+                  <span class="number">{{ currentExercise.num1 }}</span>
+                  <span class="operator">% of</span>
+                  <span class="number">{{ currentExercise.num2 }}</span>
+                </div>
+              </div>
+
+              <!-- For fraction/decimal conversion -->
+              <div v-else-if="currentExercise.displayType === 'conversion'" class="conversion">
+                <p class="conversion-prompt">
+                  Convert {{ currentExercise.num1 }} to a {{ currentExercise.num2 }}
+                </p>
+              </div>
+
+              <!-- For square root calculations -->
+              <div
+                v-else-if="currentExercise.displayType === 'squareRoot'"
+                class="square-root-calculation"
+              >
+                <p>Calculate the square root of:</p>
+                <div class="number">{{ currentExercise.num1 }}</div>
+              </div>
+
+              <!-- For number-to-word conversion -->
+              <div
+                v-else-if="currentExercise.displayType === 'number-to-word'"
+                class="number-word-conversion"
+              >
+                <p>Convert this number to a memorable word:</p>
+                <div class="number">{{ currentExercise.num1 }}</div>
+                <div class="hint" v-if="currentExercise.num2">
+                  <small>{{ currentExercise.num2 }}</small>
+                </div>
+              </div>
+
+              <!-- For word-to-number conversion -->
+              <div
+                v-else-if="currentExercise.displayType === 'word-to-number'"
+                class="word-number-conversion"
+              >
+                <p>Convert this word back to its number:</p>
+                <div class="word">{{ currentExercise.num1 }}</div>
+              </div>
+
+              <!-- For memory chain exercises -->
+              <div v-else-if="currentExercise.displayType === 'memory-chain'" class="memory-chain">
+                <p>Create a memorable sentence for this number sequence:</p>
+                <div class="sequence">{{ currentExercise.num1 }}</div>
+                <div class="hint" v-if="currentExercise.num2">
+                  <small>{{ currentExercise.num2 }}</small>
+                </div>
               </div>
             </div>
 
@@ -632,5 +889,98 @@ h1 {
   font-size: 1.5rem;
   margin-bottom: 2rem;
   text-align: center;
+}
+
+/* Add to the style section */
+.percentage-calculation,
+.conversion {
+  font-size: 1.8rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.percentage-formula {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+}
+
+.conversion-prompt {
+  font-weight: normal;
+}
+
+.square-root-calculation {
+  font-size: 1.8rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.square-root-calculation .number {
+  font-weight: bold;
+  font-size: 2rem;
+}
+
+.number-word-conversion,
+.word-number-conversion,
+.memory-chain {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.number-word-conversion .number,
+.word-number-conversion .word,
+.memory-chain .sequence {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin: 1rem 0;
+}
+
+.hint {
+  color: #666;
+  font-style: italic;
+  margin: 0.5rem 0;
+}
+
+.chapter7-exercises {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.number-word-conversion .number,
+.word-number-conversion .word,
+.memory-chain .sequence {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin: 1rem 0;
+  font-family: monospace;
+}
+
+.hint {
+  color: #666;
+  font-style: italic;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+/* Add to your existing styles */
+.digit-sound {
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.digit-sound .sounds {
+  font-size: 2.5rem;
+  font-weight: bold;
+  margin: 1rem 0;
+  font-family: monospace;
+  color: #2c3e50;
+}
+
+.digit-sound .hint {
+  color: #666;
+  font-style: italic;
+  margin: 0.5rem 0;
+  font-size: 0.9rem;
 }
 </style>

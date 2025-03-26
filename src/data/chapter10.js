@@ -8,13 +8,11 @@ export const chapter10 = {
         id: 'combined-techniques',
         title: 'Combined Techniques',
         description: 'Practice using multiple mental math techniques together.',
-        difficulty: ['easy', 'medium', 'hard'],
       },
       {
         id: 'real-world-applications',
         title: 'Real-World Applications',
         description: 'Apply mental math to solve practical, real-world problems.',
-        difficulty: ['easy', 'medium', 'hard'],
       },
     ],
   },
