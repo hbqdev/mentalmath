@@ -323,20 +323,27 @@ export function generateDividingFractionsExercises(difficulty, count) {
 
   // Ranges for numerators and denominators based on difficulty
   const ranges = {
-    easy: { numMin: 1, numMax: 5, denMin: 2, denMax: 10 },
-    medium: { numMin: 1, numMax: 10, denMin: 2, denMax: 15 },
-    hard: { numMin: 5, numMax: 15, denMin: 5, denMax: 20 },
+    easy: { numMin: 1, numMax: 10, denMin: 2, denMax: 12 },
+    medium: { numMin: 1, numMax: 20, denMin: 2, denMax: 20 },
+    hard: { numMin: 1, numMax: 30, denMin: 2, denMax: 50 },
   }
 
   const range = ranges[difficulty]
 
   for (let i = 0; i < count; i++) {
-    // Generate two fractions
-    const num1 = Math.floor(Math.random() * (range.numMax - range.numMin + 1)) + range.numMin
-    const den1 = Math.floor(Math.random() * (range.denMax - range.denMin + 1)) + range.denMin
+    // Generate two proper fractions (numerator < denominator for simplicity)
+    let num1, den1, num2, den2
 
-    const num2 = Math.floor(Math.random() * (range.numMax - range.numMin + 1)) + range.numMin
-    const den2 = Math.floor(Math.random() * (range.denMax - range.denMin + 1)) + range.denMin
+    // Generate first fraction
+    den1 = Math.floor(Math.random() * (range.denMax - range.denMin + 1)) + range.denMin
+    num1 = Math.floor(Math.random() * Math.min(den1 - 1, range.numMax)) + 1
+
+    // Generate second fraction
+    den2 = Math.floor(Math.random() * (range.denMax - range.denMin + 1)) + range.denMin
+    num2 = Math.floor(Math.random() * Math.min(den2 - 1, range.numMax)) + 1
+
+    // Avoid division by zero by ensuring num2 is not zero
+    if (num2 === 0) num2 = 1
 
     // Calculate division (multiply by reciprocal)
     const resultNum = num1 * den2
@@ -345,13 +352,13 @@ export function generateDividingFractionsExercises(difficulty, count) {
     // Simplify the result
     const gcd = findGCD(resultNum, resultDen)
     const simplifiedNum = resultNum / gcd
-    const simplifiedDen = resultDen / gcd
+    const simplifiedDenom = resultDen / gcd
 
-    // Format the question
+    // Format the question - ensure a space on both sides of ÷ for consistent parsing
     const question = `${num1}/${den1} ÷ ${num2}/${den2}`
 
     // Format the answer as a simplified fraction
-    const answer = `${simplifiedNum}/${simplifiedDen}`
+    const answer = `${simplifiedNum}/${simplifiedDenom}`
 
     exercises.push({
       question,
@@ -562,11 +569,20 @@ export function generateSubtractingFractionsExercises(difficulty, count) {
       const lcm = findLCM(denom1, denom2)
       const num2Equiv = num2 * (lcm / denom2)
 
-      // Ensure num1 (after conversion) > num2 (after conversion)
-      num1 = Math.floor(Math.random() * (denom1 - 1)) + 1
-      while (num1 * (lcm / denom1) <= num2Equiv) {
-        num1 = Math.floor(Math.random() * (denom1 - 1)) + 1
-      }
+      // Calculate maximum possible numerator value to ensure it fits within the denominator
+      const maxNum1 = Math.floor((denom1 * lcm) / denom1 / (lcm / denom1))
+
+      // Ensure num1 (after conversion) > num2 (after conversion) and is within valid range
+      let attempts = 0
+      do {
+        num1 = Math.floor(Math.random() * maxNum1) + 1
+        attempts++
+        // If too many attempts, restart with new denominators
+        if (attempts > 20) {
+          i--
+          continue
+        }
+      } while (num1 * (lcm / denom1) <= num2Equiv)
     }
 
     // Calculate the answer
