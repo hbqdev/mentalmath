@@ -9,13 +9,12 @@ export const chapter8 = {
         id: 'square-root-approximation',
         title: 'Square Root Approximation',
         description: 'Practice approximating square roots mentally.',
-        difficulty: ['easy', 'medium', 'hard'],
       },
       {
         id: 'power-approximation',
         title: 'Power Approximation',
         description: 'Practice approximating powers of numbers mentally.',
-        difficulty: ['easy', 'medium', 'hard'],
+      
       },
     ],
   },
