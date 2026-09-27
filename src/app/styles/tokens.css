@@ -25,6 +25,22 @@
   --radius: 6px;
 }
 
+/* A second light theme: white page, cool ink, cobalt accent. */
+[data-theme='bright'] {
+  color-scheme: light;
+  --paper: #ffffff;
+  --surface: #f6f8fb;
+  --ink: #16202a;
+  --muted: #55636f;
+  --faint: #8a97a3;
+  --rule: #dde4ec;
+  --accent: #1f5fbf;
+  --accent-ink: #ffffff;
+  --warm: #c27a1a;
+  --card: #eef3fa;
+  --card-rule: #c9d7ea;
+}
+
 [data-theme='dark'] {
   color-scheme: dark;
   --paper: #0f1720;

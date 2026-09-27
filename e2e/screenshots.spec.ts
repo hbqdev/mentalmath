@@ -62,9 +62,12 @@ test.describe('screenshots', () => {
     await expect(page.locator('#instant-multiplication')).toBeVisible()
     await shot(page, info, 'reader', 'chapter-0-focus')
     await page.getByTestId('focus-toggle').click()
-    await page.getByTestId('theme-toggle').click() // light -> dark
+    await page.getByTestId('theme-toggle').selectOption('dark')
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
     await shot(page, info, 'reader', 'chapter-0-dark')
+    await page.getByTestId('theme-toggle').selectOption('bright')
+    await expect(page.locator('html')).toHaveAttribute('data-theme', 'bright')
+    await shot(page, info, 'reader', 'chapter-0-bright')
   })
 
   test('reader sheet open', async ({ page }, info) => {

@@ -22,6 +22,9 @@ describe('pre-paint theme script', () => {
       fontScale: '2',
     })
   })
+  it('applies the bright theme', () => {
+    expect(run(JSON.stringify({ settings: { theme: 'bright' } })).theme).toBe('bright')
+  })
   it('falls back to the system preference and the default size', () => {
     expect(run(null, true)).toEqual({ theme: 'dark', fontScale: '1' })
     expect(run(JSON.stringify({ settings: { theme: 'system' } }), false)).toEqual({

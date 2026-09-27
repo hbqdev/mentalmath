@@ -33,4 +33,20 @@ describe('useTheme', () => {
     expect(['light', 'dark']).toContain(document.documentElement.dataset.theme)
     scope.stop()
   })
+
+  it('offers four named themes and applies the bright one', async () => {
+    const scope = effectScope()
+    let api!: ReturnType<typeof useTheme>
+    scope.run(() => {
+      api = useTheme()
+    })
+    expect(api.themes.map((t) => t.value)).toEqual(['system', 'light', 'bright', 'dark'])
+    api.setTheme('bright')
+    await nextTick()
+    expect(document.documentElement.dataset.theme).toBe('bright')
+    api.setTheme('nonsense')
+    await nextTick()
+    expect(document.documentElement.dataset.theme).toBe('bright')
+    scope.stop()
+  })
 })
