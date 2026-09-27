@@ -163,3 +163,35 @@ describe('parseUnit', () => {
     expect(doc.sections[0]?.title).toBe('Epilogue')
   })
 })
+
+describe('parseUnit exercise mapping extras', () => {
+  const two = `<html><body>
+<h2 class="section"><strong>SET</strong></h2>
+<p class="indent">Heading image then list image:</p>
+<div class="dis_img"><img src="../images/h.jpeg" alt=""/></div>
+<div class="dis_img"><img src="../images/l.jpeg" alt=""/></div>
+<p class="indent">A worked example that also carries the next list:</p>
+<div class="dis_img"><img src="../images/mixed.jpeg" alt=""/></div>
+<p class="indent">Tail.</p>
+</body></html>`
+
+  it('collapses several figures mapped to the same set into one exercise block per section', () => {
+    const { doc, figures } = parseUnit(
+      { id: '2', kicker: 'Chapter 2', files: [{ path: 'text/x.html', html: two }] },
+      { ...opts, exerciseSets: { 'ch2-f001': 'ch2-two-digit-squares', 'ch2-f002': 'ch2-two-digit-squares' } },
+    )
+    const types = doc.sections[0]!.blocks.map((b) => (b.type === 'exercise' ? `exercise:${b.setId}` : b.type))
+    expect(types).toEqual(['html', 'exercise:ch2-two-digit-squares', 'html', 'figure', 'html'])
+    expect(figures.map((f) => f.id)).toEqual(['ch2-f003'])
+  })
+
+  it('keeps a figure and inserts an exercise block after it when listed in exerciseAfter', () => {
+    const { doc, figures } = parseUnit(
+      { id: '3', kicker: 'Chapter 3', files: [{ path: 'text/x.html', html: two }] },
+      { ...opts, exerciseSets: {}, exerciseAfter: { 'ch3-f003': 'ch3-three-digit-squares' } },
+    )
+    const types = doc.sections[0]!.blocks.map((b) => (b.type === 'exercise' ? `exercise:${b.setId}` : b.type))
+    expect(types).toEqual(['html', 'figure', 'figure', 'html', 'figure', 'exercise:ch3-three-digit-squares', 'html'])
+    expect(figures.map((f) => f.id)).toEqual(['ch3-f001', 'ch3-f002', 'ch3-f003'])
+  })
+})

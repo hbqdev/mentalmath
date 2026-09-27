@@ -13,7 +13,10 @@ export interface UnitInput {
   files: Array<{ path: string; html: string; tocLabel?: string }>
 }
 export interface ParseOptions {
+  /** figure id -> set id: the figure IS the exercise list; it is replaced by an exercise block */
   exerciseSets: Record<string, string>
+  /** figure id -> set id: the figure stays and an exercise block is inserted right after it */
+  exerciseAfter?: Record<string, string>
   imageSize: (imagePath: string) => { width: number; height: number }
   figureSrc: (unitId: string, figureId: string) => string
 }
@@ -107,20 +110,28 @@ class UnitBuilder {
     const id = this.nextFigureId()
     const setId = this.opts.exerciseSets[id]
     if (setId) {
-      sec.blocks.push({ type: 'exercise', setId })
-      return
+      this.pushExercise(sec, setId)
+    } else {
+      const text = collapseWs(cheerio.load(preceding).text())
+      if (/exercis/i.test(text)) this.candidates.push({ figureId: id, after: text.slice(-160) })
+      const { width, height } = this.opts.imageSize(sourcePath)
+      sec.blocks.push({
+        type: 'figure',
+        id,
+        src: this.opts.figureSrc(this.unitId, id),
+        width,
+        height,
+      })
+      this.figures.push({ id, unitId: this.unitId, sourcePath })
     }
-    const text = collapseWs(cheerio.load(preceding).text())
-    if (/exercis/i.test(text)) this.candidates.push({ figureId: id, after: text.slice(-160) })
-    const { width, height } = this.opts.imageSize(sourcePath)
-    sec.blocks.push({
-      type: 'figure',
-      id,
-      src: this.opts.figureSrc(this.unitId, id),
-      width,
-      height,
-    })
-    this.figures.push({ id, unitId: this.unitId, sourcePath })
+    const after = this.opts.exerciseAfter?.[id]
+    if (after) this.pushExercise(sec, after)
+  }
+
+  /** One exercise block per set per section: heading images and split lists collapse into one. */
+  private pushExercise(sec: SectionDoc, setId: string) {
+    if (sec.blocks.some((b) => b.type === 'exercise' && b.setId === setId)) return
+    sec.blocks.push({ type: 'exercise', setId })
   }
 
   inlineFigure(sourcePath: string): string {
