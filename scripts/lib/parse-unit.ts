@@ -82,6 +82,10 @@ class UnitBuilder {
     private opts: ParseOptions,
   ) {}
 
+  get unitLabel() {
+    return this.unitId
+  }
+
   startSection(title: string, id?: string) {
     this.flush()
     const t = titleCase(title)
@@ -249,14 +253,43 @@ function paragraph(el: Element, b: UnitBuilder, fileDir: string): { html: string
   return page === undefined ? { html: out } : { html: out, page }
 }
 
-function childParagraphs(el: Element, b: UnitBuilder, fileDir: string): string {
-  const inner: string[] = []
+/**
+ * Children of a block-level wrapper (textbox, block1, hangings, ...): runs of <p> become one
+ * wrapper fragment; a nested div.dis_img becomes a figure block, closing and reopening the wrapper.
+ */
+function wrappedChildren(
+  $: CheerioAPI,
+  el: Element,
+  b: UnitBuilder,
+  fileDir: string,
+  open: string,
+  close: string,
+): void {
+  let run: string[] = []
+  const flushRun = () => {
+    if (run.length) b.addHtml(`${open}${run.join('')}${close}`)
+    run = []
+  }
   for (const child of el.children) {
     if (child.type !== 'tag') continue
     const c = child as Element
-    if (c.tagName.toLowerCase() === 'p') inner.push(paragraph(c, b, fileDir).html)
+    const tag = c.tagName.toLowerCase()
+    if (tag === 'p') {
+      const img = isImageOnly(c)
+      if (img) {
+        flushRun()
+        b.addFigure(imagePath(fileDir, img.attribs.src ?? ''))
+      } else {
+        run.push(paragraph(c, b, fileDir).html)
+      }
+    } else if (tag === 'div' && classesOf(c).includes('dis_img')) {
+      flushRun()
+      for (const img of $(c).find('img').toArray()) b.addFigure(imagePath(fileDir, img.attribs.src ?? ''))
+    } else {
+      console.warn(`parse-unit: unhandled <${tag}> inside wrapper, dropped`)
+    }
   }
-  return inner.join('')
+  flushRun()
 }
 
 function walkBody(
@@ -304,11 +337,11 @@ function walkBody(
         continue
       }
       if (cls.includes('textbox')) {
-        b.addHtml(`<aside>${childParagraphs(el, b, fileDir)}</aside>`)
+        wrappedChildren($, el, b, fileDir, '<aside>', '</aside>')
         continue
       }
       if (cls.some((c) => BLOCK_DIVS.has(c))) {
-        b.addHtml(`<div class="block">${childParagraphs(el, b, fileDir)}</div>`)
+        wrappedChildren($, el, b, fileDir, '<div class="block">', '</div>')
         continue
       }
       walkBody($, el.children, b, fileDir, meta)
@@ -340,6 +373,7 @@ function walkBody(
       b.addHtml(`<table>${rows}</table>`)
       continue
     }
+    console.warn(`parse-unit: unhandled top-level <${tag}> in unit ${b.unitLabel}, dropped`)
   }
 }
 

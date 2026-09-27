@@ -759,13 +759,24 @@
         },
         {
           "type": "html",
-          "html": "<p>Based on this you can break down the problem into four easier multiplication problems, which I illustrate below in criss-cross fashion as a 2-by-2, two 3-by-2s, and finally a 3-by-3, summing the results for a grand total. That is,</p><p><strong>(27 × 52) million<br>+ [(27 × 196) + (52 × 639)] thousand<br>+ (639 × 196)</strong></p><p>As with the five-digit squares, I begin in the middle with the 3-by-2s, starting with the harder 3-by-2:</p><div class=\"block\"></div><p>Committing 33,228 to memory with the mnemonic <em>Mom, no knife</em>, you then turn to the second 3-by-2:</p><div class=\"block\"><p class=\"hanging\"><strong>2. 27 × 196 = 27 × (200 − 4) = 5,400 − 108 = 5,292</strong></p></div><p>and add it to the number that you are storing:</p>",
+          "html": "<p>Based on this you can break down the problem into four easier multiplication problems, which I illustrate below in criss-cross fashion as a 2-by-2, two 3-by-2s, and finally a 3-by-3, summing the results for a grand total. That is,</p><p><strong>(27 × 52) million<br>+ [(27 × 196) + (52 × 639)] thousand<br>+ (639 × 196)</strong></p><p>As with the five-digit squares, I begin in the middle with the 3-by-2s, starting with the harder 3-by-2:</p>",
           "page": 194
         },
         {
           "type": "figure",
           "id": "ch8-f068",
           "src": "/book/figures/8/ch8-f068.jpeg",
+          "width": 464,
+          "height": 42
+        },
+        {
+          "type": "html",
+          "html": "<p>Committing 33,228 to memory with the mnemonic <em>Mom, no knife</em>, you then turn to the second 3-by-2:</p><div class=\"block\"><p class=\"hanging\"><strong>2. 27 × 196 = 27 × (200 − 4) = 5,400 − 108 = 5,292</strong></p></div><p>and add it to the number that you are storing:</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch8-f069",
+          "src": "/book/figures/8/ch8-f069.jpeg",
           "width": 272,
           "height": 74
         },
@@ -776,8 +787,8 @@
         },
         {
           "type": "figure",
-          "id": "ch8-f069",
-          "src": "/book/figures/8/ch8-f069.jpeg",
+          "id": "ch8-f070",
+          "src": "/book/figures/8/ch8-f070.jpeg",
           "width": 420,
           "height": 276
         },
@@ -788,8 +799,8 @@
         },
         {
           "type": "figure",
-          "id": "ch8-f070",
-          "src": "/book/figures/8/ch8-f070.jpeg",
+          "id": "ch8-f071",
+          "src": "/book/figures/8/ch8-f071.jpeg",
           "width": 182,
           "height": 45
         },
@@ -799,8 +810,8 @@
         },
         {
           "type": "figure",
-          "id": "ch8-f071",
-          "src": "/book/figures/8/ch8-f071.jpeg",
+          "id": "ch8-f072",
+          "src": "/book/figures/8/ch8-f072.jpeg",
           "width": 80,
           "height": 45
         },
@@ -810,8 +821,8 @@
         },
         {
           "type": "figure",
-          "id": "ch8-f072",
-          "src": "/book/figures/8/ch8-f072.jpeg",
+          "id": "ch8-f073",
+          "src": "/book/figures/8/ch8-f073.jpeg",
           "width": 418,
           "height": 44
         },
@@ -822,8 +833,8 @@
         },
         {
           "type": "figure",
-          "id": "ch8-f073",
-          "src": "/book/figures/8/ch8-f073.jpeg",
+          "id": "ch8-f074",
+          "src": "/book/figures/8/ch8-f074.jpeg",
           "width": 236,
           "height": 74
         },
@@ -833,8 +844,8 @@
         },
         {
           "type": "figure",
-          "id": "ch8-f074",
-          "src": "/book/figures/8/ch8-f074.jpeg",
+          "id": "ch8-f075",
+          "src": "/book/figures/8/ch8-f075.jpeg",
           "width": 414,
           "height": 188
         },
@@ -844,8 +855,8 @@
         },
         {
           "type": "figure",
-          "id": "ch8-f075",
-          "src": "/book/figures/8/ch8-f075.jpeg",
+          "id": "ch8-f076",
+          "src": "/book/figures/8/ch8-f076.jpeg",
           "width": 125,
           "height": 74
         },
@@ -856,8 +867,8 @@
         },
         {
           "type": "figure",
-          "id": "ch8-f076",
-          "src": "/book/figures/8/ch8-f076.jpeg",
+          "id": "ch8-f077",
+          "src": "/book/figures/8/ch8-f077.jpeg",
           "width": 502,
           "height": 437
         },

@@ -86,3 +86,20 @@ describe('useProgress', () => {
     expect(raw.reading['3'].visited).toEqual(['overview'])
   })
 })
+
+describe('useProgress with malformed stored entries', () => {
+  it('normalises reading and practice entries missing fields instead of throwing', () => {
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({ reading: { '1': { lastSection: 'x' } }, practice: { s: { best: 3 } } }),
+    )
+    disposeProgressStore()
+    const p = useProgress()
+    expect(p.isVisited('1', 'x')).toBe(false)
+    expect(p.state.value.reading['1']?.updatedAt).toBe('')
+    expect(() => p.markVisited('1', 'x')).not.toThrow()
+    expect(p.state.value.reading['1']?.visited).toEqual(['x'])
+    expect(p.state.value.practice['s']?.attempts).toEqual([])
+    expect(p.bestScore('s')).toBe(3)
+  })
+})

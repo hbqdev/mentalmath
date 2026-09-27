@@ -4,8 +4,8 @@
     "ch1-f008": "ch1-two-digit-addition",
     "ch1-f024": "ch1-three-digit-addition",
     "ch1-f025": "ch1-three-digit-addition",
-    "ch1-f031": "ch1-two-digit-subtraction",
-    "ch1-f050": "ch1-three-digit-subtraction",
+    "ch1-f033": "ch1-two-digit-subtraction",
+    "ch1-f052": "ch1-three-digit-subtraction",
 
     "ch2-f012": "ch2-2-by-1-multiplication",
     "ch2-f027": "ch2-3-by-1-multiplication",
@@ -71,6 +71,6 @@
     "ch3-f041": "ch3-three-digit-squares",
     "ch5-f055": "ch5-everyday-math",
     "ch8-f022": "ch8-3-by-2-multiplication",
-    "ch8-f076": "ch8-5-by-5-multiplication"
+    "ch8-f077": "ch8-5-by-5-multiplication"
   }
 }

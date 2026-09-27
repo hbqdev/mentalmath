@@ -327,12 +327,34 @@
         },
         {
           "type": "html",
-          "html": "<p>There are two different ways to solve this problem mentally:</p><div class=\"block\"><p class=\"hanging\">1. First subtract 20, then subtract 9:</p><p class=\"hanging\">But for this problem, I would prefer the following strategy:</p><p class=\"hanging\">2. First subtract 30, then add back 1:</p></div><p>Here is the rule for deciding which method to use: If a two-digit subtraction problem would require borrowing, then round the second number up (to a multiple of ten). Subtract the rounded number, then add back the difference.</p><p>For example, the problem 54 − 28 would require borrowing (since 8 is greater than 4), so round 28 up to 30, compute 54 − 30 = 24, then add back 2 to get 26 as your final answer:</p>"
+          "html": "<p>There are two different ways to solve this problem mentally:</p><div class=\"block\"><p class=\"hanging\">1. First subtract 20, then subtract 9:</p></div>"
         },
         {
           "type": "figure",
           "id": "ch1-f029",
           "src": "/book/figures/1/ch1-f029.jpeg",
+          "width": 298,
+          "height": 35
+        },
+        {
+          "type": "html",
+          "html": "<div class=\"block\"><p class=\"hanging\">But for this problem, I would prefer the following strategy:</p><p class=\"hanging\">2. First subtract 30, then add back 1:</p></div>"
+        },
+        {
+          "type": "figure",
+          "id": "ch1-f030",
+          "src": "/book/figures/1/ch1-f030.jpeg",
+          "width": 298,
+          "height": 35
+        },
+        {
+          "type": "html",
+          "html": "<p>Here is the rule for deciding which method to use: If a two-digit subtraction problem would require borrowing, then round the second number up (to a multiple of ten). Subtract the rounded number, then add back the difference.</p><p>For example, the problem 54 − 28 would require borrowing (since 8 is greater than 4), so round 28 up to 30, compute 54 − 30 = 24, then add back 2 to get 26 as your final answer:</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch1-f031",
+          "src": "/book/figures/1/ch1-f031.jpeg",
           "width": 298,
           "height": 106
         },
@@ -343,8 +365,8 @@
         },
         {
           "type": "figure",
-          "id": "ch1-f030",
-          "src": "/book/figures/1/ch1-f030.jpeg",
+          "id": "ch1-f032",
+          "src": "/book/figures/1/ch1-f032.jpeg",
           "width": 298,
           "height": 32
         },
@@ -362,8 +384,8 @@
         },
         {
           "type": "figure",
-          "id": "ch1-f032",
-          "src": "/book/figures/1/ch1-f032.jpeg",
+          "id": "ch1-f034",
+          "src": "/book/figures/1/ch1-f034.jpeg",
           "width": 192,
           "height": 46
         },
@@ -374,8 +396,8 @@
         },
         {
           "type": "figure",
-          "id": "ch1-f033",
-          "src": "/book/figures/1/ch1-f033.jpeg",
+          "id": "ch1-f035",
+          "src": "/book/figures/1/ch1-f035.jpeg",
           "width": 493,
           "height": 32
         },
@@ -385,8 +407,8 @@
         },
         {
           "type": "figure",
-          "id": "ch1-f034",
-          "src": "/book/figures/1/ch1-f034.jpeg",
+          "id": "ch1-f036",
+          "src": "/book/figures/1/ch1-f036.jpeg",
           "width": 143,
           "height": 46
         },
@@ -396,8 +418,8 @@
         },
         {
           "type": "figure",
-          "id": "ch1-f035",
-          "src": "/book/figures/1/ch1-f035.jpeg",
+          "id": "ch1-f037",
+          "src": "/book/figures/1/ch1-f037.jpeg",
           "width": 340,
           "height": 32
         },
@@ -407,8 +429,8 @@
         },
         {
           "type": "figure",
-          "id": "ch1-f036",
-          "src": "/book/figures/1/ch1-f036.jpeg",
+          "id": "ch1-f038",
+          "src": "/book/figures/1/ch1-f038.jpeg",
           "width": 54,
           "height": 45
         },
@@ -418,8 +440,8 @@
         },
         {
           "type": "figure",
-          "id": "ch1-f037",
-          "src": "/book/figures/1/ch1-f037.jpeg",
+          "id": "ch1-f039",
+          "src": "/book/figures/1/ch1-f039.jpeg",
           "width": 338,
           "height": 32
         },
@@ -429,8 +451,8 @@
         },
         {
           "type": "figure",
-          "id": "ch1-f038",
-          "src": "/book/figures/1/ch1-f038.jpeg",
+          "id": "ch1-f040",
+          "src": "/book/figures/1/ch1-f040.jpeg",
           "width": 311,
           "height": 46
         },
@@ -441,8 +463,8 @@
         },
         {
           "type": "figure",
-          "id": "ch1-f039",
-          "src": "/book/figures/1/ch1-f039.jpeg",
+          "id": "ch1-f041",
+          "src": "/book/figures/1/ch1-f041.jpeg",
           "width": 496,
           "height": 35
         },
@@ -452,8 +474,8 @@
         },
         {
           "type": "figure",
-          "id": "ch1-f040",
-          "src": "/book/figures/1/ch1-f040.jpeg",
+          "id": "ch1-f042",
+          "src": "/book/figures/1/ch1-f042.jpeg",
           "width": 327,
           "height": 35
         },
@@ -463,8 +485,8 @@
         },
         {
           "type": "figure",
-          "id": "ch1-f041",
-          "src": "/book/figures/1/ch1-f041.jpeg",
+          "id": "ch1-f043",
+          "src": "/book/figures/1/ch1-f043.jpeg",
           "width": 456,
           "height": 70
         },
@@ -475,8 +497,8 @@
         },
         {
           "type": "figure",
-          "id": "ch1-f042",
-          "src": "/book/figures/1/ch1-f042.jpeg",
+          "id": "ch1-f044",
+          "src": "/book/figures/1/ch1-f044.jpeg",
           "width": 154,
           "height": 46
         },
@@ -487,36 +509,14 @@
         },
         {
           "type": "figure",
-          "id": "ch1-f043",
-          "src": "/book/figures/1/ch1-f043.jpeg",
+          "id": "ch1-f045",
+          "src": "/book/figures/1/ch1-f045.jpeg",
           "width": 351,
           "height": 35
         },
         {
           "type": "html",
           "html": "<p>Try another three-digit subtraction problem:</p>"
-        },
-        {
-          "type": "figure",
-          "id": "ch1-f044",
-          "src": "/book/figures/1/ch1-f044.jpeg",
-          "width": 154,
-          "height": 46
-        },
-        {
-          "type": "html",
-          "html": "<p>To compute this mentally, subtract 300 from 821 to arrive at 521, then add back the complement of 59, which is 41, to arrive at 562, our final answer. The procedure looks like this:</p>"
-        },
-        {
-          "type": "figure",
-          "id": "ch1-f045",
-          "src": "/book/figures/1/ch1-f045.jpeg",
-          "width": 351,
-          "height": 32
-        },
-        {
-          "type": "html",
-          "html": "<p>Here is another problem for you to try:</p>"
         },
         {
           "type": "figure",
@@ -527,12 +527,34 @@
         },
         {
           "type": "html",
-          "html": "<p>Check your answer and the procedure for solving the problem below:</p>"
+          "html": "<p>To compute this mentally, subtract 300 from 821 to arrive at 521, then add back the complement of 59, which is 41, to arrive at 562, our final answer. The procedure looks like this:</p>"
         },
         {
           "type": "figure",
           "id": "ch1-f047",
           "src": "/book/figures/1/ch1-f047.jpeg",
+          "width": 351,
+          "height": 32
+        },
+        {
+          "type": "html",
+          "html": "<p>Here is another problem for you to try:</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch1-f048",
+          "src": "/book/figures/1/ch1-f048.jpeg",
+          "width": 154,
+          "height": 46
+        },
+        {
+          "type": "html",
+          "html": "<p>Check your answer and the procedure for solving the problem below:</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch1-f049",
+          "src": "/book/figures/1/ch1-f049.jpeg",
           "width": 495,
           "height": 31
         },
@@ -542,8 +564,8 @@
         },
         {
           "type": "figure",
-          "id": "ch1-f048",
-          "src": "/book/figures/1/ch1-f048.jpeg",
+          "id": "ch1-f050",
+          "src": "/book/figures/1/ch1-f050.jpeg",
           "width": 164,
           "height": 46
         },
@@ -554,8 +576,8 @@
         },
         {
           "type": "figure",
-          "id": "ch1-f049",
-          "src": "/book/figures/1/ch1-f049.jpeg",
+          "id": "ch1-f051",
+          "src": "/book/figures/1/ch1-f051.jpeg",
           "width": 359,
           "height": 32
         },
