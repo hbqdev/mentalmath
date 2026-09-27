@@ -57,9 +57,9 @@
 
     <div class="disclaimer">
       <p>
-        This application is not affiliated with or endorsed by the authors or publishers of
-        "Secrets of Mental Math." It is created as an educational tool to help people practice
-        mental calculation techniques.
+        This application is not affiliated with or endorsed by the authors or publishers of "Secrets
+        of Mental Math." It is created as an educational tool to help people practice mental
+        calculation techniques.
       </p>
     </div>
   </div>

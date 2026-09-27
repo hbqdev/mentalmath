@@ -38,7 +38,12 @@ export function setTitle(setId: string): string {
 export function bookSetsFor(chapterId: string): BookSetRef[] {
   const ch = chapterIndex.find((c) => c.id === chapterId)
   if (!ch) return []
-  return ch.sets.map((s) => ({ id: s.id, chapterId, sectionId: s.sectionId, title: setTitle(s.id) }))
+  return ch.sets.map((s) => ({
+    id: s.id,
+    chapterId,
+    sectionId: s.sectionId,
+    title: setTitle(s.id),
+  }))
 }
 
 export function generatedSetsFor(chapterId: string): GeneratedSetDef[] {
@@ -54,10 +59,15 @@ export function allSetsFor(chapterId: string): SetRef[] {
     ...bookSetsFor(chapterId).map((ref): SetRef => ({ kind: 'book', ref })),
     ...generatedSetsFor(chapterId).map((def): SetRef => ({ kind: 'generated', def })),
   ]
-  const sectionOf = (s: SetRef) => order.get(s.kind === 'book' ? s.ref.sectionId : s.def.sectionId) ?? 999
+  const sectionOf = (s: SetRef) =>
+    order.get(s.kind === 'book' ? s.ref.sectionId : s.def.sectionId) ?? 999
   return refs
     .map((s, i) => ({ s, i }))
-    .sort((a, b) => sectionOf(a.s) - sectionOf(b.s) || (a.s.kind === b.s.kind ? a.i - b.i : a.s.kind === 'book' ? -1 : 1))
+    .sort(
+      (a, b) =>
+        sectionOf(a.s) - sectionOf(b.s) ||
+        (a.s.kind === b.s.kind ? a.i - b.i : a.s.kind === 'book' ? -1 : 1),
+    )
     .map((x) => x.s)
 }
 

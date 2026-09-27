@@ -60,16 +60,32 @@ export function phoneticDigits(word: string): string {
     const next = w[i + 1] ?? ''
     let d = ''
     let skip = 0
-    if (ch === ' ') { lastDigit = ''; lastLetter = ''; continue }
+    if (ch === ' ') {
+      lastDigit = ''
+      lastLetter = ''
+      continue
+    }
     const atWordStart = i === 0 || w[i - 1] === ' '
     if (atWordStart && ch === 'k' && next === 'n') continue // silent k (knee, knife)
-    if (ch === 'c' && next === 'k') { d = '7'; skip = 1 }
-    else if (ch === 'p' && next === 'h') { d = '8'; skip = 1 }
-    else if (ch === 's' && next === 'h') { d = '6'; skip = 1 }
-    else if (ch === 'c' && next === 'h') { d = '6'; skip = 1 }
-    else if (ch === 't' && next === 'h') { d = '1'; skip = 1 }
-    else if (ch === 'd' && next === 'g') { d = '6'; skip = 1 }
-    else if ('sz'.includes(ch)) d = '0'
+    if (ch === 'c' && next === 'k') {
+      d = '7'
+      skip = 1
+    } else if (ch === 'p' && next === 'h') {
+      d = '8'
+      skip = 1
+    } else if (ch === 's' && next === 'h') {
+      d = '6'
+      skip = 1
+    } else if (ch === 'c' && next === 'h') {
+      d = '6'
+      skip = 1
+    } else if (ch === 't' && next === 'h') {
+      d = '1'
+      skip = 1
+    } else if (ch === 'd' && next === 'g') {
+      d = '6'
+      skip = 1
+    } else if ('sz'.includes(ch)) d = '0'
     else if (ch === 'c') d = next !== '' && 'eiy'.includes(next) ? '0' : '7'
     else if ('td'.includes(ch)) d = '1'
     else if (ch === 'n') d = '2'
@@ -82,7 +98,10 @@ export function phoneticDigits(word: string): string {
     else if ('fv'.includes(ch)) d = '8'
     else if ('pb'.includes(ch)) d = '9'
     else if (ch === 'x') d = '70'
-    else { lastLetter = ch; continue } // vowels, w, h, y
+    else {
+      lastLetter = ch
+      continue
+    } // vowels, w, h, y
     // doubled consonant letters make one sound
     if (ch === lastLetter && d === lastDigit && skip === 0) continue
     out += d
@@ -133,7 +152,8 @@ export function check(spec: AnswerSpec, input: string): CheckResult {
     case 'fraction': {
       const f = parseFraction(raw)
       if (f) {
-        if (spec.exact) return { correct: f.num === spec.value.num && f.den === spec.value.den, shown }
+        if (spec.exact)
+          return { correct: f.num === spec.value.num && f.den === spec.value.den, shown }
         const a = reduce(f)
         const b = reduce(spec.value)
         return { correct: a.num === b.num && a.den === b.den, shown }
@@ -153,7 +173,10 @@ export function check(spec: AnswerSpec, input: string): CheckResult {
       if (mixed) {
         const f = reduce({ num: Number(mixed[2]), den: Number(mixed[3]) })
         const want = reduce({ num: spec.r, den: spec.divisor })
-        return { correct: Number(mixed[1]) === spec.q && f.num === want.num && f.den === want.den, shown }
+        return {
+          correct: Number(mixed[1]) === spec.q && f.num === want.num && f.den === want.den,
+          shown,
+        }
       }
       const n = normalizeNumber(raw)
       const exact = spec.q + spec.r / spec.divisor
@@ -167,7 +190,11 @@ export function check(spec: AnswerSpec, input: string): CheckResult {
     }
     case 'text': {
       const norm = (s: string) =>
-        spec.normalize === 'lower' ? s.toLowerCase().trim() : spec.normalize === 'digits' ? s.replace(/\D/g, '') : s.trim()
+        spec.normalize === 'lower'
+          ? s.toLowerCase().trim()
+          : spec.normalize === 'digits'
+            ? s.replace(/\D/g, '')
+            : s.trim()
       const t = norm(raw)
       return { correct: spec.accept.some((a) => norm(a) === t), shown }
     }
@@ -176,7 +203,9 @@ export function check(spec: AnswerSpec, input: string): CheckResult {
     case 'estimate': {
       const n = normalizeNumber(raw)
       return {
-        correct: n !== null && Math.abs(n - spec.value) / Math.abs(spec.value || 1) <= spec.relTolerance + 1e-9,
+        correct:
+          n !== null &&
+          Math.abs(n - spec.value) / Math.abs(spec.value || 1) <= spec.relTolerance + 1e-9,
         shown,
       }
     }

@@ -6,7 +6,7 @@ const jsDay = (iso: string) => {
   return WEEKDAYS[new Date(Date.UTC(y!, m! - 1, d!)).getUTCDay()]!
 }
 
-describe('dayOfWeek (the book\'s codes)', () => {
+describe("dayOfWeek (the book's codes)", () => {
   it.each([
     ['2007-01-19', 'Friday'],
     ['2012-02-14', 'Tuesday'],
@@ -25,7 +25,7 @@ describe('dayOfWeek (the book\'s codes)', () => {
 
   it('agrees with the JavaScript calendar across four centuries', () => {
     let seed = 7
-    const rnd = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648)
+    const rnd = () => (seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648
     for (let i = 0; i < 3000; i++) {
       const y = 1600 + Math.floor(rnd() * 800)
       const m = 1 + Math.floor(rnd() * 12)
@@ -36,7 +36,7 @@ describe('dayOfWeek (the book\'s codes)', () => {
     }
   })
 
-  it('explains the calculation in the book\'s terms', () => {
+  it("explains the calculation in the book's terms", () => {
     const steps = daySteps('2007-01-19')
     expect(steps.join(' | ')).toMatch(/January.*6/)
     expect(steps.join(' | ')).toMatch(/2007.*year code/i)

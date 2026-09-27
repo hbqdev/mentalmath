@@ -42,8 +42,12 @@ const sets = computed(() =>
         <RouterLink
           v-if="isUnlocked(chapterId, s.sectionId)"
           class="go"
-          :to="{ name: 'practice', params: { chapter: chapterId, set: s.id } }"
-          >Start</RouterLink
+          :to="{
+            name: 'practice',
+            params: { chapter: chapterId, set: s.id },
+            query: s.kind === 'generated' ? { mode: 'generated' } : undefined,
+          }"
+          >{{ s.kind === 'generated' ? 'Generate' : 'Start' }}</RouterLink
         >
         <span v-else class="meta">Unlocks when you read its section</span>
       </li>

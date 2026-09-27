@@ -12,7 +12,12 @@ export type Prompt =
   | { kind: 'power'; base: number; exp: 2 | 3 }
   | { kind: 'root'; radicand: number; degree: 2 | 3 }
   | { kind: 'fraction-binary'; a: Frac; b: Frac; op: Op }
-  | { kind: 'fraction-task'; value: Frac; task: 'simplify' | 'to-decimal' | 'rewrite'; den?: number }
+  | {
+      kind: 'fraction-task'
+      value: Frac
+      task: 'simplify' | 'to-decimal' | 'rewrite'
+      den?: number
+    }
   | { kind: 'percent'; percent: number; of: number }
   | { kind: 'divisible'; n: number; by: number }
   | { kind: 'date'; iso: string }

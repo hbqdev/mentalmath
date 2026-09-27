@@ -5,7 +5,18 @@ import { ALLOWED_TAGS } from '../../../scripts/lib/sanitize'
 describe('extracted content', () => {
   it('has intro, chapters 0-9 and the epilogue in order', () => {
     expect(chapterIndex.map((c) => c.id)).toEqual([
-      'intro', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'epilogue',
+      'intro',
+      '0',
+      '1',
+      '2',
+      '3',
+      '4',
+      '5',
+      '6',
+      '7',
+      '8',
+      '9',
+      'epilogue',
     ])
   })
 
@@ -37,7 +48,16 @@ describe('extracted content', () => {
   })
 
   it('contains the curated exercise sets exactly once each', async () => {
-    const expected: Record<string, number> = { '1': 4, '2': 3, '3': 7, '4': 10, '5': 6, '6': 4, '8': 5, '9': 1 }
+    const expected: Record<string, number> = {
+      '1': 4,
+      '2': 3,
+      '3': 7,
+      '4': 10,
+      '5': 6,
+      '6': 4,
+      '8': 5,
+      '9': 1,
+    }
     for (const [id, count] of Object.entries(expected)) {
       const doc = await loadChapter(id)
       const sets = doc.sections.flatMap((s) => s.blocks).filter((b) => b.type === 'exercise')

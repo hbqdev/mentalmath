@@ -3,7 +3,7 @@ import { formatAnswer } from '../src/exercises/checker'
 import { findGenerated } from '../src/exercises/generators'
 import { generateMany } from '../src/exercises/generators/shared'
 import { createRng } from '../src/exercises/rng'
-import { unlockAll } from './helpers'
+import { lockUntilRead, unlockAll } from './helpers'
 
 const SET = 'gen1-two-digit-addition'
 
@@ -14,7 +14,9 @@ function expectedAnswers(seed: number) {
 }
 
 test.describe('practice', () => {
-  test('a seeded generated session runs to a perfect score and updates the rail', async ({ page }) => {
+  test('a seeded generated session runs to a perfect score and updates the rail', async ({
+    page,
+  }) => {
     await unlockAll(page)
     await page.goto(`/practice/1/${SET}?mode=generated&seed=42`)
     const answers = expectedAnswers(42)
@@ -46,6 +48,7 @@ test.describe('practice', () => {
   })
 
   test('a locked set explains itself and links to its section', async ({ page }) => {
+    await lockUntilRead(page)
     await page.goto('/practice/1/ch1-two-digit-addition')
     await expect(page.getByTestId('locked')).toBeVisible()
     await page.getByRole('link', { name: /Read “Left-to-Right Addition”/ }).click()
@@ -63,5 +66,29 @@ test.describe('practice', () => {
   test('an unknown set shows not-found', async ({ page }) => {
     await page.goto('/practice/1/nope')
     await expect(page.getByTestId('set-not-found')).toBeVisible()
+  })
+
+  test('the practice hub opens any technique directly and a session can draw a new set', async ({
+    page,
+  }) => {
+    await page.goto('/practice')
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('Practice')
+    const card = page.getByTestId('technique-gen1-two-digit-addition')
+    await expect(card).toBeVisible()
+    await card.getByTestId('generate').click()
+    await expect(page).toHaveURL(/\/practice\/1\/gen1-two-digit-addition\?mode=generated/)
+    await expect(page.getByTestId('practice-prompt')).toBeVisible()
+    const first = await page.getByTestId('practice-prompt').textContent()
+    const url1 = page.url()
+    await page.getByTestId('new-set').click()
+    await expect.poll(() => page.url()).not.toBe(url1)
+    await expect(page.getByTestId('practice-progress')).toContainText('1 / 10')
+    expect(typeof first).toBe('string')
+    await page.getByTestId('difficulty').selectOption('hard')
+    await expect(page).toHaveURL(/difficulty=hard/)
+    await page.goto('/practice')
+    await page.getByTestId('technique-gen1-two-digit-addition').getByTestId('book-set').click()
+    await expect(page).toHaveURL(/\/practice\/1\/ch1-two-digit-addition(\?mode=book)?$/)
+    await expect(page.getByTestId('generate-similar')).toBeVisible()
   })
 })

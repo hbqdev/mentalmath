@@ -3,557 +3,557 @@ import type { ChapterDoc, ChapterMeta } from './types'
 
 export const chapterIndex: ChapterMeta[] = [
   {
-    "id": "intro",
-    "number": null,
-    "title": "Forewords and Introduction",
-    "kicker": "Before you begin",
-    "sections": [
+    id: 'intro',
+    number: null,
+    title: 'Forewords and Introduction',
+    kicker: 'Before you begin',
+    sections: [
       {
-        "id": "foreword-by-bill-nye-the-science-guy",
-        "title": "Foreword by Bill Nye (the Science Guy®)"
+        id: 'foreword-by-bill-nye-the-science-guy',
+        title: 'Foreword by Bill Nye (the Science Guy®)',
       },
       {
-        "id": "foreword-by-james-randi",
-        "title": "Foreword by James Randi"
+        id: 'foreword-by-james-randi',
+        title: 'Foreword by James Randi',
       },
       {
-        "id": "prologue-by-michael-shermer",
-        "title": "Prologue by Michael Shermer"
+        id: 'prologue-by-michael-shermer',
+        title: 'Prologue by Michael Shermer',
       },
       {
-        "id": "introduction-by-arthur-benjamin",
-        "title": "Introduction by Arthur Benjamin"
-      }
+        id: 'introduction-by-arthur-benjamin',
+        title: 'Introduction by Arthur Benjamin',
+      },
     ],
-    "sets": []
+    sets: [],
   },
   {
-    "id": "0",
-    "number": 0,
-    "title": "Quick Tricks: Easy (and Impressive) Calculations",
-    "kicker": "Chapter 0",
-    "sections": [
+    id: '0',
+    number: 0,
+    title: 'Quick Tricks: Easy (and Impressive) Calculations',
+    kicker: 'Chapter 0',
+    sections: [
       {
-        "id": "overview",
-        "title": "Overview"
+        id: 'overview',
+        title: 'Overview',
       },
       {
-        "id": "instant-multiplication",
-        "title": "Instant Multiplication"
+        id: 'instant-multiplication',
+        title: 'Instant Multiplication',
       },
       {
-        "id": "squaring-and-more",
-        "title": "Squaring and More"
+        id: 'squaring-and-more',
+        title: 'Squaring and More',
       },
       {
-        "id": "more-practical-tips",
-        "title": "More Practical Tips"
+        id: 'more-practical-tips',
+        title: 'More Practical Tips',
       },
       {
-        "id": "improve-your-memory",
-        "title": "Improve Your Memory"
-      }
+        id: 'improve-your-memory',
+        title: 'Improve Your Memory',
+      },
     ],
-    "sets": []
+    sets: [],
   },
   {
-    "id": "1",
-    "number": 1,
-    "title": "A Little Give and Take: Mental Addition and Subtraction",
-    "kicker": "Chapter 1",
-    "sections": [
+    id: '1',
+    number: 1,
+    title: 'A Little Give and Take: Mental Addition and Subtraction',
+    kicker: 'Chapter 1',
+    sections: [
       {
-        "id": "overview",
-        "title": "Overview"
+        id: 'overview',
+        title: 'Overview',
       },
       {
-        "id": "left-to-right-addition",
-        "title": "Left-to-Right Addition"
+        id: 'left-to-right-addition',
+        title: 'Left-to-Right Addition',
       },
       {
-        "id": "left-to-right-subtraction",
-        "title": "Left-to-Right Subtraction"
-      }
+        id: 'left-to-right-subtraction',
+        title: 'Left-to-Right Subtraction',
+      },
     ],
-    "sets": [
+    sets: [
       {
-        "id": "ch1-two-digit-addition",
-        "sectionId": "left-to-right-addition"
+        id: 'ch1-two-digit-addition',
+        sectionId: 'left-to-right-addition',
       },
       {
-        "id": "ch1-three-digit-addition",
-        "sectionId": "left-to-right-addition"
+        id: 'ch1-three-digit-addition',
+        sectionId: 'left-to-right-addition',
       },
       {
-        "id": "ch1-two-digit-subtraction",
-        "sectionId": "left-to-right-subtraction"
+        id: 'ch1-two-digit-subtraction',
+        sectionId: 'left-to-right-subtraction',
       },
       {
-        "id": "ch1-three-digit-subtraction",
-        "sectionId": "left-to-right-subtraction"
-      }
-    ]
+        id: 'ch1-three-digit-subtraction',
+        sectionId: 'left-to-right-subtraction',
+      },
+    ],
   },
   {
-    "id": "2",
-    "number": 2,
-    "title": "Products of a Misspent Youth: Basic Multiplication",
-    "kicker": "Chapter 2",
-    "sections": [
+    id: '2',
+    number: 2,
+    title: 'Products of a Misspent Youth: Basic Multiplication',
+    kicker: 'Chapter 2',
+    sections: [
       {
-        "id": "overview",
-        "title": "Overview"
+        id: 'overview',
+        title: 'Overview',
       },
       {
-        "id": "multiplication-table-of-numbers-1-10",
-        "title": "Multiplication Table of Numbers 1–10"
+        id: 'multiplication-table-of-numbers-1-10',
+        title: 'Multiplication Table of Numbers 1–10',
       },
       {
-        "id": "2-by-1-multiplication-problems",
-        "title": "2-by-1 Multiplication Problems"
+        id: '2-by-1-multiplication-problems',
+        title: '2-by-1 Multiplication Problems',
       },
       {
-        "id": "3-by-1-multiplication-problems",
-        "title": "3-by-1 Multiplication Problems"
+        id: '3-by-1-multiplication-problems',
+        title: '3-by-1 Multiplication Problems',
       },
       {
-        "id": "be-there-or-b2-squaring-two-digit-numbers",
-        "title": "Be There or B2: Squaring Two-Digit Numbers"
+        id: 'be-there-or-b2-squaring-two-digit-numbers',
+        title: 'Be There or B2: Squaring Two-Digit Numbers',
       },
       {
-        "id": "why-these-tricks-work",
-        "title": "Why These Tricks Work"
-      }
+        id: 'why-these-tricks-work',
+        title: 'Why These Tricks Work',
+      },
     ],
-    "sets": [
+    sets: [
       {
-        "id": "ch2-2-by-1-multiplication",
-        "sectionId": "2-by-1-multiplication-problems"
+        id: 'ch2-2-by-1-multiplication',
+        sectionId: '2-by-1-multiplication-problems',
       },
       {
-        "id": "ch2-3-by-1-multiplication",
-        "sectionId": "3-by-1-multiplication-problems"
+        id: 'ch2-3-by-1-multiplication',
+        sectionId: '3-by-1-multiplication-problems',
       },
       {
-        "id": "ch2-two-digit-squares",
-        "sectionId": "be-there-or-b2-squaring-two-digit-numbers"
-      }
-    ]
+        id: 'ch2-two-digit-squares',
+        sectionId: 'be-there-or-b2-squaring-two-digit-numbers',
+      },
+    ],
   },
   {
-    "id": "3",
-    "number": 3,
-    "title": "New and Improved Products: Intermediate Multiplication",
-    "kicker": "Chapter 3",
-    "sections": [
+    id: '3',
+    number: 3,
+    title: 'New and Improved Products: Intermediate Multiplication',
+    kicker: 'Chapter 3',
+    sections: [
       {
-        "id": "overview",
-        "title": "Overview"
+        id: 'overview',
+        title: 'Overview',
       },
       {
-        "id": "2-by-2-multiplication-problems",
-        "title": "2-by-2 Multiplication Problems"
+        id: '2-by-2-multiplication-problems',
+        title: '2-by-2 Multiplication Problems',
       },
       {
-        "id": "approaching-multiplication-creatively",
-        "title": "Approaching Multiplication Creatively"
+        id: 'approaching-multiplication-creatively',
+        title: 'Approaching Multiplication Creatively',
       },
       {
-        "id": "three-digit-squares",
-        "title": "Three-Digit Squares"
+        id: 'three-digit-squares',
+        title: 'Three-Digit Squares',
       },
       {
-        "id": "cubing",
-        "title": "Cubing"
-      }
+        id: 'cubing',
+        title: 'Cubing',
+      },
     ],
-    "sets": [
+    sets: [
       {
-        "id": "ch3-multiplying-by-11",
-        "sectionId": "2-by-2-multiplication-problems"
+        id: 'ch3-multiplying-by-11',
+        sectionId: '2-by-2-multiplication-problems',
       },
       {
-        "id": "ch3-2-by-2-addition-method",
-        "sectionId": "2-by-2-multiplication-problems"
+        id: 'ch3-2-by-2-addition-method',
+        sectionId: '2-by-2-multiplication-problems',
       },
       {
-        "id": "ch3-2-by-2-subtraction-method",
-        "sectionId": "2-by-2-multiplication-problems"
+        id: 'ch3-2-by-2-subtraction-method',
+        sectionId: '2-by-2-multiplication-problems',
       },
       {
-        "id": "ch3-2-by-2-factoring-method",
-        "sectionId": "2-by-2-multiplication-problems"
+        id: 'ch3-2-by-2-factoring-method',
+        sectionId: '2-by-2-multiplication-problems',
       },
       {
-        "id": "ch3-2-by-2-general-multiplication",
-        "sectionId": "approaching-multiplication-creatively"
+        id: 'ch3-2-by-2-general-multiplication',
+        sectionId: 'approaching-multiplication-creatively',
       },
       {
-        "id": "ch3-three-digit-squares",
-        "sectionId": "three-digit-squares"
+        id: 'ch3-three-digit-squares',
+        sectionId: 'three-digit-squares',
       },
       {
-        "id": "ch3-two-digit-cubes",
-        "sectionId": "cubing"
-      }
-    ]
+        id: 'ch3-two-digit-cubes',
+        sectionId: 'cubing',
+      },
+    ],
   },
   {
-    "id": "4",
-    "number": 4,
-    "title": "Divide and Conquer: Mental Division",
-    "kicker": "Chapter 4",
-    "sections": [
+    id: '4',
+    number: 4,
+    title: 'Divide and Conquer: Mental Division',
+    kicker: 'Chapter 4',
+    sections: [
       {
-        "id": "overview",
-        "title": "Overview"
+        id: 'overview',
+        title: 'Overview',
       },
       {
-        "id": "one-digit-division",
-        "title": "One-Digit Division"
+        id: 'one-digit-division',
+        title: 'One-Digit Division',
       },
       {
-        "id": "the-rule-of-thumb",
-        "title": "The Rule of “thumb”"
+        id: 'the-rule-of-thumb',
+        title: 'The Rule of “thumb”',
       },
       {
-        "id": "two-digit-division",
-        "title": "Two-Digit Division"
+        id: 'two-digit-division',
+        title: 'Two-Digit Division',
       },
       {
-        "id": "matching-wits-with-a-calculator-learning-decimalization",
-        "title": "Matching Wits with a Calculator: Learning Decimalization"
-      }
+        id: 'matching-wits-with-a-calculator-learning-decimalization',
+        title: 'Matching Wits with a Calculator: Learning Decimalization',
+      },
     ],
-    "sets": [
+    sets: [
       {
-        "id": "ch4-one-digit-division",
-        "sectionId": "one-digit-division"
+        id: 'ch4-one-digit-division',
+        sectionId: 'one-digit-division',
       },
       {
-        "id": "ch4-two-digit-division",
-        "sectionId": "two-digit-division"
+        id: 'ch4-two-digit-division',
+        sectionId: 'two-digit-division',
       },
       {
-        "id": "ch4-decimalization",
-        "sectionId": "matching-wits-with-a-calculator-learning-decimalization"
+        id: 'ch4-decimalization',
+        sectionId: 'matching-wits-with-a-calculator-learning-decimalization',
       },
       {
-        "id": "ch4-testing-for-divisibility",
-        "sectionId": "matching-wits-with-a-calculator-learning-decimalization"
+        id: 'ch4-testing-for-divisibility',
+        sectionId: 'matching-wits-with-a-calculator-learning-decimalization',
       },
       {
-        "id": "ch4-multiplying-fractions",
-        "sectionId": "matching-wits-with-a-calculator-learning-decimalization"
+        id: 'ch4-multiplying-fractions',
+        sectionId: 'matching-wits-with-a-calculator-learning-decimalization',
       },
       {
-        "id": "ch4-dividing-fractions",
-        "sectionId": "matching-wits-with-a-calculator-learning-decimalization"
+        id: 'ch4-dividing-fractions',
+        sectionId: 'matching-wits-with-a-calculator-learning-decimalization',
       },
       {
-        "id": "ch4-simplifying-fractions",
-        "sectionId": "matching-wits-with-a-calculator-learning-decimalization"
+        id: 'ch4-simplifying-fractions',
+        sectionId: 'matching-wits-with-a-calculator-learning-decimalization',
       },
       {
-        "id": "ch4-adding-fractions-equal-denominators",
-        "sectionId": "matching-wits-with-a-calculator-learning-decimalization"
+        id: 'ch4-adding-fractions-equal-denominators',
+        sectionId: 'matching-wits-with-a-calculator-learning-decimalization',
       },
       {
-        "id": "ch4-adding-fractions-unequal-denominators",
-        "sectionId": "matching-wits-with-a-calculator-learning-decimalization"
+        id: 'ch4-adding-fractions-unequal-denominators',
+        sectionId: 'matching-wits-with-a-calculator-learning-decimalization',
       },
       {
-        "id": "ch4-subtracting-fractions",
-        "sectionId": "matching-wits-with-a-calculator-learning-decimalization"
-      }
-    ]
+        id: 'ch4-subtracting-fractions',
+        sectionId: 'matching-wits-with-a-calculator-learning-decimalization',
+      },
+    ],
   },
   {
-    "id": "5",
-    "number": 5,
-    "title": "Good Enough: The Art of “Guesstimation”",
-    "kicker": "Chapter 5",
-    "sections": [
+    id: '5',
+    number: 5,
+    title: 'Good Enough: The Art of “Guesstimation”',
+    kicker: 'Chapter 5',
+    sections: [
       {
-        "id": "overview",
-        "title": "Overview"
+        id: 'overview',
+        title: 'Overview',
       },
       {
-        "id": "addition-guesstimation",
-        "title": "Addition Guesstimation"
+        id: 'addition-guesstimation',
+        title: 'Addition Guesstimation',
       },
       {
-        "id": "subtraction-guesstimation",
-        "title": "Subtraction Guesstimation"
+        id: 'subtraction-guesstimation',
+        title: 'Subtraction Guesstimation',
       },
       {
-        "id": "division-guesstimation",
-        "title": "Division Guesstimation"
+        id: 'division-guesstimation',
+        title: 'Division Guesstimation',
       },
       {
-        "id": "multiplication-guesstimation",
-        "title": "Multiplication Guesstimation"
+        id: 'multiplication-guesstimation',
+        title: 'Multiplication Guesstimation',
       },
       {
-        "id": "square-root-estimation-divide-and-average",
-        "title": "Square Root Estimation: Divide and Average"
+        id: 'square-root-estimation-divide-and-average',
+        title: 'Square Root Estimation: Divide and Average',
       },
       {
-        "id": "more-tips-on-tips",
-        "title": "More Tips on Tips"
+        id: 'more-tips-on-tips',
+        title: 'More Tips on Tips',
       },
       {
-        "id": "not-too-taxing-calculations",
-        "title": "Not-Too-Taxing Calculations"
+        id: 'not-too-taxing-calculations',
+        title: 'Not-Too-Taxing Calculations',
       },
       {
-        "id": "some-interest-ing-calculations",
-        "title": "Some “interest-Ing” Calculations"
+        id: 'some-interest-ing-calculations',
+        title: 'Some “interest-Ing” Calculations',
       },
       {
-        "id": "guesstimation-exercises",
-        "title": "Guesstimation Exercises"
-      }
+        id: 'guesstimation-exercises',
+        title: 'Guesstimation Exercises',
+      },
     ],
-    "sets": [
+    sets: [
       {
-        "id": "ch5-addition-guesstimation",
-        "sectionId": "guesstimation-exercises"
+        id: 'ch5-addition-guesstimation',
+        sectionId: 'guesstimation-exercises',
       },
       {
-        "id": "ch5-subtraction-guesstimation",
-        "sectionId": "guesstimation-exercises"
+        id: 'ch5-subtraction-guesstimation',
+        sectionId: 'guesstimation-exercises',
       },
       {
-        "id": "ch5-division-guesstimation",
-        "sectionId": "guesstimation-exercises"
+        id: 'ch5-division-guesstimation',
+        sectionId: 'guesstimation-exercises',
       },
       {
-        "id": "ch5-multiplication-guesstimation",
-        "sectionId": "guesstimation-exercises"
+        id: 'ch5-multiplication-guesstimation',
+        sectionId: 'guesstimation-exercises',
       },
       {
-        "id": "ch5-square-root-guesstimation",
-        "sectionId": "guesstimation-exercises"
+        id: 'ch5-square-root-guesstimation',
+        sectionId: 'guesstimation-exercises',
       },
       {
-        "id": "ch5-everyday-math",
-        "sectionId": "guesstimation-exercises"
-      }
-    ]
+        id: 'ch5-everyday-math',
+        sectionId: 'guesstimation-exercises',
+      },
+    ],
   },
   {
-    "id": "6",
-    "number": 6,
-    "title": "Math for the Board: Pencil-and-Paper Math",
-    "kicker": "Chapter 6",
-    "sections": [
+    id: '6',
+    number: 6,
+    title: 'Math for the Board: Pencil-and-Paper Math',
+    kicker: 'Chapter 6',
+    sections: [
       {
-        "id": "overview",
-        "title": "Overview"
+        id: 'overview',
+        title: 'Overview',
       },
       {
-        "id": "columns-of-numbers",
-        "title": "Columns of Numbers"
+        id: 'columns-of-numbers',
+        title: 'Columns of Numbers',
       },
       {
-        "id": "mod-sums",
-        "title": "Mod Sums"
+        id: 'mod-sums',
+        title: 'Mod Sums',
       },
       {
-        "id": "subtracting-on-paper",
-        "title": "Subtracting on Paper"
+        id: 'subtracting-on-paper',
+        title: 'Subtracting on Paper',
       },
       {
-        "id": "pencil-and-paper-square-roots",
-        "title": "Pencil-and-Paper Square Roots"
+        id: 'pencil-and-paper-square-roots',
+        title: 'Pencil-and-Paper Square Roots',
       },
       {
-        "id": "pencil-and-paper-multiplication",
-        "title": "Pencil-and-Paper Multiplication"
+        id: 'pencil-and-paper-multiplication',
+        title: 'Pencil-and-Paper Multiplication',
       },
       {
-        "id": "casting-out-elevens",
-        "title": "Casting Out Elevens"
-      }
+        id: 'casting-out-elevens',
+        title: 'Casting Out Elevens',
+      },
     ],
-    "sets": [
+    sets: [
       {
-        "id": "ch6-columns-of-numbers",
-        "sectionId": "casting-out-elevens"
+        id: 'ch6-columns-of-numbers',
+        sectionId: 'casting-out-elevens',
       },
       {
-        "id": "ch6-subtracting-on-paper",
-        "sectionId": "casting-out-elevens"
+        id: 'ch6-subtracting-on-paper',
+        sectionId: 'casting-out-elevens',
       },
       {
-        "id": "ch6-square-root-guesstimation",
-        "sectionId": "casting-out-elevens"
+        id: 'ch6-square-root-guesstimation',
+        sectionId: 'casting-out-elevens',
       },
       {
-        "id": "ch6-pencil-and-paper-multiplication",
-        "sectionId": "casting-out-elevens"
-      }
-    ]
+        id: 'ch6-pencil-and-paper-multiplication',
+        sectionId: 'casting-out-elevens',
+      },
+    ],
   },
   {
-    "id": "7",
-    "number": 7,
-    "title": "A Memorable Chapter: Memorizing Numbers",
-    "kicker": "Chapter 7",
-    "sections": [
+    id: '7',
+    number: 7,
+    title: 'A Memorable Chapter: Memorizing Numbers',
+    kicker: 'Chapter 7',
+    sections: [
       {
-        "id": "overview",
-        "title": "Overview"
+        id: 'overview',
+        title: 'Overview',
       },
       {
-        "id": "using-mnemonics",
-        "title": "Using Mnemonics"
+        id: 'using-mnemonics',
+        title: 'Using Mnemonics',
       },
       {
-        "id": "the-phonetic-code",
-        "title": "The Phonetic Code"
+        id: 'the-phonetic-code',
+        title: 'The Phonetic Code',
       },
       {
-        "id": "how-mnemonics-makes-mental-calculation-easier",
-        "title": "How Mnemonics Makes Mental Calculation Easier"
+        id: 'how-mnemonics-makes-mental-calculation-easier',
+        title: 'How Mnemonics Makes Mental Calculation Easier',
       },
       {
-        "id": "memory-magic",
-        "title": "Memory Magic"
-      }
+        id: 'memory-magic',
+        title: 'Memory Magic',
+      },
     ],
-    "sets": []
+    sets: [],
   },
   {
-    "id": "8",
-    "number": 8,
-    "title": "The Tough Stuff Made Easy: Advanced Multiplication",
-    "kicker": "Chapter 8",
-    "sections": [
+    id: '8',
+    number: 8,
+    title: 'The Tough Stuff Made Easy: Advanced Multiplication',
+    kicker: 'Chapter 8',
+    sections: [
       {
-        "id": "overview",
-        "title": "Overview"
+        id: 'overview',
+        title: 'Overview',
       },
       {
-        "id": "four-digit-squares",
-        "title": "Four-Digit Squares"
+        id: 'four-digit-squares',
+        title: 'Four-Digit Squares',
       },
       {
-        "id": "3-by-2-multiplication",
-        "title": "3-by-2 Multiplication"
+        id: '3-by-2-multiplication',
+        title: '3-by-2 Multiplication',
       },
       {
-        "id": "five-digit-squares",
-        "title": "Five-Digit Squares"
+        id: 'five-digit-squares',
+        title: 'Five-Digit Squares',
       },
       {
-        "id": "3-by-3-multiplication",
-        "title": "3-by-3 Multiplication"
+        id: '3-by-3-multiplication',
+        title: '3-by-3 Multiplication',
       },
       {
-        "id": "5-by-5-multiplication",
-        "title": "5-by-5 Multiplication"
-      }
+        id: '5-by-5-multiplication',
+        title: '5-by-5 Multiplication',
+      },
     ],
-    "sets": [
+    sets: [
       {
-        "id": "ch8-four-digit-squares",
-        "sectionId": "four-digit-squares"
+        id: 'ch8-four-digit-squares',
+        sectionId: 'four-digit-squares',
       },
       {
-        "id": "ch8-3-by-2-multiplication",
-        "sectionId": "3-by-2-multiplication"
+        id: 'ch8-3-by-2-multiplication',
+        sectionId: '3-by-2-multiplication',
       },
       {
-        "id": "ch8-five-digit-squares",
-        "sectionId": "five-digit-squares"
+        id: 'ch8-five-digit-squares',
+        sectionId: 'five-digit-squares',
       },
       {
-        "id": "ch8-3-by-3-multiplication",
-        "sectionId": "3-by-3-multiplication"
+        id: 'ch8-3-by-3-multiplication',
+        sectionId: '3-by-3-multiplication',
       },
       {
-        "id": "ch8-5-by-5-multiplication",
-        "sectionId": "5-by-5-multiplication"
-      }
-    ]
+        id: 'ch8-5-by-5-multiplication',
+        sectionId: '5-by-5-multiplication',
+      },
+    ],
   },
   {
-    "id": "9",
-    "number": 9,
-    "title": "Presto-digit-ation: The Art of Mathematical Magic",
-    "kicker": "Chapter 9",
-    "sections": [
+    id: '9',
+    number: 9,
+    title: 'Presto-digit-ation: The Art of Mathematical Magic',
+    kicker: 'Chapter 9',
+    sections: [
       {
-        "id": "overview",
-        "title": "Overview"
+        id: 'overview',
+        title: 'Overview',
       },
       {
-        "id": "psychic-math",
-        "title": "Psychic Math"
+        id: 'psychic-math',
+        title: 'Psychic Math',
       },
       {
-        "id": "the-magic-1089",
-        "title": "The Magic 1089!"
+        id: 'the-magic-1089',
+        title: 'The Magic 1089!',
       },
       {
-        "id": "missing-digit-tricks",
-        "title": "Missing-Digit Tricks"
+        id: 'missing-digit-tricks',
+        title: 'Missing-Digit Tricks',
       },
       {
-        "id": "leapfrog-addition",
-        "title": "Leapfrog Addition"
+        id: 'leapfrog-addition',
+        title: 'Leapfrog Addition',
       },
       {
-        "id": "magic-squares",
-        "title": "Magic Squares"
+        id: 'magic-squares',
+        title: 'Magic Squares',
       },
       {
-        "id": "how-to-construct-a-magic-square",
-        "title": "How to Construct a Magic Square"
+        id: 'how-to-construct-a-magic-square',
+        title: 'How to Construct a Magic Square',
       },
       {
-        "id": "quick-cube-roots",
-        "title": "Quick Cube Roots"
+        id: 'quick-cube-roots',
+        title: 'Quick Cube Roots',
       },
       {
-        "id": "simplified-square-roots",
-        "title": "Simplified Square Roots"
+        id: 'simplified-square-roots',
+        title: 'Simplified Square Roots',
       },
       {
-        "id": "an-amazing-sum",
-        "title": "An “amazing” Sum"
+        id: 'an-amazing-sum',
+        title: 'An “amazing” Sum',
       },
       {
-        "id": "a-day-for-any-date",
-        "title": "A Day for Any Date"
-      }
+        id: 'a-day-for-any-date',
+        title: 'A Day for Any Date',
+      },
     ],
-    "sets": [
+    sets: [
       {
-        "id": "ch9-a-day-for-any-date",
-        "sectionId": "a-day-for-any-date"
-      }
-    ]
+        id: 'ch9-a-day-for-any-date',
+        sectionId: 'a-day-for-any-date',
+      },
+    ],
   },
   {
-    "id": "epilogue",
-    "number": null,
-    "title": "Epilogue: How Math Helps Us Think About Weird Things, by Michael Shermer",
-    "kicker": "Chapter ∞",
-    "sections": [
+    id: 'epilogue',
+    number: null,
+    title: 'Epilogue: How Math Helps Us Think About Weird Things, by Michael Shermer',
+    kicker: 'Chapter ∞',
+    sections: [
       {
-        "id": "overview",
-        "title": "Epilogue"
-      }
+        id: 'overview',
+        title: 'Epilogue',
+      },
     ],
-    "sets": []
-  }
+    sets: [],
+  },
 ]
 
 export const chapterLoaders: Record<string, () => Promise<{ default: ChapterDoc }>> = {
-  'intro': () => import('./chapters/intro.json') as Promise<{ default: ChapterDoc }>,
+  intro: () => import('./chapters/intro.json') as Promise<{ default: ChapterDoc }>,
   '0': () => import('./chapters/0.json') as Promise<{ default: ChapterDoc }>,
   '1': () => import('./chapters/1.json') as Promise<{ default: ChapterDoc }>,
   '2': () => import('./chapters/2.json') as Promise<{ default: ChapterDoc }>,
@@ -564,5 +564,5 @@ export const chapterLoaders: Record<string, () => Promise<{ default: ChapterDoc 
   '7': () => import('./chapters/7.json') as Promise<{ default: ChapterDoc }>,
   '8': () => import('./chapters/8.json') as Promise<{ default: ChapterDoc }>,
   '9': () => import('./chapters/9.json') as Promise<{ default: ChapterDoc }>,
-  'epilogue': () => import('./chapters/epilogue.json') as Promise<{ default: ChapterDoc }>,
+  epilogue: () => import('./chapters/epilogue.json') as Promise<{ default: ChapterDoc }>,
 }

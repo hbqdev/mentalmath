@@ -2,7 +2,18 @@ import { WEEKDAY_OPTIONS, dayOfWeek, daySteps, isValidDate } from '../dates'
 import type { GeneratedSetDef, Rng } from '../types'
 import { MINUS, digits, integer } from './shared'
 
-const CUBE_LAST_DIGIT: Record<number, number> = { 0: 0, 1: 1, 8: 2, 7: 3, 4: 4, 5: 5, 6: 6, 3: 7, 2: 8, 9: 9 }
+const CUBE_LAST_DIGIT: Record<number, number> = {
+  0: 0,
+  1: 1,
+  8: 2,
+  7: 3,
+  4: 4,
+  5: 5,
+  6: 6,
+  3: 7,
+  2: 8,
+  9: 9,
+}
 
 function randomIso(rng: Rng, yearLo: number, yearHi: number): string {
   for (;;) {
@@ -22,7 +33,12 @@ export const sets: GeneratedSetDef[] = [
     title: 'Psychic math',
     description: 'Double, add, halve, subtract the original: the number they picked cancels out.',
     generate(difficulty, rng) {
-      const k = difficulty === 'easy' ? rng.pick([12, 8, 10]) : difficulty === 'medium' ? 2 * rng.int(5, 15) : 2 * rng.int(11, 30)
+      const k =
+        difficulty === 'easy'
+          ? rng.pick([12, 8, 10])
+          : difficulty === 'medium'
+            ? 2 * rng.int(5, 15)
+            : 2 * rng.int(11, 30)
       const x = rng.int(1, 99)
       return {
         difficulty,
@@ -32,7 +48,13 @@ export const sets: GeneratedSetDef[] = [
           emphasis: String(k),
         },
         answer: integer(k / 2),
-        solution: { steps: [`2x + ${k}`, `(2x + ${k}) ÷ 2 = x + ${k / 2}`, `x + ${k / 2} ${MINUS} x = ${k / 2}`] },
+        solution: {
+          steps: [
+            `2x + ${k}`,
+            `(2x + ${k}) ÷ 2 = x + ${k / 2}`,
+            `x + ${k / 2} ${MINUS} x = ${k / 2}`,
+          ],
+        },
       }
     },
   },
@@ -60,7 +82,12 @@ export const sets: GeneratedSetDef[] = [
           emphasis: String(n),
         },
         answer: integer(1089),
-        solution: { steps: [`${n} ${MINUS} ${rev} = ${String(diff).padStart(3, '0')}`, `${String(diff).padStart(3, '0')} + ${diffRev} = ${diff + diffRev}`] },
+        solution: {
+          steps: [
+            `${n} ${MINUS} ${rev} = ${String(diff).padStart(3, '0')}`,
+            `${String(diff).padStart(3, '0')} + ${diffRev} = ${diff + diffRev}`,
+          ],
+        },
       }
     },
   },
@@ -69,10 +96,16 @@ export const sets: GeneratedSetDef[] = [
     chapterId: '9',
     sectionId: 'missing-digit-tricks',
     title: 'Missing digit',
-    description: 'A multiple of 9 has digits summing to a multiple of 9, so one hidden digit gives itself away.',
+    description:
+      'A multiple of 9 has digits summing to a multiple of 9, so one hidden digit gives itself away.',
     generate(difficulty, rng) {
       for (;;) {
-        const base = difficulty === 'easy' ? rng.int(12, 99) : difficulty === 'medium' ? rng.int(100, 999) : rng.int(1000, 9999)
+        const base =
+          difficulty === 'easy'
+            ? rng.int(12, 99)
+            : difficulty === 'medium'
+              ? rng.int(100, 999)
+              : rng.int(1000, 9999)
         const product = base * 9
         const ds = digits(product)
         const idx = rng.int(0, ds.length - 1)
@@ -89,7 +122,13 @@ export const sets: GeneratedSetDef[] = [
             emphasis: shown.join(' '),
           },
           answer: integer(answer),
-          solution: { steps: [`Digits shown add to ${sum}`, `Next multiple of 9 above ${sum} is ${sum + answer}`, `Missing digit: ${answer}`] },
+          solution: {
+            steps: [
+              `Digits shown add to ${sum}`,
+              `Next multiple of 9 above ${sum} is ${sum + answer}`,
+              `Missing digit: ${answer}`,
+            ],
+          },
         }
       }
     },
@@ -99,7 +138,8 @@ export const sets: GeneratedSetDef[] = [
     chapterId: '9',
     sectionId: 'leapfrog-addition',
     title: 'Leapfrog addition',
-    description: 'Ten numbers where each is the sum of the two before: the total is 11 times the seventh.',
+    description:
+      'Ten numbers where each is the sum of the two before: the total is 11 times the seventh.',
     generate(difficulty, rng) {
       const hi = difficulty === 'easy' ? 9 : difficulty === 'medium' ? 20 : 50
       const xs = [rng.int(1, hi), rng.int(1, hi)]
@@ -120,7 +160,12 @@ export const sets: GeneratedSetDef[] = [
     title: 'Quick cube roots',
     description: 'The last digit tells the last digit; the thousands tell the tens.',
     generate(difficulty, rng) {
-      const n = difficulty === 'easy' ? rng.int(11, 40) : difficulty === 'medium' ? rng.int(30, 70) : rng.int(60, 99)
+      const n =
+        difficulty === 'easy'
+          ? rng.int(11, 40)
+          : difficulty === 'medium'
+            ? rng.int(30, 70)
+            : rng.int(60, 99)
       const cube = n ** 3
       const tens = Math.floor(n / 10)
       return {
@@ -142,9 +187,15 @@ export const sets: GeneratedSetDef[] = [
     chapterId: '9',
     sectionId: 'simplified-square-roots',
     title: 'Simplified square roots',
-    description: 'For perfect squares: the hundreds give the tens, the last digit narrows to two candidates, 5² decides.',
+    description:
+      'For perfect squares: the hundreds give the tens, the last digit narrows to two candidates, 5² decides.',
     generate(difficulty, rng) {
-      const n = difficulty === 'easy' ? rng.int(11, 40) : difficulty === 'medium' ? rng.int(30, 70) : rng.int(60, 99)
+      const n =
+        difficulty === 'easy'
+          ? rng.int(11, 40)
+          : difficulty === 'medium'
+            ? rng.int(30, 70)
+            : rng.int(60, 99)
       const sq = n * n
       const tens = Math.floor(n / 10)
       const last = n % 10
@@ -157,8 +208,12 @@ export const sets: GeneratedSetDef[] = [
         solution: {
           steps: [
             `${Math.floor(sq / 100)} hundreds sits between ${tens}² = ${tens * tens} and ${tens + 1}² = ${(tens + 1) ** 2} → tens digit ${tens}`,
-            last === 0 || last === 5 ? `Last digit ${sq % 10} → the root ends in ${last}` : `Last digit ${sq % 10} → the root ends in ${Math.min(last, other)} or ${Math.max(last, other)}`,
-            last === 0 || last === 5 ? `√${sq} = ${n}` : `${mid}² = ${mid * mid}; ${sq} is ${sq > mid * mid ? 'more' : 'less'}, so √${sq} = ${n}`,
+            last === 0 || last === 5
+              ? `Last digit ${sq % 10} → the root ends in ${last}`
+              : `Last digit ${sq % 10} → the root ends in ${Math.min(last, other)} or ${Math.max(last, other)}`,
+            last === 0 || last === 5
+              ? `√${sq} = ${n}`
+              : `${mid}² = ${mid * mid}; ${sq} is ${sq > mid * mid ? 'more' : 'less'}, so √${sq} = ${n}`,
           ],
         },
       }

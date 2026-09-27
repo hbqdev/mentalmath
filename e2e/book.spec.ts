@@ -33,13 +33,17 @@ for (const [chapter, setId] of SETS) {
     expect(problems.length).toBeGreaterThan(0)
     await page.goto(`/practice/${chapter}/${setId}`)
     for (let i = 0; i < problems.length; i++) {
-      await expect(page.getByTestId('practice-progress')).toContainText(`${i + 1} / ${problems.length}`)
+      await expect(page.getByTestId('practice-progress')).toContainText(
+        `${i + 1} / ${problems.length}`,
+      )
       await answer(page, problems[i]!.answer)
       await expect(page.getByTestId('feedback')).toContainText('Correct')
       if (i === 0) await expect(page.getByTestId('solution-steps')).toBeVisible()
       await page.getByTestId('next-button').click()
     }
-    await expect(page.getByTestId('results-score')).toHaveText(`${problems.length} / ${problems.length}`)
+    await expect(page.getByTestId('results-score')).toHaveText(
+      `${problems.length} / ${problems.length}`,
+    )
     await expect(page.getByTestId('generated-twin')).toBeVisible()
   })
 }
