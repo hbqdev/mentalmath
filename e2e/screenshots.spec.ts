@@ -266,5 +266,79 @@ test.describe('screenshots', () => {
         'chapter-3-figure-with-callout',
       )
     })
+
+    test('chapters 4 to 9: division, tables, criss-cross, mod sums, big squares, magic squares', async ({
+      page,
+    }, info) => {
+      await seedProgress(page, sampleProgress)
+      await figureShot(
+        page,
+        info,
+        '/read/4/one-digit-division',
+        'ch4-f003',
+        'chapter-4-long-division',
+      )
+      await figureShot(
+        page,
+        info,
+        '/read/4/matching-wits-with-a-calculator-learning-decimalization',
+        'ch4-f036',
+        'chapter-4-decimal-table',
+      )
+      await figureShot(
+        page,
+        info,
+        '/read/4/matching-wits-with-a-calculator-learning-decimalization',
+        'ch4-f099',
+        'chapter-4-fractions',
+      )
+      await figureShot(
+        page,
+        info,
+        '/read/5/addition-guesstimation',
+        'ch5-f005',
+        'chapter-5-receipts',
+      )
+      await figureShot(
+        page,
+        info,
+        '/read/5/square-root-estimation-divide-and-average',
+        'ch5-f023',
+        'chapter-5-divide-and-average',
+      )
+      await figureShot(page, info, '/read/6/mod-sums', 'ch6-f002', 'chapter-6-mod-sums')
+      await figureShot(
+        page,
+        info,
+        '/read/6/pencil-and-paper-square-roots',
+        'ch6-f005',
+        'chapter-6-square-root',
+      )
+      await figureShot(
+        page,
+        info,
+        '/read/6/pencil-and-paper-multiplication',
+        'ch6-f020',
+        'chapter-6-crisscross',
+      )
+      await figureShot(page, info, '/read/7/the-phonetic-code', 'ch7-f002', 'chapter-7-mnemonic')
+      await figureShot(page, info, '/read/8/four-digit-squares', 'ch8-f003', 'chapter-8-big-square')
+      await figureShot(
+        page,
+        info,
+        '/read/8/3-by-3-multiplication',
+        'ch8-f044',
+        'chapter-8-close-together',
+      )
+      await figureShot(
+        page,
+        info,
+        '/read/8/5-by-5-multiplication',
+        'ch8-f070',
+        'chapter-8-five-by-five',
+      )
+      await figureShot(page, info, '/read/9/magic-squares', 'ch9-f009', 'chapter-9-magic-square')
+      await figureShot(page, info, '/read/9/a-day-for-any-date', 'ch9-f016', 'chapter-9-year-codes')
+    })
   })
 })
