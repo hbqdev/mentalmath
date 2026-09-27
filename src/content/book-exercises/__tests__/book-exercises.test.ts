@@ -13,7 +13,7 @@ const bookMap = JSON.parse(readFileSync(new URL('../../../../scripts/book-map.js
 const mappedIds = [...new Set([...Object.values(bookMap.exerciseSets), ...Object.values(bookMap.exerciseAfter)])].sort()
 
 // Sets whose data lands in later tasks of this plan; each task removes its ids from here.
-const PENDING = new Set<string>(mappedIds.filter((id) => !id.startsWith('ch1-')))
+const PENDING = new Set<string>(mappedIds.filter((id) => !/^ch[123]-/.test(id)))
 
 describe('book exercise data', () => {
   it('covers every curated set id and nothing else', () => {
@@ -60,6 +60,29 @@ describe('book exercise data', () => {
     expect(xs[0]).toMatchObject({ id: 'ch1-two-digit-addition-1', setId: 'ch1-two-digit-addition', source: 'book' })
     expect(xs[0]?.solution?.steps).toEqual(['23 + 10 = 33', '33 + 6 = 39'])
     expect(xs[14]).toBeUndefined()
+  })
+
+  it('has the expected problem counts for chapters 2 and 3', () => {
+    const counts = Object.fromEntries(allBookSets().filter((s) => /^ch[23]-/.test(s.id)).map((s) => [s.id, s.problems.length]))
+    expect(counts).toEqual({
+      'ch2-2-by-1-multiplication': 20,
+      'ch2-3-by-1-multiplication': 36,
+      'ch2-two-digit-squares': 20,
+      'ch3-multiplying-by-11': 3,
+      'ch3-2-by-2-addition-method': 11,
+      'ch3-2-by-2-subtraction-method': 11,
+      'ch3-2-by-2-factoring-method': 12,
+      'ch3-2-by-2-general-multiplication': 33,
+      'ch3-three-digit-squares': 11,
+      'ch3-two-digit-cubes': 16,
+    })
+  })
+
+  it('keeps the book\'s alternative routes where it printed them', () => {
+    const p = allBookSets().find((s) => s.id === 'ch2-2-by-1-multiplication')!.problems[5]!
+    expect(p.steps).toEqual(['50 × 9 = 450', '1 × 9 = 9', '450 − 9 = 441'])
+    const f = allBookSets().find((s) => s.id === 'ch3-2-by-2-factoring-method')!.problems[0]!
+    expect(f.steps[0]).toBe('14 = 7 × 2')
   })
 
   it('has the expected problem counts for chapter 1', () => {
