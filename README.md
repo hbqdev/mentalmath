@@ -47,9 +47,17 @@ A set unlocks once its section of the chapter has been on screen for two seconds
 - `e2e/` Playwright config and specs
 - `docs/superpowers/` design spec and implementation plans
 
+## Typeset figures
+
+The worked examples of chapters 0 to 3 (110 figures) are transcribed as `FigureSpec` data under `src/content/figures/` and rendered by `FigureLayout.vue` instead of the EPUB's small JPEGs: vertical columns, equal-sign chains, the tables, the squaring diagram and the ×11 glyph, all in em units so they scale with the prose and follow the theme. `overrides.test.ts` recomputes every printed line (column runs, labelled products, chains, squares) so a transcription slip fails the build. Later chapters still show the book's images; add a spec to `chapterN.ts` and it takes over automatically.
+
+## Offline and install
+
+`vite-plugin-pwa` precaches the app shell, chapter data, fonts and figures (about 3.3 MB) on the first visit, so every chapter reads offline afterwards and the app installs from the browser menu. Icons come from `scripts/make-icons.ts` (`npx tsx scripts/make-icons.ts`), which rasterises the favicon without an image library. `e2e/offline.spec.ts` reads a chapter with the network switched off.
+
 ## Status
 
-Reader, generated drills for chapters 0 to 9, and all 40 book problem sets with solution steps in the book's methods are complete. Next: re-typeset worked figures for chapters 0 to 3, offline support.
+Complete: reader with typeset figures for chapters 0 to 3, generated drills for chapters 0 to 9, all 40 book problem sets with solution steps in the book's methods, offline support, unit and end-to-end suites. Deferred: typeset figures for chapters 4 to 9 (the same mechanism), visual-regression comparison of the screenshots, a hosted deployment.
 
 ## Book exercise data
 
