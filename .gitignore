@@ -28,3 +28,10 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+
+# brainstorming companion sessions
+.superpowers/
+.playwright-mcp/
+
+# book source, never commit
+*.epub
