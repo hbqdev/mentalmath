@@ -6,6 +6,8 @@ import { formatAnswer } from '../src/exercises/checker'
 import { findGenerated } from '../src/exercises/generators'
 import { generateMany } from '../src/exercises/generators/shared'
 import { createRng } from '../src/exercises/rng'
+import { bookExercises } from '../src/exercises/bookSets'
+import '../src/content/book-exercises'
 import { freezeClock, sampleProgress, seedProgress, unlockAll } from './helpers'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'screenshots')
@@ -96,6 +98,34 @@ test.describe('screenshots', () => {
       await expect(page.getByTestId('practice-prompt')).toBeVisible()
       await shot(page, info, 'practice', `prompt-${set}`)
     }
+  })
+
+  test('book session prompt, steps, results', async ({ page }, info) => {
+    await unlockAll(page)
+    await freezeClock(page)
+    const problems = bookExercises('ch1-three-digit-subtraction')
+    await page.goto('/practice/1/ch1-three-digit-subtraction')
+    await expect(page.getByTestId('practice-prompt')).toBeVisible()
+    await shot(page, info, 'practice', 'book-session-prompt')
+    await page.getByTestId('answer-input').fill('0')
+    await page.getByTestId('answer-input').press('Enter')
+    await expect(page.getByTestId('solution-steps')).toBeVisible()
+    await shot(page, info, 'practice', 'book-session-steps')
+    await page.getByTestId('next-button').click()
+    for (let i = 1; i < problems.length; i++) {
+      await page.getByTestId('answer-input').fill(formatAnswer(problems[i]!.answer))
+      await page.getByTestId('answer-input').press('Enter')
+      await page.getByTestId('next-button').click()
+    }
+    await expect(page.getByTestId('results')).toBeVisible()
+    await shot(page, info, 'practice', 'book-session-results')
+  })
+
+  test('date prompt with weekday choices', async ({ page }, info) => {
+    await unlockAll(page)
+    await page.goto('/practice/9/ch9-a-day-for-any-date')
+    await expect(page.getByTestId('choice-monday')).toBeVisible()
+    await shot(page, info, 'practice', 'book-date-prompt')
   })
 
   test('locked set', async ({ page }, info) => {

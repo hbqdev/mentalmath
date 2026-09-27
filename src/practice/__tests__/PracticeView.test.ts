@@ -94,3 +94,44 @@ describe('review fixes: practice flow', () => {
     expect(router.currentRoute.value.params.set).toBe('gen1-two-digit-addition')
   })
 })
+
+describe('book sessions', () => {
+  it('runs a book set with the authors\' steps and records an attempt with the set length', async () => {
+    const { bookExercises } = await import('@/exercises/bookSets')
+    await import('@/content/book-exercises')
+    useProgress().state.value.settings.unlockAll = true
+    const { w } = await mountAt('/practice/3/ch3-multiplying-by-11')
+    const problems = bookExercises('ch3-multiplying-by-11')
+    expect(problems).toHaveLength(3)
+    expect(w.find('[data-testid="practice-progress"]').text()).toContain('1 / 3')
+    const input = w.find('input[data-testid="answer-input"]')
+    await input.setValue('0')
+    await input.trigger('keyup.enter')
+    await flushPromises()
+    expect(w.find('[data-testid="feedback"]').text()).toContain(formatAnswer(problems[0]!.answer))
+    expect(w.find('[data-testid="solution-steps"]').text()).toContain(problems[0]!.solution!.steps[0]!)
+    await w.find('[data-testid="next-button"]').trigger('click')
+    for (let i = 1; i < 3; i++) {
+      const box = w.find('input[data-testid="answer-input"]')
+      await box.setValue(formatAnswer(problems[i]!.answer))
+      await box.trigger('keyup.enter')
+      await flushPromises()
+      await w.find('[data-testid="next-button"]').trigger('click')
+      await flushPromises()
+    }
+    expect(w.find('[data-testid="results-score"]').text()).toContain('2 / 3')
+    expect(w.find('[data-testid="generated-twin"]').attributes('href')).toContain('/practice/3/gen3-multiplying-by-11')
+    const attempt = useProgress().state.value.practice['ch3-multiplying-by-11']?.attempts.at(-1)
+    expect(attempt).toMatchObject({ correct: 2, total: 3, mode: 'book' })
+  })
+
+  it('answers a weekday choice in the chapter 9 book set', async () => {
+    await import('@/content/book-exercises')
+    useProgress().state.value.settings.unlockAll = true
+    const { w } = await mountAt('/practice/9/ch9-a-day-for-any-date')
+    expect(w.find('[data-testid="choice-friday"]').exists()).toBe(true)
+    await w.find('[data-testid="choice-friday"]').trigger('click')
+    await flushPromises()
+    expect(w.find('[data-testid="feedback"]').text()).toMatch(/Correct/)
+  })
+})
