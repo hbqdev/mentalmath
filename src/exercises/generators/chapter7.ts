@@ -15,9 +15,51 @@ const CODE: Array<[string, string, string]> = [
 ]
 
 const WORDS = [
-  'rain', 'car', 'jug', 'fish', 'bum', 'toss', 'lily', 'cow', 'shoe', 'tie', 'knee', 'ma', 'ray', 'law', 'key', 'fee', 'pie', 'zoo',
-  'dog', 'oven', 'cart', 'fossil', 'banana', 'garage', 'pencil', 'Cleveland', 'turtle', 'pancho', 'mover', 'ginger', 'rhino', 'nickel',
-  'tomato', 'lemon', 'camera', 'candle', 'carpet', 'pillow', 'rocket', 'button', 'mirror', 'dollar', 'ladder', 'cabbage', 'volcano',
+  'rain',
+  'car',
+  'jug',
+  'fish',
+  'bum',
+  'toss',
+  'lily',
+  'cow',
+  'shoe',
+  'tie',
+  'knee',
+  'ma',
+  'ray',
+  'law',
+  'key',
+  'fee',
+  'pie',
+  'zoo',
+  'dog',
+  'oven',
+  'cart',
+  'fossil',
+  'banana',
+  'garage',
+  'pencil',
+  'Cleveland',
+  'turtle',
+  'pancho',
+  'mover',
+  'ginger',
+  'rhino',
+  'nickel',
+  'tomato',
+  'lemon',
+  'camera',
+  'candle',
+  'carpet',
+  'pillow',
+  'rocket',
+  'button',
+  'mirror',
+  'dollar',
+  'ladder',
+  'cabbage',
+  'volcano',
 ]
 
 function digitString(rng: Rng, len: number): string {
@@ -44,9 +86,15 @@ export const sets: GeneratedSetDef[] = [
       const ds = digitString(rng, difficulty === 'easy' ? 2 : difficulty === 'medium' ? 3 : 4)
       return {
         difficulty,
-        prompt: { kind: 'text', text: `Find a word for ${ds} using the phonetic code.`, emphasis: ds },
+        prompt: {
+          kind: 'text',
+          text: `Find a word for ${ds} using the phonetic code.`,
+          emphasis: ds,
+        },
         answer: { kind: 'phonetic', digits: ds },
-        solution: { steps: [...hintFor(ds), `Any word with exactly those consonant sounds spells ${ds}`] },
+        solution: {
+          steps: [...hintFor(ds), `Any word with exactly those consonant sounds spells ${ds}`],
+        },
       }
     },
   },
@@ -65,7 +113,11 @@ export const sets: GeneratedSetDef[] = [
       const ds = phoneticDigits(word)
       return {
         difficulty,
-        prompt: { kind: 'text', text: `What number does the word “${word}” encode?`, emphasis: word },
+        prompt: {
+          kind: 'text',
+          text: `What number does the word “${word}” encode?`,
+          emphasis: word,
+        },
         answer: { kind: 'text', accept: [ds], normalize: 'digits' },
         solution: { steps: [...hintFor(ds), `${word} → ${ds}`] },
       }
@@ -82,7 +134,11 @@ export const sets: GeneratedSetDef[] = [
       const sound = difficulty === 'easy' ? row[1].split(', ')[0]! : rng.pick(row[1].split(', '))
       return {
         difficulty,
-        prompt: { kind: 'text', text: `Which digit does the sound “${sound}” stand for?`, emphasis: sound },
+        prompt: {
+          kind: 'text',
+          text: `Which digit does the sound “${sound}” stand for?`,
+          emphasis: sound,
+        },
         answer: { kind: 'choice', options: CODE.map((c) => c[0]), correct: row[0] },
         solution: { steps: [`${row[1]} → ${row[0]} (${row[2]})`] },
       }
@@ -100,7 +156,9 @@ export const sets: GeneratedSetDef[] = [
         difficulty,
         prompt: { kind: 'text', text: `Make a phrase that encodes ${ds}.`, emphasis: ds },
         answer: { kind: 'phonetic', digits: ds },
-        solution: { steps: [...hintFor(ds), `The phrase's consonant sounds, in order, must spell ${ds}`] },
+        solution: {
+          steps: [...hintFor(ds), `The phrase's consonant sounds, in order, must spell ${ds}`],
+        },
       }
     },
   },

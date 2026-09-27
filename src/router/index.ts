@@ -14,6 +14,11 @@ export function createAppRouter(
         component: () => import('@/reader/ReaderView.vue'),
       },
       {
+        path: '/practice',
+        name: 'practice-hub',
+        component: () => import('@/practice/PracticeHubView.vue'),
+      },
+      {
         path: '/practice/:chapter/:set',
         name: 'practice',
         component: () => import('@/practice/PracticeView.vue'),
@@ -37,7 +42,8 @@ export function createAppRouter(
     scrollBehavior(to, from, saved) {
       if (saved) return saved
       // Moving between sections of the same chapter is handled by the reader itself.
-      if (to.name === 'read' && from.name === 'read' && to.params.chapter === from.params.chapter) return false
+      if (to.name === 'read' && from.name === 'read' && to.params.chapter === from.params.chapter)
+        return false
       if (to.hash) return { el: to.hash, top: 80 }
       return { top: 0 }
     },

@@ -68,6 +68,9 @@ function toggleFocus() {
           :title="`${state.streak.current} day streak`"
           >🔥 {{ state.streak.current }}</span
         >
+        <RouterLink :to="{ name: 'practice-hub' }" class="navlink" data-testid="nav-practice"
+          >Practice</RouterLink
+        >
         <RouterLink to="/about" class="about">About</RouterLink>
       </nav>
     </header>
@@ -157,6 +160,14 @@ function toggleFocus() {
 }
 .about {
   color: var(--muted);
+}
+.navlink {
+  color: var(--accent);
+  font-weight: 700;
+}
+.navlink.router-link-active {
+  text-decoration: underline;
+  text-underline-offset: 0.2em;
 }
 .main {
   flex: 1;

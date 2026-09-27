@@ -36,7 +36,9 @@ describe('ContentBlocks', () => {
     expect(w.text()).toContain('Two-Digit Addition')
   })
 
-  it('shows the callout as locked until the section is visited', () => {
+  it('shows the callout as locked until the section is visited when the reading gate is on', async () => {
+    const { useProgress } = await import('@/app/progress')
+    useProgress().state.value.settings.lockUntilRead = true
     const w = mount(ContentBlocks, {
       props: { blocks, chapterId: '1', sectionId: 'two-digit-addition' },
       global: { plugins: [router] },
@@ -48,7 +50,7 @@ describe('ContentBlocks', () => {
 describe('ExerciseCallout links', () => {
   it('links Book set and Generate to their practice routes once unlocked', async () => {
     const { useProgress } = await import('@/app/progress')
-    useProgress().state.value.settings.unlockAll = true
+    useProgress().state.value.settings.lockUntilRead = false
     const w = mount(ContentBlocks, {
       props: { blocks, chapterId: '1', sectionId: 'two-digit-addition' },
       global: { plugins: [router] },

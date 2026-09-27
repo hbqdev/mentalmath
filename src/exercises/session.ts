@@ -50,7 +50,12 @@ export function createSession(exercises: Exercise[], opts: SessionOptions = {}):
       if (!input.trim()) return result
       const t = now()
       st.lastResult = { ...result, input }
-      st.history.push({ exercise: st.current, input, correct: result.correct, ms: t - questionStartedAt })
+      st.history.push({
+        exercise: st.current,
+        input,
+        correct: result.correct,
+        ms: t - questionStartedAt,
+      })
       if (result.correct) st.correct += 1
       st.phase = 'feedback'
       if (st.index === st.total - 1) st.finishedAt = t

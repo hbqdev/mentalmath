@@ -30,7 +30,7 @@ The script prints "exercise-set candidates". Confirmed ones are recorded in `scr
 - `seed=<integer>` makes a generated session reproducible; the results screen shows the seed used
 - `timed=1` shows the clock during the session
 
-A set unlocks once its section of the chapter has been on screen for two seconds, or immediately with the "unlock all" setting.
+`/practice` is the hub: every technique of every chapter with a Generate button (fresh problems each click, difficulty pills) and the book set it covers. Inside a generated session, "Generate new set" draws new numbers and the difficulty can be changed. Every set is open by default; the `lockUntilRead` setting gates a set until its section of the chapter has been on screen for two seconds.
 
 ## UI-driven development
 

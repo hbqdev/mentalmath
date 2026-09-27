@@ -13,7 +13,11 @@ const recent = computed(() =>
     .flatMap(([setId, entry]) => entry.attempts.map((a) => ({ setId, ...a })))
     .sort((a, b) => b.at.localeCompare(a.at))
     .slice(0, 3)
-    .map((a) => ({ ...a, title: findGenerated(a.setId)?.title ?? setTitle(a.setId), chapterId: a.setId.replace(/^(?:ch|gen)([^-]+)-.*/, '$1') })),
+    .map((a) => ({
+      ...a,
+      title: findGenerated(a.setId)?.title ?? setTitle(a.setId),
+      chapterId: a.setId.replace(/^(?:ch|gen)([^-]+)-.*/, '$1'),
+    })),
 )
 
 const resume = computed(() => {
@@ -33,26 +37,49 @@ function pct(id: string, total: number) {
 <template>
   <div class="home">
     <section class="hero">
-      <p class="kicker">An interactive edition</p>
-      <h1>Secrets of Mental Math</h1>
-      <p class="sub">
-        Read the book chapter by chapter, then practice every technique with the book's own
-        problem sets and endless generated ones.
-      </p>
-      <RouterLink
-        v-if="resume"
-        class="resume"
-        :to="{ name: 'read', params: { chapter: resume.meta.id, section: resume.section } }"
-      >
-        Resume · {{ resume.meta.kicker }} · {{ resume.meta.title }} ›
-      </RouterLink>
+      <div class="hero-text">
+        <p class="kicker">An interactive edition</p>
+        <h1>Secrets of Mental Math</h1>
+        <p class="sub">
+          Read the book chapter by chapter, then practice every technique with the book's own
+          problem sets and endless generated ones.
+        </p>
+        <div class="entries">
+          <RouterLink
+            v-if="resume"
+            class="resume"
+            :to="{ name: 'read', params: { chapter: resume.meta.id, section: resume.section } }"
+          >
+            Resume · {{ resume.meta.kicker }} · {{ resume.meta.title }} ›
+          </RouterLink>
+          <RouterLink v-else class="resume" :to="{ name: 'read', params: { chapter: '0' } }"
+            >Start reading ›</RouterLink
+          >
+          <RouterLink
+            class="practice-link"
+            data-testid="home-practice"
+            :to="{ name: 'practice-hub' }"
+            >Practice any technique ›</RouterLink
+          >
+        </div>
+      </div>
+      <img
+        class="cover"
+        src="/book-cover.jpg"
+        width="972"
+        height="1500"
+        alt="Cover of Secrets of Mental Math by Arthur Benjamin and Michael Shermer"
+        data-testid="book-cover"
+      />
     </section>
 
     <section v-if="recent.length" class="recent" data-testid="recent-sessions">
       <h2 class="label">Recent practice</h2>
       <ul>
         <li v-for="a in recent" :key="a.setId + a.at">
-          <RouterLink :to="{ name: 'practice', params: { chapter: a.chapterId, set: a.setId } }">{{ a.title }}</RouterLink>
+          <RouterLink :to="{ name: 'practice', params: { chapter: a.chapterId, set: a.setId } }">{{
+            a.title
+          }}</RouterLink>
           <span class="score">{{ a.correct }} / {{ a.total }}</span>
         </li>
       </ul>
@@ -89,17 +116,66 @@ function pct(id: string, total: number) {
   margin: 0 auto;
   padding: 2.5rem var(--gutter) 4rem;
 }
+.hero {
+  display: flex;
+  align-items: center;
+  gap: 2.5rem;
+}
+.hero-text {
+  flex: 1;
+  min-width: 0;
+}
 .hero h1 {
   font-size: clamp(2rem, 4vw, 3rem);
   margin: 0.2rem 0 0.8rem;
+}
+.cover {
+  flex: none;
+  width: clamp(120px, 22vw, 190px);
+  height: auto;
+  border-radius: 3px;
+  box-shadow:
+    0 1px 2px rgba(0, 0, 0, 0.2),
+    0 12px 28px rgba(43, 38, 34, 0.28);
+  transform: rotate(2deg);
+}
+@media (max-width: 719px) {
+  .hero {
+    flex-direction: column-reverse;
+    align-items: flex-start;
+    gap: 1.5rem;
+  }
+  .cover {
+    width: 132px;
+    align-self: center;
+    transform: none;
+  }
 }
 .sub {
   color: var(--muted);
   max-width: 60ch;
 }
+.entries {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  margin-top: 1rem;
+}
+.practice-link {
+  display: inline-block;
+  font-family: var(--font-sans);
+  font-weight: 700;
+  color: var(--accent);
+  border: 1px solid var(--accent);
+  padding: 0.6rem 1rem;
+  border-radius: var(--radius);
+}
+.practice-link:hover {
+  text-decoration: none;
+  background: var(--card);
+}
 .resume {
   display: inline-block;
-  margin-top: 1rem;
   font-family: var(--font-sans);
   font-weight: 700;
   background: var(--accent);

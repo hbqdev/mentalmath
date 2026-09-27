@@ -19,7 +19,12 @@ export const sets: GeneratedSetDef[] = [
       } else {
         a = rng.int(100, 999)
       }
-      return { difficulty, prompt: times(a, 11), answer: integer(a * 11), solution: { steps: stepsTimes11(a) } }
+      return {
+        difficulty,
+        prompt: times(a, 11),
+        answer: integer(a * 11),
+        solution: { steps: stepsTimes11(a) },
+      }
     },
   },
   {
@@ -29,7 +34,12 @@ export const sets: GeneratedSetDef[] = [
     title: 'Squares ending in 5',
     description: 'Multiply the leading part by one more than itself, then append 25.',
     generate(difficulty, rng) {
-      const t = difficulty === 'easy' ? rng.int(1, 4) : difficulty === 'medium' ? rng.int(5, 9) : rng.int(10, 99)
+      const t =
+        difficulty === 'easy'
+          ? rng.int(1, 4)
+          : difficulty === 'medium'
+            ? rng.int(5, 9)
+            : rng.int(10, 99)
       const base = t * 10 + 5
       return {
         difficulty,
@@ -44,9 +54,15 @@ export const sets: GeneratedSetDef[] = [
     chapterId: '0',
     sectionId: 'squaring-and-more',
     title: 'Same tens, ones adding to 10',
-    description: 'Same first digit, last digits summing to 10: multiply up the tens, then the ones.',
+    description:
+      'Same first digit, last digits summing to 10: multiply up the tens, then the ones.',
     generate(difficulty, rng) {
-      const t = difficulty === 'easy' ? rng.int(2, 4) : difficulty === 'medium' ? rng.int(5, 7) : rng.int(8, 9)
+      const t =
+        difficulty === 'easy'
+          ? rng.int(2, 4)
+          : difficulty === 'medium'
+            ? rng.int(5, 7)
+            : rng.int(8, 9)
       const x = difficulty === 'hard' ? rng.int(6, 9) : rng.int(1, 9)
       const y = 10 - x
       const a = t * 10 + x
@@ -58,7 +74,11 @@ export const sets: GeneratedSetDef[] = [
         prompt: times(a, b),
         answer: integer(a * b),
         solution: {
-          steps: [`${t} × ${t + 1} = ${head}`, `${x} × ${y} = ${tail}`, `Join them: ${head}${String(tail).padStart(2, '0')} = ${a * b}`],
+          steps: [
+            `${t} × ${t + 1} = ${head}`,
+            `${x} × ${y} = ${tail}`,
+            `Join them: ${head}${String(tail).padStart(2, '0')} = ${a * b}`,
+          ],
         },
       }
     },

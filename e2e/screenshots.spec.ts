@@ -8,7 +8,7 @@ import { generateMany } from '../src/exercises/generators/shared'
 import { createRng } from '../src/exercises/rng'
 import { bookExercises } from '../src/exercises/bookSets'
 import '../src/content/book-exercises'
-import { freezeClock, sampleProgress, seedProgress, unlockAll } from './helpers'
+import { freezeClock, lockUntilRead, sampleProgress, seedProgress, unlockAll } from './helpers'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'screenshots')
 
@@ -141,7 +141,15 @@ test.describe('screenshots', () => {
     await shot(page, info, 'practice', 'book-date-prompt')
   })
 
+  test('practice hub', async ({ page }, info) => {
+    await seedProgress(page, sampleProgress)
+    await page.goto('/practice')
+    await expect(page.getByTestId('technique-gen1-two-digit-addition')).toBeVisible()
+    await shot(page, info, 'practice', 'hub')
+  })
+
   test('locked set', async ({ page }, info) => {
+    await lockUntilRead(page)
     await page.goto('/practice/1/ch1-two-digit-addition')
     await expect(page.getByTestId('locked')).toBeVisible()
     await shot(page, info, 'practice', 'set-locked')
