@@ -318,15 +318,20 @@ small,
 .stack.indent {
   align-items: flex-start;
 }
+/* The inner square sits under the right half of the outer one, never wider than it. */
 .stack.indent > :nth-child(n + 2) {
-  margin-left: 45%;
+  align-self: flex-end;
 }
 @media (max-width: 719px) {
   .fl {
     font-size: 0.95em;
   }
-  .stack.indent > :nth-child(n + 2) {
-    margin-left: 25%;
+  .split {
+    font-size: 0.8em;
+  }
+  .split .fan {
+    width: 2.2em;
+    height: 2.2em;
   }
 }
 </style>

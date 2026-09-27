@@ -232,5 +232,39 @@ test.describe('screenshots', () => {
         'chapter-2-squares',
       )
     })
+
+    test('chapter 3 eleven glyph, side-by-side routes and nested squares', async ({
+      page,
+    }, info) => {
+      await seedProgress(page, sampleProgress)
+      await figureShot(
+        page,
+        info,
+        '/read/3/2-by-2-multiplication-problems',
+        'ch3-f009',
+        'chapter-3-eleven',
+      )
+      await figureShot(
+        page,
+        info,
+        '/read/3/2-by-2-multiplication-problems',
+        'ch3-f024',
+        'chapter-3-or-routes',
+      )
+      await figureShot(
+        page,
+        info,
+        '/read/3/three-digit-squares',
+        'ch3-f036',
+        'chapter-3-nested-squares',
+      )
+      await figureShot(
+        page,
+        info,
+        '/read/3/three-digit-squares',
+        'ch3-f041',
+        'chapter-3-figure-with-callout',
+      )
+    })
   })
 })

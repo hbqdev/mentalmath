@@ -5,7 +5,7 @@ import { overrides } from '../overrides'
 import type { ColumnLine, FigureSpec } from '../types'
 
 // Chapters whose every non-exercise figure must have an override.
-const COVERED: string[] = ['0', '1', '2']
+const COVERED: string[] = ['0', '1', '2', '3']
 
 const bookMap = JSON.parse(readFileSync(path.resolve('scripts/book-map.json'), 'utf8')) as {
   exerciseSets: Record<string, unknown>
@@ -218,5 +218,13 @@ describe('recomputation', () => {
         'x',
       ),
     ).toThrow()
+  })
+
+  it('keeps the worked example of a figure that also carries an exercise list', () => {
+    const bm = JSON.parse(readFileSync(path.resolve('scripts/book-map.json'), 'utf8')) as {
+      exerciseAfter: Record<string, string>
+    }
+    for (const id of Object.keys(bm.exerciseAfter).filter((k) => /^ch[0-3]-/.test(k)))
+      expect(overrides[id], id).toBeDefined()
   })
 })
