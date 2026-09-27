@@ -78,3 +78,26 @@ describe('PracticeView', () => {
     expect(b.w.find('[data-testid="set-not-found"]').exists()).toBe(true)
   })
 })
+
+describe('review fixes: practice flow', () => {
+  it('Enter advances after feedback and focus stays usable', async () => {
+    useProgress().state.value.settings.unlockAll = true
+    const { w } = await mountAt('/practice/1/gen1-two-digit-addition?mode=generated&seed=42')
+    const input = w.find('input[data-testid="answer-input"]')
+    await input.setValue('0')
+    await input.trigger('keyup.enter')
+    await flushPromises()
+    expect(w.find('[data-testid="feedback"]').exists()).toBe(true)
+    await w.find('input[data-testid="answer-input"]').trigger('keyup.enter')
+    await flushPromises()
+    expect(w.find('[data-testid="practice-progress"]').text()).toContain('2 / 10')
+    expect(w.find('[data-testid="feedback"]').exists()).toBe(false)
+  })
+
+  it('a book set opened in generated mode redirects to its generated twin', async () => {
+    useProgress().state.value.settings.unlockAll = true
+    const { router } = await mountAt('/practice/1/ch1-two-digit-addition?mode=generated')
+    await flushPromises()
+    expect(router.currentRoute.value.params.set).toBe('gen1-two-digit-addition')
+  })
+})

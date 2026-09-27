@@ -23,7 +23,8 @@ test.describe('practice', () => {
       await page.getByTestId('answer-input').fill(answers[i]!)
       await page.getByTestId('answer-input').press('Enter')
       await expect(page.getByTestId('feedback')).toContainText('Correct')
-      await page.getByTestId('next-button').click()
+      if (i % 3 === 0) await page.getByTestId('next-button').click()
+      else await page.getByTestId('answer-input').press('Enter')
     }
     await expect(page.getByTestId('results-score')).toHaveText('10 / 10')
     await expect(page.getByTestId('results')).toContainText('Seed 42')
