@@ -10,7 +10,7 @@ const emit = defineEmits<{ select: [id: string] }>()
 </script>
 
 <template>
-  <nav class="outline" aria-label="In this chapter">
+  <nav class="outline" data-testid="outline" aria-label="In this chapter">
     <p class="label">In this chapter</p>
     <ul>
       <li

@@ -6,7 +6,7 @@ const emit = defineEmits<{ close: [] }>()
 <template>
   <Teleport to="body">
     <div v-if="open" class="scrim" @click="emit('close')" />
-    <section class="sheet" :class="{ open }" :aria-hidden="!open" role="dialog" :aria-label="title">
+    <section class="sheet" data-testid="sheet" :class="{ open }" :aria-hidden="!open" role="dialog" :aria-label="title">
       <div class="grab" />
       <header>
         <strong>{{ title }}</strong>
@@ -39,6 +39,12 @@ const emit = defineEmits<{ close: [] }>()
   padding: 0.5rem 1rem calc(1rem + env(safe-area-inset-bottom, 0px));
   transform: translateY(100%);
   transition: transform 0.2s ease;
+}
+.sheet:not(.open) {
+  visibility: hidden;
+  transition:
+    transform 0.2s ease,
+    visibility 0s linear 0.2s;
 }
 .sheet.open {
   transform: none;

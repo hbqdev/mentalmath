@@ -11,7 +11,7 @@ const twin = computed(() => generatedTwin(props.setId))
 </script>
 
 <template>
-  <div class="callout" :class="{ locked: !unlocked }">
+  <div class="callout" data-testid="exercise-callout" :class="{ locked: !unlocked }" :data-locked="!unlocked">
     <div class="text">
       <p class="label">Exercise</p>
       <h4>{{ title }}</h4>
