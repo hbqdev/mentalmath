@@ -49,15 +49,19 @@ A set unlocks once its section of the chapter has been on screen for two seconds
 
 ## Typeset figures
 
-The worked examples of chapters 0 to 3 (110 figures) are transcribed as `FigureSpec` data under `src/content/figures/` and rendered by `FigureLayout.vue` instead of the EPUB's small JPEGs: vertical columns, equal-sign chains, the tables, the squaring diagram and the ×11 glyph, all in em units so they scale with the prose and follow the theme. `overrides.test.ts` recomputes every printed line (column runs, labelled products, chains, squares) so a transcription slip fails the build. Later chapters still show the book's images; add a spec to `chapterN.ts` and it takes over automatically.
+Every worked example in the book (397 figures across chapters 0 to 9) is transcribed as `FigureSpec` data under `src/content/figures/` and rendered by `FigureLayout.vue` instead of the EPUB's small JPEGs: vertical columns, equal-sign chains, tables, the squaring diagram, the ×11 glyph, long division, criss-cross line diagrams, mod-sum flows, the square-root layout and inline fractions, all in em units so they scale with the prose and follow the theme. Strings accept a small markup: `{3/4}` a stacked fraction, `~09~` an overline, `‹8›` an underline, `^N^` a superscript. `overrides.test.ts` recomputes every printed line (column runs, labelled products, breakdown notes, chains, squares, long divisions, fraction and decimal equalities, magic squares, year codes) and checks each spec's shape against the image it replaces, so a transcription slip fails the build. The JPEGs stay in `public/book/figures/` as the source of truth for review.
 
 ## Offline and install
 
 `vite-plugin-pwa` precaches the app shell, chapter data, fonts and figures (about 3.3 MB) on the first visit, so every chapter reads offline afterwards and the app installs from the browser menu. Icons come from `scripts/make-icons.ts` (`npx tsx scripts/make-icons.ts`), which rasterises the favicon without an image library. `e2e/offline.spec.ts` reads a chapter with the network switched off.
 
+## Deploy on this host
+
+`scripts/deploy.sh` builds the site, copies `dist/` to `/var/www/mentalmath`, installs `deploy/mentalmath.nginx.conf` as the default nginx site on port 80 (client-side routes fall back to the shell, hashed assets are immutable, the service worker and shell are always revalidated) and reloads nginx. Rerun it after every change; `--no-build` publishes the existing `dist/`. The app is then at `http://<this host>/` on the LAN.
+
 ## Status
 
-Complete: reader with typeset figures for chapters 0 to 3, generated drills for chapters 0 to 9, all 40 book problem sets with solution steps in the book's methods, offline support, unit and end-to-end suites. Deferred: typeset figures for chapters 4 to 9 (the same mechanism), visual-regression comparison of the screenshots, a hosted deployment.
+Complete: reader with every figure typeset, generated drills for chapters 0 to 9, all 40 book problem sets with solution steps in the book's methods, offline support, unit and end-to-end suites, nginx deployment on the LAN host. Deferred: visual-regression comparison of the screenshots.
 
 ## Book exercise data
 
