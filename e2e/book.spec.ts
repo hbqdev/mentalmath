@@ -31,7 +31,7 @@ for (const [chapter, setId] of SETS) {
     await unlockAll(page)
     const problems = bookExercises(setId)
     expect(problems.length).toBeGreaterThan(0)
-    await page.goto(`/practice/${chapter}/${setId}`)
+    await page.goto(`/practice/${chapter}/${setId}?view=one`)
     for (let i = 0; i < problems.length; i++) {
       await expect(page.getByTestId('practice-progress')).toContainText(
         `${i + 1} / ${problems.length}`,
@@ -52,7 +52,30 @@ test('a book callout leads from the text into the book set', async ({ page }) =>
   await unlockAll(page)
   await page.goto('/read/1/left-to-right-addition')
   await page.getByTestId('exercise-callout').first().getByRole('link', { name: 'Book set' }).click()
-  await expect(page).toHaveURL(/\/practice\/1\/ch1-two-digit-addition$/)
-  await expect(page.getByTestId('practice-progress')).toContainText('1 / 10')
+  await expect(page).toHaveURL(/\/practice\/1\/ch1-two-digit-addition/)
+  await expect(page.getByTestId('worksheet')).toBeVisible()
+  await expect(page.getByTestId('sheet-progress')).toContainText('0 / 10')
   await expect(page.getByRole('heading', { level: 1 })).toContainText('Two-Digit Addition')
+})
+
+test('a book set is a worksheet: every problem visible, answered in any order', async ({
+  page,
+}) => {
+  await unlockAll(page)
+  const problems = bookExercises('ch1-two-digit-addition')
+  await page.goto('/practice/1/ch1-two-digit-addition')
+  await expect(page.getByTestId('worksheet')).toBeVisible()
+  await expect(page.locator('[data-testid^="sheet-item-"]')).toHaveCount(problems.length)
+  const last = problems.length
+  await page.getByTestId(`sheet-input-${last}`).fill(formatAnswer(problems[last - 1]!.answer))
+  await page.getByTestId(`sheet-input-${last}`).press('Enter')
+  await expect(page.getByTestId(`sheet-verdict-${last}`)).toContainText('Correct')
+  await page.getByTestId('sheet-input-1').fill('0')
+  await page.getByTestId('sheet-check-1').click()
+  await expect(page.getByTestId('sheet-item-1').getByTestId('solution-steps')).toBeVisible()
+  await expect(page.getByTestId('sheet-progress')).toContainText(`2 / ${last} answered · 1 correct`)
+  await page.getByTestId('reveal-rest').click()
+  await expect(page.getByTestId('sheet-summary')).toContainText(`1 / ${last}`)
+  await page.getByTestId('view-one').click()
+  await expect(page.getByTestId('practice-progress')).toContainText(`1 / ${last}`)
 })

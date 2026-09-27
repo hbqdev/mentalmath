@@ -117,7 +117,7 @@ test.describe('screenshots', () => {
     await unlockAll(page)
     await freezeClock(page)
     const problems = bookExercises('ch1-three-digit-subtraction')
-    await page.goto('/practice/1/ch1-three-digit-subtraction')
+    await page.goto('/practice/1/ch1-three-digit-subtraction?view=one')
     await expect(page.getByTestId('practice-prompt')).toBeVisible()
     await shot(page, info, 'practice', 'book-session-prompt')
     await page.getByTestId('answer-input').fill('0')
@@ -136,9 +136,23 @@ test.describe('screenshots', () => {
 
   test('date prompt with weekday choices', async ({ page }, info) => {
     await unlockAll(page)
-    await page.goto('/practice/9/ch9-a-day-for-any-date')
+    await page.goto('/practice/9/ch9-a-day-for-any-date?view=one')
     await expect(page.getByTestId('choice-monday')).toBeVisible()
     await shot(page, info, 'practice', 'book-date-prompt')
+  })
+
+  test('book worksheet', async ({ page }, info) => {
+    await unlockAll(page)
+    await freezeClock(page)
+    const problems = bookExercises('ch1-two-digit-addition')
+    await page.goto('/practice/1/ch1-two-digit-addition')
+    await expect(page.getByTestId('worksheet')).toBeVisible()
+    await page.getByTestId('sheet-input-1').fill(formatAnswer(problems[0]!.answer))
+    await page.getByTestId('sheet-check-1').click()
+    await page.getByTestId('sheet-input-2').fill('0')
+    await page.getByTestId('sheet-check-2').click()
+    await expect(page.getByTestId('sheet-verdict-2')).toBeVisible()
+    await shot(page, info, 'practice', 'book-worksheet')
   })
 
   test('practice hub', async ({ page }, info) => {

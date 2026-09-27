@@ -6,7 +6,7 @@ import BinaryPrompt from './prompts/BinaryPrompt.vue'
 import ColumnsPrompt from './prompts/ColumnsPrompt.vue'
 import FractionGlyph from './prompts/FractionGlyph.vue'
 
-const props = defineProps<{ prompt: Prompt }>()
+const props = defineProps<{ prompt: Prompt; compact?: boolean }>()
 
 const money = (n: number) => (Number.isInteger(n) ? `$${n}` : `$${n.toFixed(2)}`)
 const textParts = computed(() => {
@@ -19,7 +19,7 @@ const textParts = computed(() => {
 </script>
 
 <template>
-  <div class="prompt" data-testid="practice-prompt">
+  <div class="prompt" :class="{ compact: props.compact }" data-testid="practice-prompt">
     <BinaryPrompt v-if="prompt.kind === 'binary'" :prompt="prompt" />
     <ColumnsPrompt v-else-if="prompt.kind === 'columns'" :prompt="prompt" />
 

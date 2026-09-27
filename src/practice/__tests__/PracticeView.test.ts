@@ -111,7 +111,7 @@ describe('book sessions', () => {
     const { bookExercises } = await import('@/exercises/bookSets')
     await import('@/content/book-exercises')
     useProgress().state.value.settings.lockUntilRead = false
-    const { w } = await mountAt('/practice/3/ch3-multiplying-by-11')
+    const { w } = await mountAt('/practice/3/ch3-multiplying-by-11?view=one')
     const problems = bookExercises('ch3-multiplying-by-11')
     expect(problems).toHaveLength(3)
     expect(w.find('[data-testid="practice-progress"]').text()).toContain('1 / 3')
@@ -143,10 +143,24 @@ describe('book sessions', () => {
   it('answers a weekday choice in the chapter 9 book set', async () => {
     await import('@/content/book-exercises')
     useProgress().state.value.settings.lockUntilRead = false
-    const { w } = await mountAt('/practice/9/ch9-a-day-for-any-date')
+    const { w } = await mountAt('/practice/9/ch9-a-day-for-any-date?view=one')
     expect(w.find('[data-testid="choice-friday"]').exists()).toBe(true)
     await w.find('[data-testid="choice-friday"]').trigger('click')
     await flushPromises()
     expect(w.find('[data-testid="feedback"]').text()).toMatch(/Correct/)
+  })
+
+  it('shows a book set as a worksheet by default and a generated set one at a time', async () => {
+    useProgress().state.value.settings.lockUntilRead = false
+    const a = await mountAt('/practice/3/ch3-multiplying-by-11')
+    expect(a.w.find('[data-testid="worksheet"]').exists()).toBe(true)
+    expect(a.w.findAll('[data-testid^="sheet-item-"]').length).toBe(3)
+    expect(a.w.find('[data-testid="answer-input"]').exists()).toBe(false)
+    const b = await mountAt('/practice/1/gen1-two-digit-addition?mode=generated&seed=1')
+    expect(b.w.find('[data-testid="worksheet"]').exists()).toBe(false)
+    expect(b.w.find('[data-testid="answer-input"]').exists()).toBe(true)
+    await b.w.find('[data-testid="view-sheet"]').trigger('click')
+    await flushPromises()
+    expect(b.w.find('[data-testid="worksheet"]').exists()).toBe(true)
   })
 })
