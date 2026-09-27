@@ -58,7 +58,6 @@ function goHome() {
 </template>
 
 <style>
-@import './assets/base.css';
 
 * {
   box-sizing: border-box;
