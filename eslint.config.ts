@@ -14,11 +14,6 @@ export default defineConfigWithVueTs(
       'src/content/chapters/**',
     ],
   },
-  {
-    // Legacy JS code kept alive until later tasks/plans replace it.
-    name: 'app/legacy-until-plan-2',
-    ignores: ['src/views/ExerciseView.vue', 'src/utils/**', 'src/data/**'],
-  },
   pluginVue.configs['flat/essential'],
   vueTsConfigs.recommended,
   skipFormatting,
