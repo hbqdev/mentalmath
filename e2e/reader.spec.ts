@@ -48,8 +48,7 @@ test.describe('reader', () => {
 
     const html = page.locator('html')
     const before = await html.getAttribute('data-theme')
-    await page.getByTestId('theme-toggle').click() // system -> light
-    await page.getByTestId('theme-toggle').click() // light -> dark
+    await page.getByTestId('theme-toggle').selectOption('dark')
     await expect(html).toHaveAttribute('data-theme', 'dark')
     expect(before).not.toBeNull()
     await page.reload()
