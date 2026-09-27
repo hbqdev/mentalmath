@@ -32,7 +32,7 @@ export const sets: GeneratedSetDef[] = [
     chapterId: '8',
     sectionId: 'five-digit-squares',
     title: 'Five-digit squares',
-    description: 'The same rounding idea one step bigger, holding the middle term with the phonetic code.',
+    description: 'Split into thousands and the rest: the big square, twice the cross product, the small square.',
     coversBookSets: ['ch8-five-digit-squares'],
     generate(difficulty, rng) {
       const base = difficulty === 'easy' ? rng.int(10001, 29999) : difficulty === 'medium' ? rng.int(30000, 69999) : rng.int(70000, 99999)
@@ -44,7 +44,7 @@ export const sets: GeneratedSetDef[] = [
     chapterId: '8',
     sectionId: '3-by-3-multiplication',
     title: '3-by-3 multiplication',
-    description: 'Split the smaller number into hundreds and the rest; two easier products, then add.',
+    description: 'Factor, round and adjust, or use the close-together method; split only when nothing else fits.',
     coversBookSets: ['ch8-3-by-3-multiplication'],
     generate(difficulty, rng) {
       const a = rng.int(101, 999)
@@ -57,7 +57,7 @@ export const sets: GeneratedSetDef[] = [
     chapterId: '8',
     sectionId: '5-by-5-multiplication',
     title: '5-by-5 multiplication',
-    description: 'The largest problem in the book: split both numbers and keep the partial products in mind.',
+    description: 'The largest problem in the book: four partial products of thousands and remainders.',
     coversBookSets: ['ch8-5-by-5-multiplication'],
     generate(difficulty, rng) {
       const a = rng.int(10001, 99999)

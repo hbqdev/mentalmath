@@ -49,7 +49,7 @@ A set unlocks once its section of the chapter has been on screen for two seconds
 
 ## Status
 
-Reader, generated drills for chapters 0 to 9, and all 40 book problem sets with the authors' methods are complete. Next: re-typeset worked figures for chapters 0 to 3, offline support.
+Reader, generated drills for chapters 0 to 9, and all 40 book problem sets with solution steps in the book's methods are complete. Next: re-typeset worked figures for chapters 0 to 3, offline support.
 
 ## Book exercise data
 
