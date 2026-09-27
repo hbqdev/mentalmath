@@ -13,7 +13,7 @@ const bookMap = JSON.parse(readFileSync(new URL('../../../../scripts/book-map.js
 const mappedIds = [...new Set([...Object.values(bookMap.exerciseSets), ...Object.values(bookMap.exerciseAfter)])].sort()
 
 // Sets whose data lands in later tasks of this plan; each task removes its ids from here.
-const PENDING = new Set<string>(mappedIds.filter((id) => !/^ch[1234]-/.test(id)))
+const PENDING = new Set<string>(mappedIds.filter((id) => !/^ch[12345]-/.test(id)))
 
 describe('book exercise data', () => {
   it('covers every curated set id and nothing else', () => {
@@ -106,6 +106,27 @@ describe('book exercise data', () => {
     const div = allBookSets().find((s) => s.id === 'ch4-one-digit-division')!.problems[0]!
     expect(check(div.answer, '35 3/9').correct).toBe(true)
     expect(check(div.answer, '35 r 3').correct).toBe(true)
+  })
+
+  it('has the expected problem counts for chapter 5 and accepts the book estimates', () => {
+    const counts = Object.fromEntries(allBookSets().filter((s) => /^ch5-/.test(s.id)).map((s) => [s.id, s.problems.length]))
+    expect(counts).toEqual({
+      'ch5-addition-guesstimation': 5,
+      'ch5-subtraction-guesstimation': 4,
+      'ch5-division-guesstimation': 5,
+      'ch5-multiplication-guesstimation': 10,
+      'ch5-square-root-guesstimation': 5,
+      'ch5-everyday-math': 9,
+    })
+    const add = allBookSets().find((s) => s.id === 'ch5-addition-guesstimation')!.problems
+    expect(check(add[0]!.answer, '2600').correct).toBe(true)
+    expect(check(add[0]!.answer, '2584').correct).toBe(true)
+    expect(check(add[4]!.answer, '47').correct).toBe(true)
+    const sq = allBookSets().find((s) => s.id === 'ch5-square-root-guesstimation')!.problems
+    expect(check(sq[0]!.answer, '4.1').correct).toBe(true)
+    const every = allBookSets().find((s) => s.id === 'ch5-everyday-math')!.problems
+    expect(check(every[0]!.answer, '13.20').correct).toBe(true)
+    expect(check(every[4]!.answer, '12').correct).toBe(true)
   })
 
   it('has the expected problem counts for chapter 1', () => {
