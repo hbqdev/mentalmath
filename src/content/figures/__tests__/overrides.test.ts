@@ -45,7 +45,18 @@ function evalExpr(expr: string): number | null {
   return acc
 }
 
+/** "(40 + 2)" / "(600 − 4)" / "(20 + 9) or (30 − 1)": the first bracketed breakdown must equal the line's value. */
+function checkNote(note: string | undefined, value: string, id: string) {
+  const m = note && /^\((\d[\d,]* (?:[+−] \d[\d,]* ?)+)\)/.exec(note)
+  if (!m) return
+  const got = evalExpr(m[1]!)
+  const want = num(value)
+  if (got !== null && want !== null) expect({ id, note, got }).toEqual({ id, note, got: want })
+}
+
 function checkColumn(lines: ColumnLine[], id: string) {
+  for (const l of lines) checkNote(l.note, l.value, id)
+  lines = lines.filter((l) => !l.carry)
   // labelled equations: "40 × 7 =" value → the label's expression equals the value
   for (const l of lines) {
     if (l.label && l.label.trim().endsWith('=')) {
@@ -92,12 +103,21 @@ function checkColumn(lines: ColumnLine[], id: string) {
   }
 }
 
-function checkChain(steps: string[], id: string) {
+function checkChain(steps: string[], id: string, notes: Array<string | undefined> = []) {
   if (steps.some((s) => s.includes('?'))) return
   const values = steps.map(evalExpr)
   for (const [i, v] of values.entries()) {
     expect({ id, step: steps[i], value: v }).toEqual({ id, step: steps[i], value: values[0] })
   }
+  // the note under each "=" names the amount moved: the change in the leading operand
+  const lead = (s: string) => num(s.trim().split(/\s+/)[0]!)!
+  notes.forEach((note, i) => {
+    const m = note && /(\d[\d,]*)/.exec(note)
+    if (!m || !steps[i + 1]) return
+    const moved = Math.abs(lead(steps[i]!) - lead(steps[i + 1]!))
+    if (moved === 0) return // a "(switch)" step
+    expect({ id, note, moved }).toEqual({ id, note, moved: num(m[1]!) })
+  })
 }
 
 function checkSplit(s: Extract<FigureSpec, { kind: 'split' }>, id: string) {
@@ -153,7 +173,7 @@ function checkSpec(spec: FigureSpec, id: string) {
     case 'column':
       return checkColumn(spec.lines, id)
     case 'chain':
-      return checkChain(spec.steps, id)
+      return checkChain(spec.steps, id, spec.notes ?? [])
     case 'split':
       return checkSplit(spec, id)
     case 'eleven': {
@@ -175,6 +195,36 @@ function checkSpec(spec: FigureSpec, id: string) {
 describe('figure overrides', () => {
   it('reproduce the arithmetic printed in the book', () => {
     for (const [id, spec] of Object.entries(overrides)) checkSpec(spec, id)
+  })
+
+  // A correct spec under the wrong id passes every arithmetic check; the image's shape does not.
+  it('have a shape compatible with the image they replace', () => {
+    const dims = new Map<string, { width: number; height: number }>()
+    for (const unit of ['0', '1', '2', '3']) {
+      const doc = JSON.parse(
+        readFileSync(path.resolve('src/content/chapters', `${unit}.json`), 'utf8'),
+      ) as {
+        sections: Array<{
+          blocks: Array<{ type: string; id?: string; width?: number; height?: number }>
+        }>
+      }
+      for (const sec of doc.sections)
+        for (const b of sec.blocks)
+          if (b.type === 'figure' && b.id) dims.set(b.id, { width: b.width!, height: b.height! })
+    }
+    for (const [id, spec] of Object.entries(overrides)) {
+      const d = dims.get(id)!
+      const lines = spec.kind === 'column' ? spec.lines.filter((l) => !l.carry).length : 0
+      const shape = { id, kind: spec.kind, ...d }
+      if (spec.kind === 'row')
+        expect(shape.width, JSON.stringify(shape)).toBeGreaterThanOrEqual(200)
+      if (spec.kind === 'column' && lines <= 2)
+        expect(shape.height, JSON.stringify(shape)).toBeLessThanOrEqual(80)
+      if (spec.kind === 'column' && lines >= 4)
+        expect(shape.height, JSON.stringify(shape)).toBeGreaterThanOrEqual(100)
+      if ((spec.kind === 'split' && spec.result) || spec.kind === 'chain')
+        expect(shape.width, JSON.stringify(shape)).toBeGreaterThanOrEqual(200)
+    }
   })
 
   it('only name figures that exist in the extracted book', () => {
@@ -199,9 +249,14 @@ describe('recomputation', () => {
       checkColumn([{ value: '47' }, { op: '+', value: '32', rule: true }, { value: '78' }], 'x'),
     ).toThrow()
   })
-  it('rejects a wrong labelled product and a wrong chain', () => {
+  it('rejects a wrong labelled product, a wrong chain, a wrong breakdown note and a wrong chain note', () => {
     expect(() => checkColumn([{ label: '40 × 7 =', value: '270' }], 'x')).toThrow()
     expect(() => checkChain(['47 + 32', '77 + 3', '79'], 'x')).toThrow()
+    expect(() =>
+      checkColumn([{ value: '47' }, { op: '+', value: '32', rule: true, note: '(30 + 3)' }], 'x'),
+    ).toThrow()
+    expect(() => checkChain(['538 + 327', '838 + 27', '865'], 'x', ['+ 30', '+ 27'])).toThrow()
+    expect(() => checkChain(['538 + 327', '838 + 27', '865'], 'x', ['+ 300', '+ 27'])).not.toThrow()
   })
   it('rejects a wrong squaring diagram', () => {
     expect(() =>

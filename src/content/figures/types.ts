@@ -15,6 +15,8 @@ export interface ColumnLine {
   rule?: boolean
   /** Trailing annotation, e.g. "(40 + 2)" or "= Tuesday". */
   note?: string
+  /** A small carry digit written above the column (`value` holds the digit and its spacing). */
+  carry?: boolean
 }
 
 export type FigureSpec =

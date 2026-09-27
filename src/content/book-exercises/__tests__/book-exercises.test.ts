@@ -334,7 +334,8 @@ describe('book exercise data', () => {
     const seven = div.find(
       (p) => p.prompt.kind === 'divisible' && p.prompt.by === 7 && p.prompt.n === 5784,
     )
-    if (seven) expect(seven.steps[0]).toContain('57 is not a multiple of 7')
+    expect(seven).toBeDefined()
+    expect(seven!.steps[0]).toContain('57 is not a multiple of 7')
     const fr = allBookSets()
       .flatMap((s) => s.problems)
       .find(
@@ -344,7 +345,8 @@ describe('book exercise data', () => {
           p.prompt.a.den !== p.prompt.b.den &&
           p.prompt.b.den % p.prompt.a.den === 0,
       )
-    if (fr) expect(fr.steps[0]).toMatch(/^\d+\/\d+ = \d+\/\d+$/)
+    expect(fr).toBeDefined()
+    expect(fr!.steps[0]).toMatch(/^\d+\/\d+ = \d+\/\d+$/)
     // chapter 8 follows the printed routes
     const three = allBookSets().find((s) => s.id === 'ch8-3-by-3-multiplication')!.problems
     expect(three[1]!.steps[0]).toBe('596 = 600 − 4')
