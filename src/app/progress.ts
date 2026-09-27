@@ -14,7 +14,8 @@ export interface ProgressState {
   practice: Record<string, { attempts: Attempt[]; best: number }>
   streak: { current: number; lastActiveDay: string }
   settings: {
-    theme: 'system' | 'light' | 'dark'
+    /** 'light' is the warm paper theme; 'bright' the white one. */
+    theme: 'system' | 'light' | 'bright' | 'dark'
     focus: boolean
     fontScale: 0 | 1 | 2
     /** Off by default: every set is open. On, a set opens once its section has been read. */

@@ -17,7 +17,7 @@
           var raw = localStorage.getItem('mentalmath.v1')
           var s = raw ? JSON.parse(raw).settings || {} : {}
           var theme =
-            s.theme === 'light' || s.theme === 'dark'
+            s.theme === 'light' || s.theme === 'bright' || s.theme === 'dark'
               ? s.theme
               : window.matchMedia('(prefers-color-scheme: dark)').matches
                 ? 'dark'
