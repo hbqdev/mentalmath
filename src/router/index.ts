@@ -16,12 +16,12 @@ export function createAppRouter(
       {
         path: '/practice/:chapter/:set',
         name: 'practice',
-        component: () => import('@/views/PracticePlaceholderView.vue'),
+        component: () => import('@/practice/PracticeView.vue'),
       },
       {
         path: '/exercises/:chapterId/:exerciseType',
         name: 'legacy-exercise',
-        component: () => import('@/views/ExerciseView.vue'),
+        redirect: (to) => ({ name: 'read', params: { chapter: String(to.params.chapterId) } }),
       },
       { path: '/about', name: 'about', component: () => import('@/views/AboutView.vue') },
       {
