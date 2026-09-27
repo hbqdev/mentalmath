@@ -28,6 +28,7 @@ export function referenceFor(p: Prompt): number | Frac | null {
     case 'fraction-binary':
       return fracOp(p.a, p.b, p.op)
     case 'fraction-task':
+      if (p.task === 'rewrite') return { num: (p.value.num * (p.den ?? p.value.den)) / p.value.den, den: p.den ?? p.value.den }
       return p.task === 'simplify' ? reduce(p.value) : p.value.num / p.value.den
     case 'percent':
       return (p.percent / 100) * p.of
@@ -50,6 +51,7 @@ export function answerMatchesReference(p: Prompt, a: AnswerSpec): boolean {
       return p.kind === 'binary' && a.q === Math.floor(p.a / p.b) && a.r === p.a % p.b && a.divisor === p.b
     case 'fraction': {
       if (typeof ref === 'number') return Math.abs(ref - a.value.num / a.value.den) < 1e-9
+      if (a.exact) return a.value.num === ref.num && a.value.den === ref.den
       const r = reduce(a.value)
       return r.num === ref.num && r.den === ref.den
     }
