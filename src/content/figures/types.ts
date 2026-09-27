@@ -24,8 +24,15 @@ export type FigureSpec =
   | { kind: 'chain'; steps: string[]; notes?: Array<string | undefined> }
   /** Plain lines of text. */
   | { kind: 'text'; lines: string[]; align?: 'left' | 'center' }
-  /** Header row plus body rows; `highlight` marks a body row; `grid` draws cell borders. */
-  | { kind: 'table'; head: string[]; rows: string[][]; highlight?: number; grid?: boolean }
+  /** Header row plus body rows; `headSpan` gives a colspan per header cell; `highlight` marks a body row; `grid` draws cell borders. */
+  | {
+      kind: 'table'
+      head: string[]
+      headSpan?: number[]
+      rows: string[][]
+      highlight?: number
+      grid?: boolean
+    }
   /** The squaring diagram: base fans out to up/down, both fan in to the result. */
   | {
       kind: 'split'

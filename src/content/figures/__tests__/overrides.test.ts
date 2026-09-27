@@ -5,7 +5,7 @@ import { overrides } from '../overrides'
 import type { ColumnLine, FigureSpec } from '../types'
 
 // Chapters whose every non-exercise figure must have an override.
-const COVERED: string[] = []
+const COVERED: string[] = ['0', '1', '2']
 
 const bookMap = JSON.parse(readFileSync(path.resolve('scripts/book-map.json'), 'utf8')) as {
   exerciseSets: Record<string, unknown>
@@ -120,6 +120,34 @@ function checkSplit(s: Extract<FigureSpec, { kind: 'split' }>, id: string) {
   }
 }
 
+function checkTable(t: Extract<FigureSpec, { kind: 'table' }>, id: string) {
+  if (t.head[0] === '×') {
+    for (const r of t.rows) {
+      const a = num(r[0]!)!
+      expect({ id, row: r }).toEqual({
+        id,
+        row: [r[0], ...t.head.slice(1).map((h) => String(a * num(h)!))],
+      })
+    }
+  }
+  const m = /^Numbers that\nadd to (\d+)$/.exec(t.head[0]!)
+  if (m) {
+    const n = Number(m[1])
+    for (const r of t.rows) {
+      const [a, b, dist, prod, diff] = r.map((c) => num(c)!)
+      expect({ id, row: r }).toEqual({
+        id,
+        row: [a!, n - a!, Math.abs(n / 2 - a!), a! * b!, (n / 2) ** 2 - prod!].map(String),
+      })
+      expect({ id, dist, diff }).toEqual({
+        id,
+        dist: Math.abs(n / 2 - a!),
+        diff: (n / 2) ** 2 - prod!,
+      })
+    }
+  }
+}
+
 function checkSpec(spec: FigureSpec, id: string) {
   switch (spec.kind) {
     case 'column':
@@ -134,6 +162,8 @@ function checkSpec(spec: FigureSpec, id: string) {
       expect({ id, result: num(spec.result) }).toEqual({ id, result: n * 11 })
       return
     }
+    case 'table':
+      return checkTable(spec, id)
     case 'row':
     case 'stack':
       return spec.items.forEach((s) => checkSpec(s, id))
