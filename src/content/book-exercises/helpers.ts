@@ -47,8 +47,10 @@ export function mulSub(n: number, a: number, b: number): BookProblem {
 }
 /** Factoring method: b = f1 × f2 (as the book factors it). */
 export function mulFactor(n: number, a: number, b: number, [f1, f2]: Pair): BookProblem {
-  if (f1 * f2 !== b) throw new Error(`bad factors for ${b}`)
-  const steps = [`${b} = ${f1} × ${f2}`, `${a} × ${f1} = ${a * f1}`, `${a * f1} × ${f2} = ${a * b}`]
+  // factor whichever operand the book factors
+  const [x, y] = f1 * f2 === b ? [a, b] : [b, a]
+  if (f1 * f2 !== y) throw new Error(`bad factors for ${a} × ${b}`)
+  const steps = [`${y} = ${f1} × ${f2}`, `${x} × ${f1} = ${x * f1}`, `${x * f1} × ${f2} = ${a * b}`]
   return { n, prompt: { kind: 'binary', a, b, op: '×' }, answer: { kind: 'integer', value: a * b }, steps }
 }
 export function sq(n: number, base: number, steps?: string[]): BookProblem {
