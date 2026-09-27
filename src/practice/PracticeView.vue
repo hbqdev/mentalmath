@@ -192,6 +192,7 @@ const focusMode = computed(() => progress.value.settings.focus)
         :seed="mode === 'generated' ? seed : undefined"
         :mode="timed ? 'timed' : mode"
         :best="bestScore(setId)"
+        :twin="set?.kind === 'book' && twin ? { chapterId, setId: twin.id, title: twin.title } : undefined"
         @again="again"
         @back="back"
       />

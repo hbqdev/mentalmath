@@ -49,4 +49,8 @@ A set unlocks once its section of the chapter has been on screen for two seconds
 
 ## Status
 
-Reader and practice engine are complete for generated drills in chapters 0 to 7. Next: the book's own problems and answers transcribed per set, generators for chapters 8 and 9, re-typeset worked figures.
+Reader, generated drills for chapters 0 to 9, and all 40 book problem sets with the authors' methods are complete. Next: re-typeset worked figures for chapters 0 to 3, offline support.
+
+## Book exercise data
+
+`src/content/book-exercises/chN.ts` holds the book's own problem sets, one line per problem, built with the helpers in `helpers.ts` (`add`, `mul`, `sq`, `div`, `mulF`, `estAdd`, `dateProblem`, …). Helpers compute the answer from the operands, so a transcription slip can only be in a prompt, and default the steps to the book's method; pass an explicit steps array where the book printed a different route. `book-exercises.test.ts` checks every set id against `scripts/book-map.json`, recomputes every computable answer, and runs each shown answer through the checker.
