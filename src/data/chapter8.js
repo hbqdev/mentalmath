@@ -14,7 +14,6 @@ export const chapter8 = {
         id: 'power-approximation',
         title: 'Power Approximation',
         description: 'Practice approximating powers of numbers mentally.',
-      
       },
     ],
   },
