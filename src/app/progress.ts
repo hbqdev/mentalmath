@@ -76,7 +76,9 @@ export function normalizeProgress(p: ProgressState): ProgressState {
     if (!isPlainObject(v)) continue
     reading[k] = {
       lastSection: typeof v.lastSection === 'string' ? v.lastSection : '',
-      visited: Array.isArray(v.visited) ? v.visited.filter((x): x is string => typeof x === 'string') : [],
+      visited: Array.isArray(v.visited)
+        ? v.visited.filter((x): x is string => typeof x === 'string')
+        : [],
       updatedAt: typeof v.updatedAt === 'string' ? v.updatedAt : '',
     }
   }

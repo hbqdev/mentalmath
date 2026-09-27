@@ -14,7 +14,9 @@ vi.mock('@/content/loader', async () => {
     number: 2,
     title: 'Products of a Misspent Youth',
     kicker: 'Chapter 2',
-    sections: [{ id: 'overview', title: 'Overview', blocks: [{ type: 'html', html: '<p>Two</p>' }] }],
+    sections: [
+      { id: 'overview', title: 'Overview', blocks: [{ type: 'html', html: '<p>Two</p>' }] },
+    ],
   }
   const meta = {
     id: '1',
@@ -98,7 +100,11 @@ describe('ReaderView robustness', () => {
   })
 
   it('offers section navigation at tablet width where the outline column is hidden', async () => {
-    const hd = (window as unknown as { happyDOM: { setViewport: (v: { width: number; height: number }) => void } }).happyDOM
+    const hd = (
+      window as unknown as {
+        happyDOM: { setViewport: (v: { width: number; height: number }) => void }
+      }
+    ).happyDOM
     hd.setViewport({ width: 800, height: 900 })
     try {
       const { w } = await mountAt('/read/1')

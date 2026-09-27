@@ -36,7 +36,7 @@ describe('chapter 0 sets', () => {
     })
   })
   it('squares ending in 5 only', () => {
-    checkSet(byId(ch0, 'gen0-square-ending-in-5'), { precondition: (d) => power(d)?.base % 10 === 5 && power(d)?.exp === 2 })
+    checkSet(byId(ch0, 'gen0-square-ending-in-5'), { precondition: (d) => power(d)!.base % 10 === 5 && power(d)!.exp === 2 })
   })
   it('same tens digit, ones digits summing to 10', () => {
     checkSet(byId(ch0, 'gen0-same-tens-sum-10'), {

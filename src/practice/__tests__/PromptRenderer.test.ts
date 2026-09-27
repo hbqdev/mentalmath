@@ -9,8 +9,16 @@ const cases: Array<[string, Prompt, string[]]> = [
   ['columns', { kind: 'columns', numbers: [672, 1367, 107] }, ['672', '1,367', '107']],
   ['power', { kind: 'power', base: 14, exp: 2 }, ['14', '2']],
   ['root', { kind: 'root', radicand: 17, degree: 2 }, ['√', '17']],
-  ['fraction-binary', { kind: 'fraction-binary', a: { num: 3, den: 5 }, b: { num: 2, den: 7 }, op: '×' }, ['3', '5', '2', '7', '×']],
-  ['fraction-task', { kind: 'fraction-task', value: { num: 14, den: 24 }, task: 'simplify' }, ['Simplify', '14', '24']],
+  [
+    'fraction-binary',
+    { kind: 'fraction-binary', a: { num: 3, den: 5 }, b: { num: 2, den: 7 }, op: '×' },
+    ['3', '5', '2', '7', '×'],
+  ],
+  [
+    'fraction-task',
+    { kind: 'fraction-task', value: { num: 14, den: 24 }, task: 'simplify' },
+    ['Simplify', '14', '24'],
+  ],
   ['percent', { kind: 'percent', percent: 15, of: 88 }, ['15%', '88']],
   ['divisible', { kind: 'divisible', n: 3932, by: 4 }, ['3,932', '4']],
   ['date', { kind: 'date', iso: '2007-01-19' }, ['January 19, 2007']],
@@ -24,7 +32,9 @@ describe('PromptRenderer', () => {
     for (const f of fragments) expect(w.text(), f).toContain(f)
   })
   it('stacks vertical arithmetic with the operator on the second line', () => {
-    const w = mount(PromptRenderer, { props: { prompt: { kind: 'binary', a: 47, b: 32, op: '+' } } })
+    const w = mount(PromptRenderer, {
+      props: { prompt: { kind: 'binary', a: 47, b: 32, op: '+' } },
+    })
     const rows = w.findAll('.row')
     expect(rows).toHaveLength(2)
     expect(rows[1]!.text()).toContain('+')
