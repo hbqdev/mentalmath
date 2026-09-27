@@ -2,9 +2,19 @@
 import { computed } from 'vue'
 import { useProgress } from '@/app/progress'
 import { readableChapters } from '@/content/loader'
+import { findGenerated } from '@/exercises/generators'
+import { setTitle } from '@/exercises/registry'
 
 const chapters = readableChapters()
 const { state, chapterCompletion, lastSection } = useProgress()
+
+const recent = computed(() =>
+  Object.entries(state.value.practice)
+    .flatMap(([setId, entry]) => entry.attempts.map((a) => ({ setId, ...a })))
+    .sort((a, b) => b.at.localeCompare(a.at))
+    .slice(0, 3)
+    .map((a) => ({ ...a, title: findGenerated(a.setId)?.title ?? setTitle(a.setId), chapterId: a.setId.replace(/^(?:ch|gen)([^-]+)-.*/, '$1') })),
+)
 
 const resume = computed(() => {
   const entries = Object.entries(state.value.reading)
@@ -36,6 +46,16 @@ function pct(id: string, total: number) {
       >
         Resume · {{ resume.meta.kicker }} · {{ resume.meta.title }} ›
       </RouterLink>
+    </section>
+
+    <section v-if="recent.length" class="recent" data-testid="recent-sessions">
+      <h2 class="label">Recent practice</h2>
+      <ul>
+        <li v-for="a in recent" :key="a.setId + a.at">
+          <RouterLink :to="{ name: 'practice', params: { chapter: a.chapterId, set: a.setId } }">{{ a.title }}</RouterLink>
+          <span class="score">{{ a.correct }} / {{ a.total }}</span>
+        </li>
+      </ul>
     </section>
 
     <section class="toc">
@@ -93,6 +113,25 @@ function pct(id: string, total: number) {
 }
 .toc {
   margin-top: 3rem;
+}
+.recent {
+  margin-top: 2.5rem;
+}
+.recent ul {
+  list-style: none;
+  margin: 0.5rem 0 0;
+  padding: 0;
+}
+.recent li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--font-sans);
+}
+.recent .score {
+  font-family: var(--font-mono);
+  color: var(--muted);
 }
 ol {
   list-style: none;

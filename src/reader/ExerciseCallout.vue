@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useProgress } from '@/app/progress'
-import { setTitle } from '@/exercises/registry'
+import { generatedTwin, setTitle } from '@/exercises/registry'
 
 const props = defineProps<{ setId: string; chapterId: string; sectionId: string }>()
 const { isUnlocked } = useProgress()
 const unlocked = computed(() => isUnlocked(props.chapterId, props.sectionId))
 const title = computed(() => setTitle(props.setId))
+const twin = computed(() => generatedTwin(props.setId))
 </script>
 
 <template>
@@ -24,12 +25,13 @@ const title = computed(() => setTitle(props.setId))
         :to="{ name: 'practice', params: { chapter: chapterId, set: setId } }"
         >Book set</RouterLink
       >
-      <button
-        type="button"
+      <RouterLink
+        v-if="unlocked && twin"
         class="btn ghost"
-        disabled
-        title="Generated practice arrives in the next phase"
+        :to="{ name: 'practice', params: { chapter: chapterId, set: twin.id }, query: { mode: 'generated' } }"
+        >Generate</RouterLink
       >
+      <button v-else-if="unlocked" type="button" class="btn ghost" disabled title="No generated drill for this set">
         Generate
       </button>
     </div>
