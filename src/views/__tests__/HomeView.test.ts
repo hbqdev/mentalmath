@@ -28,3 +28,18 @@ describe('HomeView', () => {
     expect(w.find('a.resume').attributes('href')).toBe('/read/3/overview')
   })
 })
+
+describe('HomeView recent sessions', () => {
+  it('lists the latest attempts with set title and score', () => {
+    const p = useProgress()
+    p.recordAttempt('gen1-two-digit-addition', { at: '2026-09-27T10:00:00.000Z', correct: 8, total: 10, seconds: 90, mode: 'generated' })
+    p.recordAttempt('ch1-two-digit-addition', { at: '2026-09-27T11:00:00.000Z', correct: 10, total: 10, seconds: 60, mode: 'book' })
+    const w = mount(HomeView, { global: { plugins: [createAppRouter(createMemoryHistory())] } })
+    const recent = w.find('[data-testid="recent-sessions"]')
+    expect(recent.exists()).toBe(true)
+    const rows = recent.findAll('li')
+    expect(rows[0]!.text()).toContain('Two-Digit Addition')
+    expect(rows[0]!.text()).toContain('10 / 10')
+    expect(rows[1]!.text()).toContain('8 / 10')
+  })
+})

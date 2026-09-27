@@ -4,7 +4,8 @@ import { useProgress } from '@/app/progress'
 import { allSetsFor } from '@/exercises/registry'
 
 const props = defineProps<{ chapterId: string }>()
-const { bestScore, isUnlocked } = useProgress()
+const { state, bestScore, isUnlocked } = useProgress()
+const lastAttempt = (id: string) => state.value.practice[id]?.attempts.at(-1)
 const sets = computed(() =>
   allSetsFor(props.chapterId).map((s) =>
     s.kind === 'book'
@@ -27,7 +28,11 @@ const sets = computed(() =>
       >
         <strong>{{ s.kind === 'book' ? '📖 ' : '' }}{{ s.title }}</strong>
         <span class="meta">{{ s.kind === 'book' ? 'Book set' : 'Generated' }}</span>
-        <span v-if="bestScore(s.id) !== undefined" class="meta">Best {{ bestScore(s.id) }}</span>
+        <span v-if="bestScore(s.id) !== undefined" class="meta"
+          >Best {{ bestScore(s.id) }}<template v-if="lastAttempt(s.id)">
+            · last {{ lastAttempt(s.id)!.correct }} / {{ lastAttempt(s.id)!.total }}</template
+          ></span
+        >
         <RouterLink
           v-if="isUnlocked(chapterId, s.sectionId)"
           class="go"
