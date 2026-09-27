@@ -1,0 +1,496 @@
+{
+  "id": "5",
+  "number": 5,
+  "title": "Good Enough: The Art of “Guesstimation”",
+  "kicker": "Chapter 5",
+  "sections": [
+    {
+      "id": "overview",
+      "title": "Overview",
+      "blocks": [
+        {
+          "type": "html",
+          "html": "<p>So far you’ve been perfecting the mental techniques necessary to figure out the exact answers to math problems. Often, however, all you’ll want is a ballpark estimate. Say you’re getting quotes from different lenders on refinancing your home. All you really need at this information-gathering stage is a ballpark estimate of what your monthly payments will be. Or say you’re settling a restaurant bill with a group of friends and you don’t want to figure each person’s bill to the penny. The guesstimation methods described in this chapter will make both these tasks—and many more just like them—much easier. Addition, subtraction, division, and multiplication all lend themselves to guesstimation. As usual, you’ll do your computations from left to right.</p>",
+          "page": 108
+        }
+      ]
+    },
+    {
+      "id": "addition-guesstimation",
+      "title": "Addition Guesstimation",
+      "blocks": [
+        {
+          "type": "html",
+          "html": "<p>Guesstimation is a good way to make your life easier when the numbers of a problem are too long to remember. The trick is to round the original numbers up or down:</p>",
+          "page": 109
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f001",
+          "src": "/book/figures/5/ch5-f001.jpeg",
+          "width": 217,
+          "height": 113
+        },
+        {
+          "type": "html",
+          "html": "<aside><p class=\"aside-title\"><strong>George Parker Bidder: The Calculating Engineer</strong></p><p>The British have had their share of lightning calculators, and the mental performances of George Parker Bidder (1806–1878), born in Devonshire, were as impressive as any. Like most lightning calculators, Bidder began to try his hand (and mind) at mental arithmetic as a young lad. Learning to count, add, subtract, multiply, and divide by playing with marbles, Bidder went on tour with his father at age nine.</p><p>Almost no question was too difficult for him to handle. “If the moon is 123,256 miles from the earth and sound travels four miles a minute, how long would it take for sound to travel from the earth to the moon?” The young Bidder, his face wrinkled in thought for nearly a minute, replied, “Twenty-one days, nine hours, thirty-four minutes.” (We know now that the distance is closer to 240,000 miles and sound cannot travel through the vacuum of space.) At age ten, Bidder mentally computed the square root of 119,550,669,121 as 345,761 in a mere thirty seconds. In 1818, Bidder and the American lightning calculator Zerah Colburn were paired in a mental calculating duel in which Bidder, apparently, “outnumbered” Colburn.</p><p>Riding on his fame, George Bidder entered the University of Edinburgh and went on to become one of the more respected engineers in England. In parliamentary debates over railroad conflicts, Bidder was frequently called as a witness, which made the opposition shudder; as one said, “Nature had endowed him with particular qualities that did not place his opponents on a fair footing.” Unlike Colburn, who retired as a lightning calculator at age twenty, Bidder kept it up for his entire life. As late as 1878, in fact, just before his death, Bidder calculated the number of vibrations of light striking the eye in one second, based on the fact that there are 36,918 waves of red light per inch, and light travels at approximately 190,000 miles per second.</p></aside><p>Notice that we rounded the first number down to the nearest thousand and the second number up. Since the exact answer is 14,186, our relative error is small.</p><p>If you want to be more exact, instead of rounding off to the nearest thousand, round off to the nearest hundred:</p>",
+          "page": 110
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f002",
+          "src": "/book/figures/5/ch5-f002.jpeg",
+          "width": 218,
+          "height": 74
+        },
+        {
+          "type": "html",
+          "html": "<p>The answer is only 14 off from the exact answer, an error of less than .1%. This is what I call a good guesstimation!</p><p>Try a five-digit addition problem, rounding to the nearest hundred:</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f003",
+          "src": "/book/figures/5/ch5-f003.jpeg",
+          "width": 230,
+          "height": 74
+        },
+        {
+          "type": "html",
+          "html": "<p>By rounding to the nearest hundred, our answer will always be off by less than 100. If the answer is larger than 10,000, your guesstimate will be within 1% of the exact answer.</p><p>Now let’s try something wild:</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f004",
+          "src": "/book/figures/5/ch5-f004.jpeg",
+          "width": 487,
+          "height": 74
+        },
+        {
+          "type": "html",
+          "html": "<p>If you round to the nearest million, you get an answer of 31 million, off by roughly 285,000. Not bad, but you can do better by rounding to the nearest hundred thousand, as we’ve shown in the right-hand column. Again your guesstimate will be within 1% of the precise answer. If you can compute these smaller problems exactly, you can guesstimate the answer to any addition problem.</p><h3>Guesstimating at the Supermarket</h3><p>Let’s try a real-world example. Have you ever gone to the store and wondered what the total is going to be before the cashier rings it up? For estimating the total, my technique is to round the prices to the nearest 50¢. For example, while the cashier is adding the numbers shown below on the left, I mentally add the numbers shown on the right:</p>",
+          "page": 111
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f005",
+          "src": "/book/figures/5/ch5-f005.jpeg",
+          "width": 173,
+          "height": 320
+        },
+        {
+          "type": "html",
+          "html": "<p>My final figure is usually within a dollar of the exact total.</p>"
+        }
+      ]
+    },
+    {
+      "id": "subtraction-guesstimation",
+      "title": "Subtraction Guesstimation",
+      "blocks": [
+        {
+          "type": "html",
+          "html": "<p>The way to guesstimate the answers to subtraction problems is the same—you round to the nearest thousand or hundreds digit, preferably the latter:</p>",
+          "page": 112
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f006",
+          "src": "/book/figures/5/ch5-f006.jpeg",
+          "width": 354,
+          "height": 74
+        },
+        {
+          "type": "html",
+          "html": "<p>You can see that rounding to the nearest thousand leaves you with an answer quite a bit off the mark. By rounding to the second digit (hundreds, in the example), your answer will usually be within 3% of the exact answer. For this problem, your answer is off by only 52, a relative error of 2%. If you round to the third digit, the relative error will usually be below 1%. For instance:</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f007",
+          "src": "/book/figures/5/ch5-f007.jpeg",
+          "width": 398,
+          "height": 74
+        },
+        {
+          "type": "html",
+          "html": "<p>By rounding the numbers to the third digit rather than to the second digit, you improve the accuracy of the estimate by a significant amount.</p>"
+        }
+      ]
+    },
+    {
+      "id": "division-guesstimation",
+      "title": "Division Guesstimation",
+      "blocks": [
+        {
+          "type": "html",
+          "html": "<p>The first, and most important, step in guesstimating the answer to a division problem is to determine the magnitude of the answer:</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f008",
+          "src": "/book/figures/5/ch5-f008.jpeg",
+          "width": 278,
+          "height": 161
+        },
+        {
+          "type": "html",
+          "html": "<p>The next step is to round off the larger numbers to the nearest thousand and change the 57,867 to 58,000. Dividing 6 into 58 gives you 9 with a remainder. But the most important component in this problem is where to place the 9.</p><p>For example, multiplying 6 <strong>×</strong> 90 yields 540, while multiplying 6 <strong>×</strong> 900 yields 5,400, both of which are too small. But 6 <strong>×</strong> 9,000 = 54,000, which is pretty close to the answer. This tells you the answer is 9,000 and something. You can estimate just what that something is by first subtracting 58 − 54 = 4. At this point you could bring down the 0 and divide 6 into 40, and so forth. But if you’re on your toes, you’ll realize that dividing 6 into 4 gives you <img src=\"/book/figures/5/ch5-f009.jpeg\" width=\"68\" height=\"25\" alt=\"\" class=\"inline\"> .667. Since you know the answer is 9,000 something, you’re now in a position to guess 9,667. In fact, the actual answer is 9,645—darn close!</p><p>Division on this level is simple. But what about large division problems? Let’s say we want to compute, just for fun, the amount of money a professional athlete earns a day if he makes $5,000,000 a year:</p>",
+          "page": 113
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f010",
+          "src": "/book/figures/5/ch5-f010.jpeg",
+          "width": 175,
+          "height": 23
+        },
+        {
+          "type": "html",
+          "html": "<p>First you must determine the magnitude of the answer. Does this player earn thousands every day? Well, 365 <strong>×</strong> 1000 = 365,000, which is too low.</p><p>Does he earn tens of thousands every day? Well, 365 <strong>×</strong> 10,000 = 3,650,000, and that’s more like it. To guesstimate your answer, divide the first two digits (or 36 into 50) and figure that’s <img src=\"/book/figures/5/ch5-f011.jpeg\" width=\"26\" height=\"25\" alt=\"\" class=\"inline\"> or <img src=\"/book/figures/5/ch5-f012.jpeg\" width=\"26\" height=\"25\" alt=\"\" class=\"inline\"> Since 18 goes into 70 about 4 times, your guess is that the athlete earns about $14,000. The exact answer is $13,698.63 per day. Not a bad estimate (and not a bad salary!).</p><p>Here’s an <em>astronomical</em> calculation for you. How many seconds does it take light to get from the sun to the earth? Well, light travels at 186,282 miles per second, and the sun is (on average) 92,960,130 miles away. I doubt you’re particularly eager to attempt this problem by hand. Fortunately, it’s relatively simple to guesstimate an answer. First, simplify the problem:</p>",
+          "page": 114
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f013",
+          "src": "/book/figures/5/ch5-f013.jpeg",
+          "width": 288,
+          "height": 22
+        },
+        {
+          "type": "html",
+          "html": "<p>Now divide 186 into 930, which yields 5 with no remainder. Then append the two 0s you removed from 93,000 and you get 500 seconds. The exact answer is 499.02 seconds, so this is a very respectable guesstimate.</p>"
+        }
+      ]
+    },
+    {
+      "id": "multiplication-guesstimation",
+      "title": "Multiplication Guesstimation",
+      "blocks": [
+        {
+          "type": "html",
+          "html": "<p>You can use much the same techniques to guesstimate your answers to multiplication problems. For example,</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f014",
+          "src": "/book/figures/5/ch5-f014.jpeg",
+          "width": 156,
+          "height": 71
+        },
+        {
+          "type": "html",
+          "html": "<p>Rounding up to the nearest multiple of 10 simplifies the problem considerably, but you’re still off by 252, or about 5%. You can do better if you round both numbers by the same amount, but in opposite directions. That is, if you round 88 by <em>increasing</em> 2, you should also <em>decrease</em> 54 by 2:</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f015",
+          "src": "/book/figures/5/ch5-f015.jpeg",
+          "width": 156,
+          "height": 70
+        },
+        {
+          "type": "html",
+          "html": "<p>Instead of a 1-by-1 multiplication problem, you now have a 2-by-1 problem, which should be easy enough for you to do. Your guesstimation is off by only 1.5%.</p><p>When you guesstimate the answer to multiplication problems by rounding the larger number up and the smaller number down, your guesstimate will be a little low. If you round the larger number down and the smaller number up so that the numbers are closer together, your guesstimate will be a little high. The larger the amount by which you round up or down, the greater your guesstimate will be off from the exact answer. For example:</p>",
+          "page": 115
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f016",
+          "src": "/book/figures/5/ch5-f016.jpeg",
+          "width": 156,
+          "height": 70
+        },
+        {
+          "type": "html",
+          "html": "<p>Since the numbers are closer together after you round them off, your guesstimate is a little high.</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f017",
+          "src": "/book/figures/5/ch5-f017.jpeg",
+          "width": 156,
+          "height": 70
+        },
+        {
+          "type": "html",
+          "html": "<p>Since the numbers are farther apart, the estimated answer is too low, though again, not by much. You can see that this multiplication guesstimation method works quite well. Also notice that this problem is just 67<sup>2</sup> and that our approximation is just the first step of the squaring techniques. Let’s look at one more example:</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f018",
+          "src": "/book/figures/5/ch5-f018.jpeg",
+          "width": 156,
+          "height": 71
+        },
+        {
+          "type": "html",
+          "html": "<p>We observe that the approximation is most accurate when the original numbers are close together. Try estimating a 3-by-2 multiplication problem:</p>",
+          "page": 116
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f019",
+          "src": "/book/figures/5/ch5-f019.jpeg",
+          "width": 185,
+          "height": 74
+        },
+        {
+          "type": "html",
+          "html": "<p>By rounding 63 down to 60 and 728 up to 731, you create a 3-by-1 multiplication problem, which puts your guesstimate within 2004 of the exact answer, an error of 4.3%.</p><p>Now try guesstimating the following 3-by-3 problem:</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f020",
+          "src": "/book/figures/5/ch5-f020.jpeg",
+          "width": 206,
+          "height": 74
+        },
+        {
+          "type": "html",
+          "html": "<p>You will notice that although you rounded both numbers up and down by 8, your guesstimate is off by over 1000. That’s because the multiplication problem is larger and the size of the rounding number is larger, so the resulting estimate will be off by a greater amount. But the relative error is still under 1%.</p><p>How high can you go with this system of guesstimating multiplication problems? As high as you want. You just need to know the names of large numbers. A thousand thousand is a million, and a thousand million is a billion. Knowing these names and numbers, try this one on for size:</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f021",
+          "src": "/book/figures/5/ch5-f021.jpeg",
+          "width": 308,
+          "height": 45
+        },
+        {
+          "type": "html",
+          "html": "<p>As before, the objective is to round the numbers to simpler numbers such as 29,000,000 and 14,000. Dropping the 0s for now, this is just a 2-by-2 multiplication problem: 29 × 14 = 406 (29 × 14 = 29 × 7 × 2 = 203 × 2 = 406). Hence the answer is roughly 406 billion, since a thousand million is a billion.</p>",
+          "page": 117
+        }
+      ]
+    },
+    {
+      "id": "square-root-estimation-divide-and-average",
+      "title": "Square Root Estimation: Divide and Average",
+      "blocks": [
+        {
+          "type": "html",
+          "html": "<p>The quantity <img src=\"/book/figures/5/ch5-f022.jpeg\" width=\"30\" height=\"20\" alt=\"\" class=\"inline\">, the square root of a number <em>n</em>, is the number which, when multiplied by itself, will give you <em>n</em> For example, the square root of 9 is 3 because 3 × 3 = 9. The square root is used in many science and engineering problems and is almost always solved with a calculator. The following method provides an accurate estimate of the answer.</p><p>In square root estimation your goal is to come up with a number that when multiplied by itself approximates the original number. Since the square root of most numbers is not a whole number, your estimate is likely to contain a fraction or decimal point.</p><p>Let’s start by guesstimating the square root of 19. Your first step is to think of the number that when multiplied by itself comes closest to 19. Well, 4 × 4=16 and 5 × 5 = 25. Since 25 is too high, the answer must be 4 point something. Your next step is to divide 4 into 19, giving you 4.75. Now, since 4 × 4 is less than 4 × 4.75 = 19, which in turn is less than 4.75 × 4.75, we know that 19 (or 4 × 4.75) lies between 4<sup>2</sup> and 4.75<sup>2</sup>. Hence, the square root of 19 lies between 4 and 4.75.</p><p>I’d guess the square root of 19 to be about halfway between, at 4.375. In fact, the square root of 19 (rounded to three decimal places) is 4.359, so our guesstimate is pretty close. We illustrate this procedure as follows:</p>",
+          "page": 118
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f023",
+          "src": "/book/figures/5/ch5-f023.jpeg",
+          "width": 347,
+          "height": 254
+        },
+        {
+          "type": "html",
+          "html": "<p>Actually, we can obtain this answer another way, which you might find easier. We know 4 squared is 16, which is shy of 19 by 3. To improve our guess, we <em>“add the error divided by twice our guess.”</em> Here, we add 3 divided by 8 to get 4<img src=\"/book/figures/5/ch5-f024.jpeg\" width=\"10\" height=\"25\" alt=\"\" class=\"inline\"> = 4.375. We note that this method will always produce an answer that is a little higher than the exact answer.</p><p>Now you try a slightly harder one. What’s the square root of 87?</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f025",
+          "src": "/book/figures/5/ch5-f025.jpeg",
+          "width": 338,
+          "height": 84
+        },
+        {
+          "type": "html",
+          "html": "<p>First come up with your ballpark figure, which you can get fairly quickly by noting that 9 × 9 = 81 and 10 × 10 = 100, which means the answer is 9 point something. Carrying out the division of 9 into 87 to two decimal places, you get 9.66. To improve your guesstimate, take the average of 9 and 9.66, which is 9.33—exactly the square root of 87 rounded to the second decimal place! Alternatively, our guesstimate is 9 + (error)/18 = <img src=\"/book/figures/5/ch5-f026.jpeg\" width=\"116\" height=\"25\" alt=\"\" class=\"inline\">.</p><p>Using this technique, it’s pretty easy to guesstimate the square root of two-digit numbers. But what about three-digit numbers? Actually, they are not much harder. I can tell you right off the bat that all three-digit and four-digit numbers have two-digit square roots before the decimal point. And the procedure for computing square roots is the same, no matter how large the number. For instance, to compute the square root of 679, first find your ballpark figure. Because 20 squared is 400 and 30 squared is 900, the square root of 679 must lie between 20 and 30.</p><p>When you divide 20 into 679, you get approximately 34. Averaging 20 and 34 gives you a guesstimate of 27, but here’s a better estimate. If you know that 25 squared is 625, then your error is 679 − 625 = 54. Dividing that by 50, we have <img src=\"/book/figures/5/ch5-f027.jpeg\" width=\"64\" height=\"25\" alt=\"\" class=\"inline\"> = 1.08. Hence our improved guesstimate is 25 + 1.08 = 26.08. (For an even better estimate, if you know that 26 squared is 676, your error is 3, so add <img src=\"/book/figures/5/ch5-f028.jpeg\" width=\"34\" height=\"25\" alt=\"\" class=\"inline\"> .06 to get 26.06.) The exact answer is 26.06, rounded to two decimal places.</p><p>To guesstimate the square root of four-digit numbers, look at the first two digits of the number to determine the first digit of the square root. For example, to find the square root of 7369, consider the square root of 73. Since 8 × 8 = 64 and 9 × 9 = 81, 8 must be the first digit of the square root. So the answer is 80 something. Now proceed the usual way. Dividing 80 into 7369 gives 92 plus a fraction, so a good guesstimate is 86. If you squared 86 to get 7396, you would be high by 27, so you should subtract <img src=\"/book/figures/5/ch5-f029.jpeg\" width=\"42\" height=\"25\" alt=\"\" class=\"inline\"> .16 for a better guesstimate of 85.84, which is right on the money.</p><p>To guesstimate the square root of a six-digit number like 593,472 would seem like an impossible task for the uninitiated, but for you it’s no sweat. Since 700<sup>2</sup> = 490,000, and 800<sup>2</sup> = 640,000, the square of 593,472 must lie between 700 and 800. In fact, all five-digit and six-digit numbers have three-digit square roots. In practice, you only need to look at the square root of the first two digits of six-digit numbers (or the first digit of five numbers). Once you figure out that the square root of 59 lies between 7 and 8, you know your answer is in the 700s.</p><p>Now proceed in the usual manner:</p>",
+          "page": 119
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f030",
+          "src": "/book/figures/5/ch5-f030.jpeg",
+          "width": 436,
+          "height": 84
+        },
+        {
+          "type": "html",
+          "html": "<p>The exact square root of 593,472 is 770.37 (to five places), so you’re pretty close. But you could have been closer, as the following trick demonstrates. Note that the first two digits, 59, are closer to 64 (8 × 8) than they are to 49 (7 × 7). Because of this you can start your guesstimation with the number 8 and proceed from there:</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f031",
+          "src": "/book/figures/5/ch5-f031.jpeg",
+          "width": 437,
+          "height": 84
+        },
+        {
+          "type": "html",
+          "html": "<p>Just for fun, let’s do a real whopper—the square root of 28,674,529. This isn’t as hard as it might seem. Your first step is to round to the nearest large number—in this case, just find the square root of 29.</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f032",
+          "src": "/book/figures/5/ch5-f032.jpeg",
+          "width": 389,
+          "height": 140
+        },
+        {
+          "type": "html",
+          "html": "<p>All seven-digit and eight-digit numbers have four-digit square roots, so 5.4 becomes 5400, your estimate. The exact answer is slightly greater than 5354.8. Not bad!</p><p>This wraps up the chapter on guesstimation math. After doing the exercises below, turn to the next chapter on pencil-and-paper math, where you will learn to write down answers to problems, but in a much quicker way than you’ve done on paper before.</p><aside><p class=\"aside-title\"><strong>The Mathematical Duel of Évariste Galois</strong></p><p>The tragic story of the French mathematician Évariste Galois (1811–1832) killed at the age of twenty in a duel over “an infamous coquette” is legendary in the annals of the history of mathematics. A precociously brilliant student, Galois laid the foundation for a branch of mathematics known as group theory. Legend has it that he penned his theory the night before the duel, anticipating his demise and wanting to leave his legacy to the mathematics community. Hours before his death, on May 30, 1832, Galois wrote to Auguste Chevalier: “I have made some new discoveries in analysis. The first concerns the theory of equations, the others integral functions.” After describing these, he asked his friend: “Make a public request of Jacobi or Gauss to give their opinions not as to the truth but as to the importance of these theorems. After that, I hope some men will find it profitable to sort out this mess.”</p><p>Romantic legend and historical truth, however, do not always match. What Galois penned the night before his death were corrections and editorial changes to papers that had been accepted by the Academy of Sciences long before. Further, Galois’s initial papers had been submitted three years prior to the duel, when he was all of seventeen! It was after this that Galois became embroiled in political controversy, was arrested, spent time in a prison dungeon, and, ultimately, got himself mixed up in a dispute over a woman and killed.</p><p>Aware of his own precocity, Galois noted, “I have carried out researches which will halt many savants in theirs.” For over a century that proved to be the case.</p></aside>",
+          "page": 121
+        }
+      ]
+    },
+    {
+      "id": "more-tips-on-tips",
+      "title": "More Tips on Tips",
+      "blocks": [
+        {
+          "type": "html",
+          "html": "<p>As we indicated in Chapter 0, it is easy to figure out tips for most situations. For example, to figure out a 10% tip, we merely multiply the bill by 0.1 (or divide the bill by 10). For example, if a bill came to $42, then a 10% tip would be $4.20. To determine a 20% tip, you simply multiply the bill by 0.2, or double the amount of a 10% tip. Thus a 20% tip on a $42 bill would be $8.40.</p><p>To determine a 15% tip, we have a few options. If you have mastered the techniques of Chapter 2, and are comfortable with multiplying by 15 = 5 × 3, you can simply multiply the bill by 15, then divide by 100. For example, with a $42 bill, we have 42 × 15 = 42 × 5 × 3 = 210 × 3 = 630, which when divided by 100, gives us a tip of $6.30. Another method is to take the average of a 10% tip and a 20% tip. From our earlier calculation, this would be</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f033",
+          "src": "/book/figures/5/ch5-f033.jpeg",
+          "width": 300,
+          "height": 40
+        },
+        {
+          "type": "html",
+          "html": "<p>Perhaps the most popular approach to taking a 15% tip is to take 10% of the bill, cut that amount in half (which would be a 5% tip), then add those two numbers together. So, for instance, with a $42 bill, you would add $4.20 plus half that amount, $2.10, to get</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f034",
+          "src": "/book/figures/5/ch5-f034.jpeg",
+          "width": 196,
+          "height": 16
+        },
+        {
+          "type": "html",
+          "html": "<p>Let’s use all three methods to compute 15% on a bill that is $67. By the direct method, 67 × 3 × 5 = 201 × 5 = 1005, which when divided by 100 gives us $10.05. By the averaging method, we average the 10% tip of $6.70 with the 20% tip of $13.40, to get</p>",
+          "page": 123
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f035",
+          "src": "/book/figures/5/ch5-f035.jpeg",
+          "width": 320,
+          "height": 40
+        },
+        {
+          "type": "html",
+          "html": "<p>Using the last method, we add $6.70 to half that amount, $3.35 to get</p><p class=\"center\"><strong>$6.70 + $3.35 = $10.05</strong></p><p>Finally, to calculate a 25% tip, we offer two methods. Either multiply the amount by 25, then divide by 100, or divide the amount by 4 (perhaps by cutting the amount in half twice). For example, with a $42 bill, you can compute 42 × 25 = 42 × 5 <strong>×</strong> 5 = 210 <strong>×</strong> 5 = 1050, which when divided by 100 produces a tip of $10.50. Or you can divide the original amount directly by 4, or cut in half twice: half of $42 is $21, and half of that is $10.50. With a $67 bill, I would probably divide by 4 directly: since 67 = 4 = 16¾, we get a 25% tip of $16.75.</p>"
+        }
+      ]
+    },
+    {
+      "id": "not-too-taxing-calculations",
+      "title": "Not-Too-Taxing Calculations",
+      "blocks": [
+        {
+          "type": "html",
+          "html": "<p>In this section, I will show you my method for mentally estimating sales tax. For some tax rates, like 5% or 6% or 10%, the calculation is straightforward. For example, to calculate 6% tax, just multiply by 6, then divide by 100. For instance, if the sale came to $58, then 58 <strong>×</strong> 6 = 348, which when divided by 100 gives the exact sales tax of $3.48. (So your total amount would be $61.48.)</p><p>But how would you calculate a sales tax of 6½% on $58? I will show you several ways to do this calculation, and you choose the one that seems easiest for you. Perhaps the easiest way to add half of a percent to any dollar amount is to simply cut the dollar amount in half, then turn it into cents. For example, with $58, since half of 58 is 29, simply add 29 cents to the 6% tax (already computed as $3.48) to get a sales tax of $3.77.</p><p>Another way to calculate the answer (or a good mental estimate) is to take the 6% tax, divide it by 12, then add those two numbers. For example, since 6% of $58 is $3.48, and 12 goes into 348 almost 30 times, then add 30 cents for an estimate of $3.78, which is only off by a penny. If you would rather divide by 10 instead of 12, go ahead and do it. You will be calculating 6.6% instead of 6.5% (since <img src=\"/book/figures/5/ch5-f036.jpeg\" width=\"17\" height=\"25\" alt=\"\" class=\"inline\"> = 0.6) but that should still be a very good estimate. Here, you would take $3.48 and add 34¢ to get $3.82.</p><p>Let’s try some other sales tax percentages. How can we calculate 7¼% sales tax on $124? Begin by computing 7% of 124. From the methods shown in Chapter 2, you know that 124 × 7 = 868, so 7% of 124 is $8.68. To add a quarter percent, you can divide the original dollar amount by 4 (or cut it in half, twice) and turn the dollars into cents. Here, 124 = 4 = 31, so add 310 to $8.68 to get an exact sales tax of $8.99.</p><p>Another way to arrive at 31¢ is to take your 7% sales tax, $8.68, and divide it by 28. The reason this works is because = <strong>¼</strong> For a quick mental estimate, I would probably divide $8.68 by 30, to get about 29¢, for an approximate total sales tax of $8.97.</p><p>When you divide by 30, then you are actually computing a tax of <img src=\"/book/figures/5/ch5-f037.jpeg\" width=\"27\" height=\"25\" alt=\"\" class=\"inline\"><strong><em>%</em></strong>, which is approximately 7.23% instead of 7.25%.</p><p>How would you calculate a sales tax of 7.75%? Probably for most approximations, it is sufficient to just say that it is a little less than 8% sales tax. But to get a better approximation, here are some suggestions. As you saw in the last example, if you can easily calculate a ¼% adjustment, then simply triple that amount for the ¾% adjustment. For example, to calculate 7.75% of $124, you first calculate 7% to obtain $8.68. If you calculated that ¼% is 31¢, then ¾% would be 93¢, for a grand total of $8.68 <strong>+</strong> 0.93 <strong>=</strong> $9.61. For a quick approximation, you can exploit the fact that <img src=\"/book/figures/5/ch5-f038.jpeg\" width=\"10\" height=\"25\" alt=\"\" class=\"inline\"> = .777 is approximately .75, so you can divide the 7% sales tax by 9 to get slightly more than the .75% adjustment. In this example, since $8.68 divided by 9 is about 96¢, simply add $8.68 <strong>+</strong> 0.96 <strong>=</strong> $9.64 for a slight overestimate.</p><p>We can use this approximation procedure for any sales tax. For a general formula, to estimate the sales tax of $<em>A.B%</em>, first multiply the amount of the sale by A%. Then divide this amount by the number <em>D</em>, where <em>A/D</em> is equal to 0.<em>B</em>. (Thus <em>D</em> is equal to <em>A</em> times the reciprocal of B.) Adding these numbers together gives you the total sales tax (or an approximate one, if you rounded <em>D</em> to an easier nearby number). For instance, with 7.75%, the magic divisor <em>D</em> would be <img src=\"/book/figures/5/ch5-f039.jpeg\" width=\"140\" height=\"25\" alt=\"\" class=\"inline\">, which we rounded down to 9. For sales tax of <img src=\"/book/figures/5/ch5-f040.jpeg\" width=\"20\" height=\"25\" alt=\"\" class=\"inline\">%, first compute the sales tax on 6%, then divide that number by 16, since <img src=\"/book/figures/5/ch5-f041.jpeg\" width=\"56\" height=\"25\" alt=\"\" class=\"inline\">. (To divide a number by 16, divide the number by 4 twice, or divide the number by 8, then by 2.) Try to come up with methods for finding the sales tax in the state that you live in. You will find that the problem is not as taxing as it seems!</p>",
+          "page": 124
+        }
+      ]
+    },
+    {
+      "id": "some-interest-ing-calculations",
+      "title": "Some “interest-Ing” Calculations",
+      "blocks": [
+        {
+          "type": "html",
+          "html": "<p>Finally, we’ll briefly mention some practical problems pertaining to interest, from the standpoint of watching your investments grow, and paying off money that you owe.</p><p>We begin with the famous Rule of 70, which tells you approximately how long it takes your money to double: <strong>To find the</strong> <strong>number of years that it will take for your money to double, divide the number 70 by the rate of interest</strong>.</p><p>Suppose that you find an investment that promises to pay you 5% interest per year. Since 70 ÷ 5 = 14, then it will take about 14 years for your money to double. For example, if you invested $1000 in a savings account that paid that interest, then after 14 years, it will have $1000(1.05)<sup>14</sup> = $1979.93. With an interest rate of 7%, the Rule of 70 indicates that it will take about 10 years for your money to double. Indeed, if you invest $1000 at that annual interest rate, you will have after ten years $1000(1.07)<sup>10</sup> = $1967.15. At a rate of 2%, the Rule of 70 says that it should take about 35 years to double, as shown below:</p><p class=\"center\"><strong>$1000(1.02)<sup>35</sup> = $1999.88</strong></p><p>A similar method is called the <strong>Rule of 110</strong>, which indicates how long it takes for your money to <em>triple</em>. For example, at 5% interest, since 110 ÷ 5 = 22, it should take about 22 years to turn $1000 into $3000. This is verified by the calculation $1000(1.05)<sup>22</sup> = $2925.26. The Rule of 70 and the Rule of 110 are based on properties of the number <em>e</em> = 2.71828 … and “natural logarithms” (studied in precalculus), but fortunately we do not need to utilize this higher mathematics to apply the rules.</p><p>Now suppose that you borrow money, and you have to pay the money back. For example, suppose that you borrow $360,000 at an annual interest rate of 6% per year (which we shall interpret to mean that interest will accumulate at a rate of 0.5% per month) and suppose that you have thirty years to pay off the loan. About how much will you need to pay each month? First of all, you will need to pay $360,000 times 0.5% = $1,800 each month just to cover what you owe in interest. (Although, actually, what you owe in interest will go down gradually over time.) Since you will make 30 × 12 = 360 monthly payments, then paying an extra $1,000 each month would cover the rest of the loan, so an upper bound on your monthly payment is $1,800 + $1,000 = $2,800. But fortunately you do not need to pay that much extra. Here is my rule of thumb for estimating your monthly payment.</p><p>Let <em>i</em> be your <em>monthly</em> interest rate. (This is your annual interest rate divided by 12.) Then to pay back a loan of <em>$P</em> in <em>?</em> months, your monthly payment M is about</p>",
+          "page": 126
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f042",
+          "src": "/book/figures/5/ch5-f042.jpeg",
+          "width": 157,
+          "height": 46
+        },
+        {
+          "type": "html",
+          "html": "<p>In our last example, <em>?</em> = $360,000, and <em>i</em> = 0.005, so our formula indicates that our monthly payment should be about</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f043",
+          "src": "/book/figures/5/ch5-f043.jpeg",
+          "width": 264,
+          "height": 46
+        },
+        {
+          "type": "html",
+          "html": "<p>Notice that the first two numbers in the numerator multiply to $1,800. Using a calculator (for a change) to compute (1.005)<sup>360</sup> = 6.02, we have that your monthly payment should be about $1,800(6.02)/5.02, which is about $2,160 per month.</p><p>Here’s one more example. Suppose you wish to pay for a car, and after your down payment, you owe $18,000 to be paid off in five years, with an annual interest rate of 4%. If there was no interest, you would have to pay $18,000/60 = $300 per month. Since the first year’s interest is $18,000(.04) = $720, you know that you will need to pay no more than $300 + $60 = $360. Using our formula, since the monthly interest rate is <em>i</em> = .04/12 = 0.00333, we have and since (1.00333)<sup>60</sup> = 1.22, we have a monthly payment of about $60(1.22)/(0.22) = $333.</p>",
+          "page": 128
+        },
+        {
+          "type": "figure",
+          "id": "ch5-f044",
+          "src": "/book/figures/5/ch5-f044.jpeg",
+          "width": 290,
+          "height": 46
+        },
+        {
+          "type": "html",
+          "html": "<p>We conclude with some exercises that we hope will hold your interest.</p>"
+        }
+      ]
+    },
+    {
+      "id": "guesstimation-exercises",
+      "title": "Guesstimation Exercises",
+      "blocks": [
+        {
+          "type": "html",
+          "html": "<p>Go through the following exercises for guesstimation math; then check your answers and computations at the back of the book.</p>"
+        },
+        {
+          "type": "exercise",
+          "setId": "ch5-addition-guesstimation"
+        },
+        {
+          "type": "html",
+          "html": "<p>Round these numbers up or down and see how close you come to the exact answer:</p>"
+        },
+        {
+          "type": "html",
+          "html": "<p>Mentally estimate the total for the following column of prices by rounding to the nearest 50¢:</p>"
+        },
+        {
+          "type": "exercise",
+          "setId": "ch5-subtraction-guesstimation"
+        },
+        {
+          "type": "html",
+          "html": "<p>Estimate the following subtraction problems by rounding to the second or third digit:</p>"
+        },
+        {
+          "type": "exercise",
+          "setId": "ch5-division-guesstimation"
+        },
+        {
+          "type": "html",
+          "html": "<p>Adjust the numbers in a way that allows you to guesstimate the following division problems:</p>"
+        },
+        {
+          "type": "exercise",
+          "setId": "ch5-multiplication-guesstimation"
+        },
+        {
+          "type": "html",
+          "html": "<p>Adjust the numbers in a way that allows you to guesstimate the following multiplication problems:</p>"
+        },
+        {
+          "type": "exercise",
+          "setId": "ch5-square-root-guesstimation"
+        },
+        {
+          "type": "html",
+          "html": "<p>Estimate the square roots of the following numbers using the divide and average method:</p>"
+        },
+        {
+          "type": "exercise",
+          "setId": "ch5-everyday-math"
+        },
+        {
+          "type": "html",
+          "html": "<div class=\"block\"><p class=\"hanging\">1. Compute 15% of <strong>$88</strong>.</p><p class=\"hanging\">2. Compute 15% of <strong>$53</strong>.</p><p class=\"hanging\">3. Compute 25% of <strong>$74</strong>.</p><p class=\"hanging\">4. How long does it take an annual interest rate of 10% to double your money?</p><p class=\"hanging\">5. How long does it take an annual interest rate of 6% to double your money?</p><p class=\"hanging\">6. How long does it take an annual interest rate of 7% to triple your money?</p><p class=\"hanging\">7. How long does it take an annual interest rate of 7% to quadruple your money?</p><p class=\"hanging\">8. Estimate the monthly payment to repay a loan of $100,000 at an interest rate of 9% over a ten-year period.</p><p class=\"hanging\">9. Estimate the monthly payment to repay a loan of $30,000 at an interest rate of 5% over a four-year period.</p></div>"
+        }
+      ]
+    }
+  ]
+}

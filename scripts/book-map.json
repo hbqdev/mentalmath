@@ -1,0 +1,76 @@
+{
+  "_comment": "Curated by viewing every large figure. exerciseSets: the figure IS the problem list (replaced by a callout). exerciseAfter: the figure also holds a worked example, so it stays and the callout follows it. Set ids follow the Answers-section headings.",
+  "exerciseSets": {
+    "ch1-f008": "ch1-two-digit-addition",
+    "ch1-f024": "ch1-three-digit-addition",
+    "ch1-f025": "ch1-three-digit-addition",
+    "ch1-f031": "ch1-two-digit-subtraction",
+    "ch1-f050": "ch1-three-digit-subtraction",
+
+    "ch2-f012": "ch2-2-by-1-multiplication",
+    "ch2-f027": "ch2-3-by-1-multiplication",
+    "ch2-f037": "ch2-two-digit-squares",
+    "ch2-f038": "ch2-two-digit-squares",
+
+    "ch3-f012": "ch3-multiplying-by-11",
+    "ch3-f014": "ch3-2-by-2-addition-method",
+    "ch3-f023": "ch3-2-by-2-subtraction-method",
+    "ch3-f027": "ch3-2-by-2-factoring-method",
+    "ch3-f030": "ch3-2-by-2-general-multiplication",
+    "ch3-f031": "ch3-2-by-2-general-multiplication",
+    "ch3-f032": "ch3-2-by-2-general-multiplication",
+    "ch3-f042": "ch3-two-digit-cubes",
+
+    "ch4-f008": "ch4-one-digit-division",
+    "ch4-f026": "ch4-two-digit-division",
+    "ch4-f054": "ch4-decimalization",
+    "ch4-f055": "ch4-decimalization",
+    "ch4-f058": "ch4-testing-for-divisibility",
+    "ch4-f059": "ch4-testing-for-divisibility",
+    "ch4-f061": "ch4-multiplying-fractions",
+    "ch4-f064": "ch4-dividing-fractions",
+    "ch4-f065": "ch4-dividing-fractions",
+    "ch4-f082": "ch4-simplifying-fractions",
+    "ch4-f083": "ch4-simplifying-fractions",
+    "ch4-f084": "ch4-simplifying-fractions",
+    "ch4-f087": "ch4-adding-fractions-equal-denominators",
+    "ch4-f097": "ch4-adding-fractions-unequal-denominators",
+    "ch4-f100": "ch4-subtracting-fractions",
+
+    "ch5-f045": "ch5-addition-guesstimation",
+    "ch5-f046": "ch5-addition-guesstimation",
+    "ch5-f047": "ch5-addition-guesstimation",
+    "ch5-f048": "ch5-subtraction-guesstimation",
+    "ch5-f049": "ch5-subtraction-guesstimation",
+    "ch5-f050": "ch5-division-guesstimation",
+    "ch5-f051": "ch5-division-guesstimation",
+    "ch5-f052": "ch5-multiplication-guesstimation",
+    "ch5-f053": "ch5-multiplication-guesstimation",
+    "ch5-f054": "ch5-square-root-guesstimation",
+    "ch5-f055": "ch5-square-root-guesstimation",
+
+    "ch6-f046": "ch6-columns-of-numbers",
+    "ch6-f047": "ch6-columns-of-numbers",
+    "ch6-f048": "ch6-columns-of-numbers",
+    "ch6-f049": "ch6-subtracting-on-paper",
+    "ch6-f050": "ch6-subtracting-on-paper",
+    "ch6-f051": "ch6-square-root-guesstimation",
+    "ch6-f052": "ch6-square-root-guesstimation",
+    "ch6-f053": "ch6-pencil-and-paper-multiplication",
+
+    "ch8-f006": "ch8-four-digit-squares",
+    "ch8-f023": "ch8-3-by-2-multiplication",
+    "ch8-f024": "ch8-3-by-2-multiplication",
+    "ch8-f032": "ch8-five-digit-squares",
+    "ch8-f064": "ch8-3-by-3-multiplication",
+    "ch8-f065": "ch8-3-by-3-multiplication",
+
+    "ch9-f018": "ch9-a-day-for-any-date"
+  },
+  "exerciseAfter": {
+    "ch3-f041": "ch3-three-digit-squares",
+    "ch5-f055": "ch5-everyday-math",
+    "ch8-f022": "ch8-3-by-2-multiplication",
+    "ch8-f076": "ch8-5-by-5-multiplication"
+  }
+}
