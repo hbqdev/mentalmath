@@ -19,7 +19,7 @@ export function promptText(p: Prompt): string {
     case 'binary':
       return `${p.a} ${p.op} ${p.b}`
     case 'columns':
-      return p.numbers.join(' + ')
+      return p.numbers.map((n) => (p.unit === '$' ? `$${n.toFixed(2)}` : String(n))).join(' + ')
     case 'power':
       return `${p.base}${p.exp === 2 ? '²' : '³'}`
     case 'root':
@@ -29,7 +29,9 @@ export function promptText(p: Prompt): string {
     case 'fraction-task':
       return p.task === 'simplify'
         ? `Simplify ${fracText(p.value)}`
-        : `Convert ${fracText(p.value)} to a decimal`
+        : p.task === 'rewrite'
+          ? `Write ${fracText(p.value)} with denominator ${p.den}`
+          : `Convert ${fracText(p.value)} to a decimal`
     case 'percent':
       return `${p.percent}% of ${p.of}`
     case 'divisible':

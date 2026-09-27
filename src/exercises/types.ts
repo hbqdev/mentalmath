@@ -8,11 +8,11 @@ export interface Frac {
 
 export type Prompt =
   | { kind: 'binary'; a: number; b: number; op: Op }
-  | { kind: 'columns'; numbers: number[] }
+  | { kind: 'columns'; numbers: number[]; unit?: '$' }
   | { kind: 'power'; base: number; exp: 2 | 3 }
   | { kind: 'root'; radicand: number; degree: 2 | 3 }
   | { kind: 'fraction-binary'; a: Frac; b: Frac; op: Op }
-  | { kind: 'fraction-task'; value: Frac; task: 'simplify' | 'to-decimal' }
+  | { kind: 'fraction-task'; value: Frac; task: 'simplify' | 'to-decimal' | 'rewrite'; den?: number }
   | { kind: 'percent'; percent: number; of: number }
   | { kind: 'divisible'; n: number; by: number }
   | { kind: 'date'; iso: string }
@@ -21,7 +21,7 @@ export type Prompt =
 export type AnswerSpec =
   | { kind: 'integer'; value: number }
   | { kind: 'decimal'; value: number; tolerance: number }
-  | { kind: 'fraction'; value: Frac; acceptDecimal: boolean }
+  | { kind: 'fraction'; value: Frac; acceptDecimal: boolean; exact?: boolean }
   | { kind: 'quotient-remainder'; q: number; r: number; divisor: number }
   | { kind: 'choice'; options: string[]; correct: string }
   | { kind: 'text'; accept: string[]; normalize: 'lower' | 'digits' | 'none' }

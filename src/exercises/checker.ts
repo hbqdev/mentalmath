@@ -100,6 +100,7 @@ export function formatAnswer(spec: AnswerSpec): string {
     case 'decimal':
       return String(spec.value)
     case 'fraction': {
+      if (spec.exact) return `${spec.value.num}/${spec.value.den}`
       const r = reduce(spec.value)
       return r.den === 1 ? String(r.num) : `${spec.value.num}/${spec.value.den}`
     }
@@ -132,10 +133,12 @@ export function check(spec: AnswerSpec, input: string): CheckResult {
     case 'fraction': {
       const f = parseFraction(raw)
       if (f) {
+        if (spec.exact) return { correct: f.num === spec.value.num && f.den === spec.value.den, shown }
         const a = reduce(f)
         const b = reduce(spec.value)
         return { correct: a.num === b.num && a.den === b.den, shown }
       }
+      if (spec.exact) return { correct: false, shown }
       const n = normalizeNumber(raw)
       if (n === null) return { correct: false, shown }
       const b = reduce(spec.value)
