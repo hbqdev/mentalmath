@@ -1,6 +1,7 @@
 import type { BookProblem } from '@/exercises/bookSets'
 import { reduce } from '@/exercises/checker'
-import { MINUS, stepsMultiplyByDigit, stepsSquareNear, stepsTimes11 } from '@/exercises/generators/shared'
+import { WEEKDAY_OPTIONS, dayOfWeek, daySteps } from '@/exercises/dates'
+import { MINUS, nearestFactorPair as factorPair, stepsMultiplyByDigit, stepsSquareNear, stepsTimes11 } from '@/exercises/generators/shared'
 import type { Frac } from '@/exercises/types'
 
 // Constructors compute answers from the operands (a transcription slip in an answer is
@@ -191,3 +192,56 @@ export function crissCross(n: number, a: number, b: number, steps: string[]): Bo
   return { n, prompt: { kind: 'binary', a, b, op: '×' }, answer: { kind: 'integer', value: a * b }, steps: [...steps, `${a} × ${b} = ${a * b}`] }
 }
 
+
+// Chapters 8 and 9
+
+/** Large squares: round to the nearest thousand, multiply up and down, add the small square. */
+export function sqBig(n: number, base: number): BookProblem {
+  return { n, prompt: { kind: 'power', base, exp: 2 }, answer: { kind: 'integer', value: base * base }, steps: stepsSquareNear(base, 1000) }
+}
+
+/**
+ * Big products the way chapter 8 works them: factor the smaller number when it factors into
+ * small pieces, round it up when it sits just below a multiple of 10, otherwise split it into
+ * its leading part and the rest and add the two products.
+ */
+export function big(n: number, a: number, b: number): BookProblem {
+  const [x, y] = a >= b ? [a, b] : [b, a] // y is the smaller factor, the one we take apart
+  let steps: string[]
+  const pair = y < 100 ? factorPair(y) : null
+  if (pair) {
+    const [f1, f2] = pair
+    steps = [`${y} = ${f1} × ${f2}`, `${x} × ${f1} = ${x * f1}`, `${x * f1} × ${f2} = ${a * b}`]
+  } else if (y < 100 && y % 10 >= 7) {
+    const r = Math.ceil(y / 10) * 10
+    const k = r - y
+    steps = [`${y} = ${r} ${MINUS} ${k}`, `${x} × ${r} = ${x * r}`, `${x} × ${k} = ${x * k}`, `${x * r} ${MINUS} ${x * k} = ${a * b}`]
+  } else {
+    const unit = 10 ** (String(y).length - 1)
+    const hi = Math.floor(y / unit) * unit
+    const lo = y - hi
+    steps = lo === 0
+      ? [`${x} × ${y} = ${a * b}`]
+      : [`${y} = ${hi} + ${lo}`, `${x} × ${hi} = ${x * hi}`, `${x} × ${lo} = ${x * lo}`, `${x * hi} + ${x * lo} = ${a * b}`]
+  }
+  return { n, prompt: { kind: 'binary', a, b, op: '×' }, answer: { kind: 'integer', value: a * b }, steps }
+}
+
+export function dateProblem(n: number, iso: string): BookProblem {
+  return {
+    n,
+    prompt: { kind: 'date', iso },
+    answer: { kind: 'choice', options: [...WEEKDAY_OPTIONS], correct: dayOfWeek(iso) },
+    steps: daySteps(iso),
+  }
+}
+
+/** The book's trick question: a date that does not exist. */
+export function noSuchDate(n: number, text: string, reason = 'June has only 30 days'): BookProblem {
+  return {
+    n,
+    prompt: { kind: 'text', text: `What day of the week was ${text}?`, emphasis: text },
+    answer: { kind: 'text', accept: ['No such date', 'no such day', 'none', 'invalid', 'trick question'], normalize: 'lower' },
+    steps: [reason, 'No such date'],
+  }
+}
