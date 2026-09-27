@@ -47,6 +47,21 @@ function dayDiff(a: string, b: string): number {
   return Math.round((tb - ta) / 86_400_000)
 }
 
+function isPlainObject(v: unknown): v is Record<string, unknown> {
+  return typeof v === 'object' && v !== null && !Array.isArray(v)
+}
+
+/** Defaults win for missing keys at any depth; stored values win where present. */
+export function mergeWithDefaults<T>(stored: unknown, defaults: T): T {
+  if (!isPlainObject(stored) || !isPlainObject(defaults)) return defaults
+  const out: Record<string, unknown> = { ...defaults }
+  for (const [k, v] of Object.entries(stored)) {
+    const d = (defaults as Record<string, unknown>)[k]
+    out[k] = isPlainObject(v) && isPlainObject(d) ? mergeWithDefaults(v, d) : v
+  }
+  return out as T
+}
+
 let shared: Ref<ProgressState> | null = null
 
 /** Drop the shared ref so the next useProgress() re-reads storage. Used by tests. */
@@ -56,7 +71,7 @@ export function disposeProgressStore() {
 
 function createState(): Ref<ProgressState> {
   return useStorage<ProgressState>(STORAGE_KEY, defaultProgress(), localStorage, {
-    mergeDefaults: true,
+    mergeDefaults: (stored, defaults) => mergeWithDefaults(stored, defaults),
     onError: () => {
       /* corrupt JSON: useStorage keeps the defaults; nothing else to do */
     },
