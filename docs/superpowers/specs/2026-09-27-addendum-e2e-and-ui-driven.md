@@ -2,7 +2,7 @@
 
 Date: 2026-09-27
 Amends: `2026-09-26-mentalmath-revamp-design.md`
-Status: approved by the owner in conversation ("full test end to end, UI driving design and testing, create a folder to store the screenshots for UI driven development")
+Status: approved by the owner in conversation ("full test end to end, UI driving design and testing, create a folder to store the screenshots for UI driven development"); completion criteria met at the end of Plan 4 (2026-09-27): unit, lint, typecheck, build and end-to-end suites green, screenshots regenerated from the final UI.
 
 ## 1. End-to-end tests are in scope now, not later
 
