@@ -195,3 +195,29 @@ describe('parseUnit exercise mapping extras', () => {
     expect(figures.map((f) => f.id)).toEqual(['ch3-f001', 'ch3-f002', 'ch3-f003'])
   })
 })
+
+describe('parseUnit figures nested in block divs', () => {
+  it('emits a figure block for div.dis_img inside div.block1 and keeps numbering in document order', () => {
+    const html = `<html><body>
+<h2 class="section"><strong>SUB</strong></h2>
+<p class="indent">Lead.</p>
+<div class="block1">
+<p class="bl_hanging">First line</p>
+<div class="dis_img"><img src="../images/a.jpeg" alt=""/></div>
+<p class="bl_hanging">Second line</p>
+</div>
+<div class="dis_img"><img src="../images/b.jpeg" alt=""/></div>
+</body></html>`
+    const { doc, figures } = parseUnit(
+      { id: '1', kicker: 'Chapter 1', files: [{ path: 'text/x.html', html }] },
+      { ...opts, exerciseSets: {} },
+    )
+    const blocks = doc.sections[0]!.blocks
+    expect(blocks.map((b) => b.type)).toEqual(['html', 'figure', 'html', 'figure'])
+    expect((blocks[0] as { html: string }).html).toBe('<p>Lead.</p><div class="block"><p class="hanging">First line</p></div>')
+    expect(blocks[1]).toMatchObject({ id: 'ch1-f001' })
+    expect((blocks[2] as { html: string }).html).toBe('<div class="block"><p class="hanging">Second line</p></div>')
+    expect(blocks[3]).toMatchObject({ id: 'ch1-f002' })
+    expect(figures.map((f) => f.sourcePath)).toEqual(['images/a.jpeg', 'images/b.jpeg'])
+  })
+})

@@ -59,6 +59,7 @@ function clearObservers() {
 function observeSections() {
   clearObservers()
   if (typeof IntersectionObserver === 'undefined') return
+  const cid = chapterId.value
   for (const [id, el] of Object.entries(sectionEls.value)) {
     const { stop } = useIntersectionObserver(
       el,
@@ -71,11 +72,11 @@ function observeSections() {
           ) {
             activeId.value = id
           }
-          if (!isVisited(chapterId.value, id) && !timers.has(id)) {
+          if (!isVisited(cid, id) && !timers.has(id)) {
             timers.set(
               id,
               setTimeout(() => {
-                markVisited(chapterId.value, id)
+                markVisited(cid, id)
                 timers.delete(id)
               }, 2000),
             )
@@ -96,12 +97,18 @@ function observeSections() {
 
 onBeforeUnmount(clearObservers)
 
+// Each navigation bumps the sequence; a load that finishes after a newer one started is ignored.
+let loadSeq = 0
+
 async function load() {
+  const my = ++loadSeq
+  clearObservers()
   status.value = 'loading'
   doc.value = null
   sectionEls.value = {}
   try {
     const d = await loadChapter(chapterId.value)
+    if (my !== loadSeq) return
     doc.value = d
     registerDiscoveredSets(
       d.id,
@@ -123,11 +130,12 @@ async function load() {
       ''
     activeId.value = target
     await nextTick()
+    if (my !== loadSeq) return
     observeSections()
     if (target && target !== d.sections[0]?.id) scrollToSection(target, 'auto', false)
     if (wanted && !known) router.replace({ name: 'read', params: { chapter: d.id } })
   } catch {
-    status.value = 'missing'
+    if (my === loadSeq) status.value = 'missing'
   }
 }
 
@@ -227,7 +235,7 @@ function selectFromSheet(id: string) {
       </aside>
     </div>
 
-    <template v-if="isPhone && doc">
+    <template v-if="!isDesktop && doc">
       <SectionPill
         :index="activeIndex"
         :total="sections.length"

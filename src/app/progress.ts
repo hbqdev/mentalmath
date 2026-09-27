@@ -69,9 +69,31 @@ export function disposeProgressStore() {
   shared = null
 }
 
+/** Older or hand-edited storage may lack per-entry fields; give every entry its full shape. */
+export function normalizeProgress(p: ProgressState): ProgressState {
+  const reading: ProgressState['reading'] = {}
+  for (const [k, v] of Object.entries(p.reading ?? {})) {
+    if (!isPlainObject(v)) continue
+    reading[k] = {
+      lastSection: typeof v.lastSection === 'string' ? v.lastSection : '',
+      visited: Array.isArray(v.visited) ? v.visited.filter((x): x is string => typeof x === 'string') : [],
+      updatedAt: typeof v.updatedAt === 'string' ? v.updatedAt : '',
+    }
+  }
+  const practice: ProgressState['practice'] = {}
+  for (const [k, v] of Object.entries(p.practice ?? {})) {
+    if (!isPlainObject(v)) continue
+    practice[k] = {
+      attempts: Array.isArray(v.attempts) ? (v.attempts as Attempt[]) : [],
+      best: typeof v.best === 'number' ? v.best : 0,
+    }
+  }
+  return { ...p, reading, practice }
+}
+
 function createState(): Ref<ProgressState> {
   return useStorage<ProgressState>(STORAGE_KEY, defaultProgress(), localStorage, {
-    mergeDefaults: (stored, defaults) => mergeWithDefaults(stored, defaults),
+    mergeDefaults: (stored, defaults) => normalizeProgress(mergeWithDefaults(stored, defaults)),
     onError: () => {
       /* corrupt JSON: useStorage keeps the defaults; nothing else to do */
     },
