@@ -30,6 +30,12 @@ sudo nginx -t
 sudo systemctl enable --now nginx >/dev/null
 sudo systemctl reload nginx
 
+# The reload hands over sockets asynchronously; wait until the new site answers a deep route.
+code=000
+for _ in $(seq 1 20); do
+  code=$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1/read/1")
+  [ "$code" = 200 ] && break
+  sleep 0.5
+done
 ip=$(hostname -I 2>/dev/null | awk '{print $1}')
-code=$(curl -s -o /dev/null -w '%{http_code}' "http://127.0.0.1/read/1")
 echo "deployed $(git rev-parse --short HEAD) -> http://${ip:-localhost}/  (GET /read/1 -> HTTP $code)"
