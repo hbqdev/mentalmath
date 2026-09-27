@@ -55,9 +55,13 @@ Every worked example in the book (397 figures across chapters 0 to 9) is transcr
 
 `vite-plugin-pwa` precaches the app shell, chapter data, fonts and figures (about 3.3 MB) on the first visit, so every chapter reads offline afterwards and the app installs from the browser menu. Icons come from `scripts/make-icons.ts` (`npx tsx scripts/make-icons.ts`), which rasterises the favicon without an image library. `e2e/offline.spec.ts` reads a chapter with the network switched off.
 
+## Deployment on this host
+
+The site runs as a systemd user service (`mentalmath.service`, enabled at boot with linger) that serves a copy of `dist/` from `~/srv/mentalmath` on port 8547 through `scripts/serve.mjs`, a dependency-free static server with the SPA fallback and the cache headers the service worker needs. `scripts/mentalmath.sh` manages it: `deploy` (build and publish), `update` (pull, install if the lockfile changed, deploy), `start`, `stop`, `restart`, `status`, `logs`, `health`, `url`, `install`, `uninstall`. Override `PORT`, `HOST` or `SITE_DIR` in the environment.
+
 ## Status
 
-Complete: reader with every figure typeset, generated drills for chapters 0 to 9, all 40 book problem sets with solution steps in the book's methods, offline support, unit and end-to-end suites. Deferred: visual-regression comparison of the screenshots, deployment.
+Complete: reader with every figure typeset, generated drills for chapters 0 to 9, all 40 book problem sets with solution steps in the book's methods, offline support, unit and end-to-end suites. Deployed on the LAN host as a user service on port 8547. Deferred: visual-regression comparison of the screenshots.
 
 ## Book exercise data
 
