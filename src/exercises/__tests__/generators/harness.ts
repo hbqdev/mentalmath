@@ -42,7 +42,7 @@ export function answerMatchesReference(p: Prompt, a: AnswerSpec): boolean {
   if (ref === null) return true
   switch (a.kind) {
     case 'integer':
-      return typeof ref === 'number' && ref === a.value
+      return typeof ref === 'number' && Math.abs(ref - a.value) < 1e-6
     case 'decimal':
       return typeof ref === 'number' && Math.abs(ref - a.value) <= a.tolerance + 1e-9
     case 'estimate':

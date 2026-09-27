@@ -104,6 +104,30 @@ export function stepsTimes11(n: number): string[] {
   return [...sums, `Digits ${raw.join(' ')} with carries resolved: ${answer}`]
 }
 
+/**
+ * Chapter 8's approach to big products: take the smaller factor apart. Factor it when it
+ * factors into pieces ≤ 12, round it up when it sits just below a multiple of 10, otherwise
+ * split it into its leading part and the rest.
+ */
+export function stepsBigProduct(a: number, b: number): string[] {
+  const [x, y] = a >= b ? [a, b] : [b, a]
+  const pair = y < 100 ? nearestFactorPair(y) : null
+  if (pair) {
+    const [f1, f2] = pair
+    return [`${y} = ${f1} × ${f2}`, `${x} × ${f1} = ${x * f1}`, `${x * f1} × ${f2} = ${a * b}`]
+  }
+  if (y < 100 && y % 10 >= 7) {
+    const r = Math.ceil(y / 10) * 10
+    const k = r - y
+    return [`${y} = ${r} ${MINUS} ${k}`, `${x} × ${r} = ${x * r}`, `${x} × ${k} = ${x * k}`, `${x * r} ${MINUS} ${x * k} = ${a * b}`]
+  }
+  const unit = 10 ** (String(y).length - 1)
+  const hi = Math.floor(y / unit) * unit
+  const lo = y - hi
+  if (lo === 0) return [`${x} × ${y} = ${a * b}`]
+  return [`${y} = ${hi} + ${lo}`, `${x} × ${hi} = ${x * hi}`, `${x} × ${lo} = ${x * lo}`, `${x * hi} + ${x * lo} = ${a * b}`]
+}
+
 export function nearestFactorPair(n: number): [number, number] | null {
   for (let f = Math.floor(Math.sqrt(n)); f >= 2; f--) {
     if (n % f === 0 && n / f <= 12) return [f, n / f]
