@@ -1,12 +1,36 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
   <head>
-    <meta charset="UTF-8">
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <meta charset="UTF-8" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <!-- Fallback for browsers that don't support SVG favicons -->
-    <link rel="alternate icon" href="/favicon.ico" type="image/png">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="alternate icon" href="/favicon.ico" type="image/png" />
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Mental Math Trainer</title>
+    <meta name="theme-color" content="#f6f1e7" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0f1720" media="(prefers-color-scheme: dark)" />
+    <script>
+      // Apply the saved theme and text size before the first paint so the page never flashes.
+      ;(function () {
+        try {
+          var raw = localStorage.getItem('mentalmath.v1')
+          var s = raw ? JSON.parse(raw).settings || {} : {}
+          var theme =
+            s.theme === 'light' || s.theme === 'dark'
+              ? s.theme
+              : window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light'
+          document.documentElement.dataset.theme = theme
+          document.documentElement.dataset.fontScale = String(
+            s.fontScale === 0 || s.fontScale === 2 ? s.fontScale : 1,
+          )
+        } catch (e) {
+          /* storage unavailable: the app applies the theme after mount */
+        }
+      })()
+    </script>
   </head>
   <body>
     <div id="app"></div>

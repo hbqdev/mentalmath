@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { RouterLink, RouterView, useRoute } from 'vue-router'
+import { getChapterMeta } from '@/content/loader'
+import { chapterCompletion } from './completion'
 import { useProgress } from './progress'
 import { useTheme } from './theme'
 
@@ -9,6 +11,13 @@ const { state } = useProgress()
 const { resolved, cycleTheme, cycleFontScale } = useTheme()
 
 const inReader = computed(() => route.name === 'read')
+const completion = computed(() => {
+  if (!inReader.value) return null
+  const id = String(route.params.chapter ?? '')
+  const meta = getChapterMeta(id)
+  if (!meta) return null
+  return chapterCompletion(meta, state.value.reading[id]?.visited)
+})
 const themeGlyph = computed(() =>
   state.value.settings.theme === 'system' ? 'A' : resolved.value === 'dark' ? '☾' : '☀',
 )
@@ -44,6 +53,15 @@ function toggleFocus() {
           {{ themeGlyph }}
         </button>
         <button type="button" class="tgl" title="Text size" @click="cycleFontScale">Aa</button>
+        <span
+          v-if="completion"
+          class="ring"
+          data-testid="chapter-ring"
+          role="img"
+          :aria-label="`${completion.done} of ${completion.total} sections read`"
+          :title="`${completion.done} of ${completion.total} sections read`"
+          :style="{ '--p': `${Math.round(completion.fraction * 100)}%` }"
+        />
         <span
           v-if="state.streak.current > 0"
           class="streak"
@@ -120,6 +138,22 @@ function toggleFocus() {
 .streak {
   color: var(--warm);
   font-weight: 700;
+}
+.ring {
+  --p: 0%;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: conic-gradient(var(--accent) var(--p), var(--rule) 0);
+  position: relative;
+  flex: none;
+}
+.ring::after {
+  content: '';
+  position: absolute;
+  inset: 4px;
+  border-radius: 50%;
+  background: var(--surface);
 }
 .about {
   color: var(--muted);

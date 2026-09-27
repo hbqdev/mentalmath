@@ -6,11 +6,15 @@ const props = defineProps<{ spec: AnswerSpec; disabled: boolean }>()
 const emit = defineEmits<{ submit: [value: string] }>()
 
 const value = ref('')
+const hint = ref('')
+const chosen = ref<string | null>(null)
 const el = ref<HTMLInputElement | null>(null)
 
 const isChoice = computed(() => props.spec.kind === 'choice')
 const inputMode = computed(() =>
-  ['integer', 'decimal', 'estimate', 'quotient-remainder'].includes(props.spec.kind) ? 'decimal' : 'text',
+  ['integer', 'decimal', 'estimate', 'quotient-remainder'].includes(props.spec.kind)
+    ? 'decimal'
+    : 'text',
 )
 const placeholder = computed(() => {
   switch (props.spec.kind) {
@@ -31,7 +35,19 @@ const placeholder = computed(() => {
 
 function submitText() {
   if (props.disabled) return
+  if (value.value.trim() === '') {
+    hint.value = 'Type an answer first'
+    el.value?.focus()
+    return
+  }
+  hint.value = ''
   emit('submit', value.value)
+}
+
+function choose(option: string) {
+  if (props.disabled) return
+  chosen.value = option
+  emit('submit', option)
 }
 
 /** Enter while answering submits and stops here; while feedback is shown it bubbles up to advance. */
@@ -43,6 +59,8 @@ function onEnterKey(e: KeyboardEvent) {
 
 function reset() {
   value.value = ''
+  hint.value = ''
+  chosen.value = null
 }
 function focus() {
   el.value?.focus()
@@ -52,15 +70,22 @@ defineExpose({ reset, focus })
 
 <template>
   <div class="answer">
-    <div v-if="isChoice && spec.kind === 'choice'" class="choices" role="group" aria-label="Choose an answer">
+    <div
+      v-if="isChoice && spec.kind === 'choice'"
+      class="choices"
+      role="group"
+      aria-label="Choose an answer"
+    >
       <button
         v-for="o in spec.options"
         :key="o"
         type="button"
         class="choice"
+        :class="{ chosen: chosen === o }"
         :data-testid="`choice-${o.toLowerCase()}`"
         :disabled="disabled"
-        @click="!disabled && emit('submit', o)"
+        :aria-pressed="chosen === o"
+        @click="choose(o)"
       >
         {{ o }}
       </button>
@@ -80,18 +105,38 @@ defineExpose({ reset, focus })
         :readonly="disabled"
         :aria-disabled="disabled"
         aria-label="Your answer"
+        :aria-describedby="hint ? 'answer-hint' : undefined"
         @keyup.enter="onEnterKey"
+        @input="hint = ''"
       />
-      <button type="button" data-testid="answer-submit" class="go" :disabled="disabled" @click="submitText">Check</button>
+      <button
+        type="button"
+        data-testid="answer-submit"
+        class="go"
+        :disabled="disabled"
+        @click="submitText"
+      >
+        Check
+      </button>
     </form>
+    <p v-if="hint" id="answer-hint" class="hint" data-testid="empty-hint" role="status">
+      {{ hint }}
+    </p>
   </div>
 </template>
 
 <style scoped>
 .answer {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   margin-top: 1rem;
+}
+.hint {
+  margin: 0.4rem 0 0;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  color: var(--accent);
 }
 .field {
   display: flex;
@@ -147,5 +192,11 @@ input[readonly] {
 .choice:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+.choice.chosen,
+.choice.chosen:disabled {
+  opacity: 1;
+  background: var(--accent);
+  color: var(--accent-ink);
 }
 </style>

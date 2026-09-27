@@ -5,7 +5,12 @@ const emit = defineEmits<{ prev: []; next: []; practice: [] }>()
 
 <template>
   <div class="pill" role="toolbar" aria-label="Section navigation">
-    <button type="button" :disabled="index <= 0" aria-label="Previous section" @click="emit('prev')">
+    <button
+      type="button"
+      :disabled="index <= 0"
+      aria-label="Previous section"
+      @click="emit('prev')"
+    >
       ‹
     </button>
     <span class="pos">Section {{ index + 1 }} / {{ total }}</span>

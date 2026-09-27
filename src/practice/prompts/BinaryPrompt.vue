@@ -11,7 +11,10 @@ const fmt = (n: number) => n.toLocaleString('en-US')
 <template>
   <div v-if="vertical" class="stack" :aria-label="`${prompt.a} ${opGlyph} ${prompt.b}`">
     <div class="row">{{ fmt(prompt.a) }}</div>
-    <div class="row"><span class="op">{{ opGlyph }}</span>{{ fmt(prompt.b) }}</div>
+    <div class="row">
+      <span class="op">{{ opGlyph }}</span
+      >{{ fmt(prompt.b) }}
+    </div>
   </div>
   <div v-else class="inline" :aria-label="`${prompt.a} divided by ${prompt.b}`">
     {{ fmt(prompt.a) }} <span class="op">÷</span> {{ fmt(prompt.b) }}

@@ -8,7 +8,7 @@ import FractionGlyph from './prompts/FractionGlyph.vue'
 
 const props = defineProps<{ prompt: Prompt }>()
 
-const money = (n: number) => (Number.isInteger(n) ? String(n) : `$${n.toFixed(2)}`)
+const money = (n: number) => (Number.isInteger(n) ? `$${n}` : `$${n.toFixed(2)}`)
 const textParts = computed(() => {
   if (props.prompt.kind !== 'text' || !props.prompt.emphasis) return null
   const { text, emphasis } = props.prompt
@@ -28,16 +28,25 @@ const textParts = computed(() => {
     </div>
 
     <div v-else-if="prompt.kind === 'root'" class="big root">
-      <span class="radical">{{ prompt.degree === 2 ? '√' : '∛' }}</span><span class="radicand">{{ prompt.radicand }}</span>
+      <span class="radical">{{ prompt.degree === 2 ? '√' : '∛' }}</span
+      ><span class="radicand">{{ prompt.radicand }}</span>
     </div>
 
     <div v-else-if="prompt.kind === 'fraction-binary'" class="big">
-      <FractionGlyph :value="prompt.a" /> <span class="op">{{ prompt.op === '-' ? '−' : prompt.op }}</span> <FractionGlyph :value="prompt.b" />
+      <FractionGlyph :value="prompt.a" />
+      <span class="op">{{ prompt.op === '-' ? '−' : prompt.op }}</span>
+      <FractionGlyph :value="prompt.b" />
     </div>
 
     <div v-else-if="prompt.kind === 'fraction-task'" class="task">
       <p class="lead">
-        {{ prompt.task === 'simplify' ? 'Simplify' : prompt.task === 'rewrite' ? `Write with denominator ${prompt.den}` : 'As a decimal' }}
+        {{
+          prompt.task === 'simplify'
+            ? 'Simplify'
+            : prompt.task === 'rewrite'
+              ? `Write with denominator ${prompt.den}`
+              : 'As a decimal'
+        }}
       </p>
       <div class="big"><FractionGlyph :value="prompt.value" /></div>
     </div>
@@ -49,7 +58,10 @@ const textParts = computed(() => {
     <div v-else-if="prompt.kind === 'divisible'" class="task">
       <p class="lead">Is</p>
       <div class="big">{{ prompt.n.toLocaleString('en-US') }}</div>
-      <p class="lead">divisible by <strong>{{ prompt.by }}</strong>?</p>
+      <p class="lead">
+        divisible by <strong>{{ prompt.by }}</strong
+        >?
+      </p>
     </div>
 
     <div v-else-if="prompt.kind === 'date'" class="task">
@@ -59,7 +71,8 @@ const textParts = computed(() => {
 
     <div v-else class="task text">
       <p v-if="textParts" class="lead">
-        {{ textParts.before }}<strong class="em">{{ textParts.em }}</strong>{{ textParts.after }}
+        {{ textParts.before }}<strong class="em">{{ textParts.em }}</strong
+        >{{ textParts.after }}
       </p>
       <p v-else class="lead">{{ prompt.text }}</p>
     </div>

@@ -1,16 +1,59 @@
 <script setup lang="ts">
-defineProps<{ open: boolean; title: string }>()
+import { nextTick, onBeforeUnmount, ref, watch } from 'vue'
+
+const props = defineProps<{ open: boolean; title: string }>()
 const emit = defineEmits<{ close: [] }>()
+
+const closeBtn = ref<HTMLButtonElement | null>(null)
+let opener: HTMLElement | null = null
+
+function onKey(e: KeyboardEvent) {
+  if (e.key === 'Escape') emit('close')
+}
+
+// Focus moves into the sheet when it opens and back to whatever opened it when it closes.
+watch(
+  () => props.open,
+  async (open) => {
+    if (open) {
+      opener = document.activeElement instanceof HTMLElement ? document.activeElement : null
+      window.addEventListener('keydown', onKey)
+      await nextTick()
+      closeBtn.value?.focus()
+    } else {
+      window.removeEventListener('keydown', onKey)
+      opener?.focus()
+      opener = null
+    }
+  },
+)
+onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
 </script>
 
 <template>
   <Teleport to="body">
     <div v-if="open" class="scrim" @click="emit('close')" />
-    <section class="sheet" data-testid="sheet" :class="{ open }" :aria-hidden="!open" role="dialog" :aria-label="title">
+    <section
+      class="sheet"
+      data-testid="sheet"
+      :class="{ open }"
+      :inert="!open"
+      role="dialog"
+      aria-modal="true"
+      :aria-label="title"
+    >
       <div class="grab" />
       <header>
         <strong>{{ title }}</strong>
-        <button type="button" aria-label="Close" @click="emit('close')">×</button>
+        <button
+          ref="closeBtn"
+          type="button"
+          data-testid="sheet-close"
+          aria-label="Close"
+          @click="emit('close')"
+        >
+          ×
+        </button>
       </header>
       <div class="body"><slot /></div>
     </section>

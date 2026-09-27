@@ -11,7 +11,12 @@ const twin = computed(() => generatedTwin(props.setId))
 </script>
 
 <template>
-  <div class="callout" data-testid="exercise-callout" :class="{ locked: !unlocked }" :data-locked="!unlocked">
+  <div
+    class="callout"
+    data-testid="exercise-callout"
+    :class="{ locked: !unlocked }"
+    :data-locked="!unlocked"
+  >
     <div class="text">
       <p class="label">Exercise</p>
       <h4>{{ title }}</h4>
@@ -28,10 +33,20 @@ const twin = computed(() => generatedTwin(props.setId))
       <RouterLink
         v-if="unlocked && twin"
         class="btn ghost"
-        :to="{ name: 'practice', params: { chapter: chapterId, set: twin.id }, query: { mode: 'generated' } }"
+        :to="{
+          name: 'practice',
+          params: { chapter: chapterId, set: twin.id },
+          query: { mode: 'generated' },
+        }"
         >Generate</RouterLink
       >
-      <button v-else-if="unlocked" type="button" class="btn ghost" disabled title="No generated drill for this set">
+      <button
+        v-else-if="unlocked"
+        type="button"
+        class="btn ghost"
+        disabled
+        title="No generated drill for this set"
+      >
         Generate
       </button>
     </div>
