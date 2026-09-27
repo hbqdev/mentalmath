@@ -43,8 +43,9 @@ export function answerMatchesReference(p: Prompt, a: AnswerSpec): boolean {
     case 'integer':
       return typeof ref === 'number' && ref === a.value
     case 'decimal':
+      return typeof ref === 'number' && Math.abs(ref - a.value) <= a.tolerance + 1e-9
     case 'estimate':
-      return typeof ref === 'number' && Math.abs(ref - a.value) <= (a.kind === 'decimal' ? a.tolerance : 1e-9)
+      return typeof ref === 'number' && Math.abs(ref - a.value) <= a.relTolerance * Math.abs(ref) + 1e-9
     case 'quotient-remainder':
       return p.kind === 'binary' && a.q === Math.floor(p.a / p.b) && a.r === p.a % p.b && a.divisor === p.b
     case 'fraction': {
@@ -60,6 +61,7 @@ export function answerMatchesReference(p: Prompt, a: AnswerSpec): boolean {
 export function lastStepMentionsAnswer(d: ExerciseDraft): boolean {
   const steps = d.solution?.steps ?? []
   const last = steps[steps.length - 1] ?? ''
+  if (d.answer.kind === 'phonetic') return last.includes(d.answer.digits)
   const shown = formatAnswer(d.answer).replace(/^≈ /, '')
   const bare = shown.replace(/ remainder .*/, '')
   return last.replace(/,/g, '').includes(bare.replace(/,/g, ''))
