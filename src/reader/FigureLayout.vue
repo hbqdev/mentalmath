@@ -1,14 +1,20 @@
 <script setup lang="ts">
 import type { FigureSpec } from '@/content/figures/types'
+import { RichText } from './RichText'
 defineProps<{ spec: FigureSpec }>()
+
+const CELL = 44
+const ccWidth = (n: number) => n * CELL
+const ccX = (i: number) => i * CELL + CELL / 2
 </script>
 
 <template>
   <!-- column: label | op | value | note -->
-  <div v-if="spec.kind === 'column'" class="fl column">
+  <div v-if="spec.kind === 'column'" class="fl column" :class="{ captioned: spec.caption }">
+    <span v-if="spec.caption" class="caption">{{ spec.caption }}</span>
     <template v-for="(line, i) in spec.lines" :key="i">
       <span class="lbl">{{ line.label ?? '' }}</span>
-      <span class="op" :class="{ rule: line.rule }">{{ line.op ?? '' }}</span>
+      <span class="op" :class="{ rule: line.rule && line.op }">{{ line.op ?? '' }}</span>
       <span class="value" :class="{ rule: line.rule, carry: line.carry }">{{ line.value }}</span>
       <span class="note">{{ line.note ?? '' }}</span>
     </template>
@@ -16,23 +22,78 @@ defineProps<{ spec: FigureSpec }>()
 
   <div v-else-if="spec.kind === 'chain'" class="fl chain">
     <template v-for="(step, i) in spec.steps" :key="i">
-      <span v-if="i === 0" class="step">{{ step }}</span>
+      <span v-if="i === 0" class="step"><RichText :text="step" /></span>
       <span v-else class="link">
         <span class="eq">
-          <span class="sign">=</span>
+          <span class="sign">{{
+            step.startsWith('≈') || step.startsWith('<') ? step[0] : '='
+          }}</span>
           <span v-if="spec.notes?.[i - 1]" class="under">{{ spec.notes[i - 1] }}</span>
         </span>
-        <span class="step">{{ step }}</span>
+        <span class="step"><RichText :text="step.replace(/^[≈<] ?/, '')" /></span>
       </span>
     </template>
   </div>
 
-  <div v-else-if="spec.kind === 'text'" class="fl text" :class="spec.align ?? 'center'">
-    <p v-for="(line, i) in spec.lines" :key="i">{{ line }}</p>
+  <div
+    v-else-if="spec.kind === 'text'"
+    class="fl text"
+    :class="[spec.align ?? 'center', { serif: spec.serif }]"
+  >
+    <p v-for="(line, i) in spec.lines" :key="i"><RichText :text="line" /></p>
   </div>
 
-  <table v-else-if="spec.kind === 'table'" class="fl table" :class="{ grid: spec.grid }">
-    <thead>
+  <div v-else-if="spec.kind === 'pre'" class="fl pre" :class="spec.align ?? 'left'">
+    <p v-for="(line, i) in spec.lines" :key="i"><RichText :text="line" /></p>
+  </div>
+
+  <span v-else-if="spec.kind === 'inline'" class="fl inline"><RichText :text="spec.text" /></span>
+
+  <div v-else-if="spec.kind === 'grid'" class="fl gridk" :class="spec.align ?? 'right'">
+    <div v-for="(row, r) in spec.rows" :key="r" class="grow">
+      <span
+        v-for="(cell, c) in row"
+        :key="c"
+        class="gcell"
+        :class="{ arrow: /^[→↓←]+$/.test(cell), empty: cell === '' }"
+        ><RichText :text="cell"
+      /></span>
+    </div>
+  </div>
+
+  <div v-else-if="spec.kind === 'longdiv'" class="fl longdiv">
+    <div class="ld">
+      <span class="quot">{{ spec.quotient }}</span>
+      <span class="divd"
+        ><span class="divisor">{{ spec.divisor }}</span
+        ><span class="bracket">)</span><span class="dividend">{{ spec.dividend }}</span></span
+      >
+      <span v-for="(line, i) in spec.lines" :key="i" class="ldl" :class="{ rule: line.rule }">
+        <span class="v">{{ line.value }}</span
+        ><span v-if="line.note" class="note">{{ line.note }}</span>
+      </span>
+    </div>
+    <p v-if="spec.answer" class="answer"><RichText :text="spec.answer" /></p>
+  </div>
+
+  <svg
+    v-else-if="spec.kind === 'crisscross'"
+    class="fl crisscross"
+    :viewBox="`0 0 ${ccWidth(Math.max(spec.top.length, spec.bottom.length))} 76`"
+    :style="{ width: `${Math.max(spec.top.length, spec.bottom.length) * 2.2}em` }"
+    aria-hidden="true"
+  >
+    <line v-for="([a, b], i) in spec.links" :key="i" :x1="ccX(a)" y1="20" :x2="ccX(b)" y2="56" />
+    <text v-for="(d, i) in spec.top" :key="'t' + i" :x="ccX(i)" y="14">{{ d }}</text>
+    <text v-for="(d, i) in spec.bottom" :key="'b' + i" :x="ccX(i)" y="70">{{ d }}</text>
+  </svg>
+
+  <table
+    v-else-if="spec.kind === 'table'"
+    class="fl table"
+    :class="{ grid: spec.grid, plain: spec.plain }"
+  >
+    <thead v-if="spec.head.length">
       <tr>
         <th v-for="(h, i) in spec.head" :key="i" :colspan="spec.headSpan?.[i] ?? 1">{{ h }}</th>
       </tr>
@@ -58,14 +119,17 @@ defineProps<{ spec: FigureSpec }>()
       <span class="branch">{{ spec.up }}</span>
       <span class="branch">{{ spec.down }}</span>
     </span>
-    <template v-if="spec.result">
+    <template v-if="spec.result !== undefined">
       <svg class="fan in" viewBox="0 0 40 40" aria-hidden="true">
         <line x1="2" y1="5" x2="34" y2="19" />
         <line x1="2" y1="35" x2="34" y2="21" />
         <polygon points="36,20 30.6,19.8 32.2,16.2" />
         <polygon points="36,20 30.6,20.2 32.2,23.8" />
       </svg>
-      <span class="result">{{ spec.result }}</span>
+      <span class="resbox">
+        <small v-if="spec.label" class="lbl">{{ spec.label }}</small>
+        <span class="result">{{ spec.result }}</span>
+      </span>
     </template>
   </div>
 
@@ -183,9 +247,152 @@ small,
   margin-top: -0.2em;
 }
 
-/* text */
-.text p {
+/* text, pre, inline, grid */
+.text.left {
+  text-align: left;
+}
+.text.serif {
+  font-family: var(--font-serif);
+  font-weight: 500;
+  font-size: 1em;
+  max-width: 100%;
+}
+.text.serif p {
+  white-space: normal;
+}
+.text p,
+.pre p {
   margin: 0;
+  white-space: pre-wrap;
+}
+.pre p {
+  white-space: pre;
+  text-align: left;
+}
+.pre.center {
+  display: inline-block;
+}
+.inline {
+  font-size: 1em;
+}
+.gridk {
+  display: inline-grid;
+  grid-auto-flow: row;
+  column-gap: 0.6em;
+  row-gap: 0.15em;
+}
+.gridk .gcell {
+  text-align: right;
+  white-space: nowrap;
+  padding: 0 0.3em;
+}
+.gridk .gcell.empty {
+  min-width: 1.4em;
+}
+.gridk.left .gcell {
+  text-align: left;
+}
+.gridk.center .gcell {
+  text-align: center;
+}
+.gridk .arrow {
+  color: var(--muted);
+  font-weight: 400;
+  text-align: center;
+}
+.column .caption {
+  grid-column: 1 / -1;
+  text-align: right;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  color: var(--muted);
+  font-size: 0.8em;
+}
+
+/* rich text */
+:deep(.rt-frac) {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  vertical-align: middle;
+  line-height: 1.05;
+  font-size: 0.85em;
+  margin: 0 0.1em;
+}
+:deep(.rt-num) {
+  border-bottom: 0.08em solid currentColor;
+  padding: 0 0.15em;
+}
+:deep(.rt-den) {
+  padding: 0 0.15em;
+}
+:deep(.rt-over) {
+  text-decoration: overline;
+  text-decoration-thickness: 0.08em;
+}
+:deep(.rt-under) {
+  text-decoration: underline;
+  text-decoration-thickness: 0.08em;
+  text-underline-offset: 0.1em;
+}
+:deep(.rt-sup) {
+  font-size: 0.7em;
+}
+
+/* long division */
+.longdiv .ld {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-end;
+}
+.longdiv .quot,
+.longdiv .ldl .v {
+  white-space: pre;
+}
+.longdiv .divd {
+  display: inline-flex;
+  align-items: baseline;
+}
+.longdiv .bracket {
+  margin: 0 0.05em;
+}
+.longdiv .dividend {
+  border-top: 0.09em solid currentColor;
+  padding-top: 0.05em;
+  white-space: pre;
+}
+.longdiv .ldl {
+  display: inline-flex;
+  align-items: baseline;
+  position: relative;
+}
+.longdiv .ldl.rule .v {
+  border-bottom: 0.09em solid currentColor;
+}
+.longdiv .ldl .note {
+  position: absolute;
+  left: 100%;
+  margin-left: 0.6em;
+  white-space: nowrap;
+}
+.longdiv .answer {
+  margin: 0.6em 0 0;
+  text-align: left;
+}
+
+/* criss-cross */
+.crisscross {
+  display: inline-block;
+  height: auto;
+  stroke: currentColor;
+  stroke-width: 1.2;
+  overflow: visible;
+}
+.crisscross text {
+  fill: currentColor;
+  stroke: none;
+  font-size: 20px;
+  text-anchor: middle;
 }
 .text.center {
   text-align: center;
@@ -219,10 +426,13 @@ small,
   border: 1px solid var(--rule);
   text-align: center;
 }
-.table.grid th,
-.table.grid td:first-child {
+.table.grid:not(.plain) th,
+.table.grid:not(.plain) td:first-child {
   font-weight: 700;
   background: var(--card);
+}
+.table.plain td {
+  padding: 0.3em 0.9em;
 }
 .table .hi td {
   background: var(--card);
@@ -263,6 +473,16 @@ small,
 }
 .split .branch {
   line-height: 1.1;
+}
+.split .resbox {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.split .resbox .lbl {
+  font-size: 0.65em;
+  line-height: 1;
+  margin-bottom: 0.1em;
 }
 .split .result {
   white-space: nowrap;
@@ -320,6 +540,7 @@ small,
   flex-direction: column;
   align-items: center;
   gap: 1em;
+  max-width: 100%;
 }
 .stack.indent {
   align-items: flex-start;

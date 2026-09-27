@@ -10,7 +10,7 @@ const router = createAppRouter(createMemoryHistory())
 
 const blocks: Block[] = [
   { type: 'html', html: '<p>Hello <u>5</u></p>', page: 12 },
-  { type: 'figure', id: 'ch4-f001', src: '/book/figures/4/ch4-f001.jpeg', width: 32, height: 70 },
+  { type: 'figure', id: 'ch4-f999', src: '/book/figures/4/ch4-f999.jpeg', width: 32, height: 70 },
   { type: 'exercise', setId: 'ch1-two-digit-addition' },
 ]
 
@@ -30,7 +30,7 @@ describe('ContentBlocks', () => {
     expect(kids[0]?.innerHTML).toContain('<u>5</u>')
     expect(kids[0]?.getAttribute('data-page')).toBe('12')
     const img = w.find('img')
-    expect(img.attributes('src')).toBe('/book/figures/4/ch4-f001.jpeg')
+    expect(img.attributes('src')).toBe('/book/figures/4/ch4-f999.jpeg')
     expect(img.attributes('width')).toBe('32')
     expect(img.attributes('loading')).toBe('lazy')
     expect(w.text()).toContain('Two-Digit Addition')
