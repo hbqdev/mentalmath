@@ -110,3 +110,14 @@ describe('ReaderView robustness', () => {
     }
   })
 })
+
+describe('PracticeRail in the reader', () => {
+  it('lists book and generated sets for the chapter with kind badges', async () => {
+    const { w } = await mountAt('/read/1')
+    const rail = w.find('aside.rail')
+    expect(rail.exists()).toBe(true)
+    expect(rail.text()).toContain('Two-Digit Addition')
+    expect(rail.text()).toContain('Book set')
+    expect(rail.text()).toContain('Generated')
+  })
+})

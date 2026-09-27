@@ -44,3 +44,18 @@ describe('ContentBlocks', () => {
     expect(w.text()).toMatch(/unlocks|locked/i)
   })
 })
+
+describe('ExerciseCallout links', () => {
+  it('links Book set and Generate to their practice routes once unlocked', async () => {
+    const { useProgress } = await import('@/app/progress')
+    useProgress().state.value.settings.unlockAll = true
+    const w = mount(ContentBlocks, {
+      props: { blocks, chapterId: '1', sectionId: 'two-digit-addition' },
+      global: { plugins: [router] },
+    })
+    expect(w.find('a[href="/practice/1/ch1-two-digit-addition"]').text()).toBe('Book set')
+    const gen = w.find('a[href="/practice/1/gen1-two-digit-addition?mode=generated"]')
+    expect(gen.exists()).toBe(true)
+    expect(gen.text()).toBe('Generate')
+  })
+})
