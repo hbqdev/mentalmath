@@ -1,0 +1,11 @@
+<?xml version='1.0' encoding='utf-8'?>
+<ncx xmlns="http://www.daisy.org/z3986/2005/ncx/" version="2005-1">
+  <navMap>
+    <navPoint id="n1" playOrder="1"><navLabel><text>Foreword by Bill Nye (the Science Guy®)</text></navLabel><content src="text/part0005.html#x1"/></navPoint>
+    <navPoint id="n2" playOrder="2"><navLabel><text>Introduction by Arthur Benjamin</text></navLabel><content src="text/part0008.html#x2"/></navPoint>
+    <navPoint id="n3" playOrder="3"><navLabel><text>Chapter 0 Quick Tricks: Easy (and Impressive) Calculations</text></navLabel><content src="text/part0009_split_000.html#x3"/></navPoint>
+    <navPoint id="n4" playOrder="4"><navLabel><text>Chapter ∞ Epilogue by Michael Shermer: How Math Helps Us Think About Weird Things</text></navLabel><content src="text/part0019.html#x4"/></navPoint>
+    <navPoint id="n5" playOrder="5"><navLabel><text>Answers</text></navLabel><content src="text/part0020.html#x5"/></navPoint>
+    <navPoint id="n6" playOrder="6"><navLabel><text>About the Author</text></navLabel><content src="text/part0022.html#x6"/></navPoint>
+  </navMap>
+</ncx>
