@@ -28,3 +28,8 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+
+# brainstorming companion sessions
+
+# book source, never commit
+*.epub
