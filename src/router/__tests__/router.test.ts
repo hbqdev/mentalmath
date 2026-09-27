@@ -22,9 +22,10 @@ describe('router', () => {
     expect(r.params.chapter).toBe('3')
   })
 
-  it('keeps the legacy exercise route alive until Plan 2', async () => {
+  it('redirects the legacy exercise route to the chapter', async () => {
     const r = await go('/exercises/1/left-to-right-addition')
-    expect(r.name).toBe('legacy-exercise')
+    expect(r.name).toBe('read')
+    expect(r.params.chapter).toBe('1')
   })
 
   it('falls back to not-found for unknown paths', async () => {
