@@ -34,6 +34,13 @@ function submitText() {
   emit('submit', value.value)
 }
 
+/** Enter while answering submits and stops here; while feedback is shown it bubbles up to advance. */
+function onEnterKey(e: KeyboardEvent) {
+  if (props.disabled) return
+  e.stopPropagation()
+  submitText()
+}
+
 function reset() {
   value.value = ''
 }
@@ -58,7 +65,8 @@ defineExpose({ reset, focus })
         {{ o }}
       </button>
     </div>
-    <form v-else class="field" @submit.prevent="submitText">
+    <!-- Implicit form submission is suppressed; Enter is handled on the input so feedback can use it to advance. -->
+    <form v-else class="field" @submit.prevent>
       <input
         ref="el"
         v-model="value"
@@ -69,9 +77,10 @@ defineExpose({ reset, focus })
         spellcheck="false"
         :inputmode="inputMode"
         :placeholder="placeholder"
-        :disabled="disabled"
+        :readonly="disabled"
+        :aria-disabled="disabled"
         aria-label="Your answer"
-        @keyup.enter="submitText"
+        @keyup.enter="onEnterKey"
       />
       <button type="button" data-testid="answer-submit" class="go" :disabled="disabled" @click="submitText">Check</button>
     </form>
@@ -102,7 +111,7 @@ input {
   color: var(--ink);
   text-align: center;
 }
-input:disabled {
+input[readonly] {
   opacity: 0.7;
 }
 .go {

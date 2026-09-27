@@ -1,11 +1,18 @@
 import type { GeneratedSetDef, Rng } from '../types'
 import { MINUS } from './shared'
 
-const estimate = (value: number, relTolerance: number) => ({ kind: 'estimate' as const, value, relTolerance })
+/** Estimate spec whose tolerance always admits the book-method estimate shown in the steps. */
+const estimate = (exact: number, shown: number, base: number) => ({
+  kind: 'estimate' as const,
+  value: exact,
+  relTolerance: Math.max(base, Math.abs(shown - exact) / Math.abs(exact || 1) + 0.005),
+})
 
-/** Round to two significant digits, the book's guesstimation habit. */
+/** The book's rounding habit: two-digit numbers to the nearest 5, larger ones to two significant digits. */
 function round2(n: number): number {
   if (n === 0) return 0
+  if (Math.abs(n) < 20) return n
+  if (Math.abs(n) < 100) return Math.round(n / 5) * 5
   const mag = 10 ** (Math.floor(Math.log10(Math.abs(n))) - 1)
   return Math.round(n / mag) * mag
 }
@@ -31,7 +38,7 @@ export const sets: GeneratedSetDef[] = [
       return {
         difficulty,
         prompt: { kind: 'binary', a, b, op: '+' },
-        answer: estimate(a + b, 0.02),
+        answer: estimate(a + b, ra + rb, 0.02),
         solution: { steps: [`${a} ≈ ${ra}`, `${b} ≈ ${rb}`, `${ra} + ${rb} = ${ra + rb}`, `Exact: ${a + b}`] },
       }
     },
@@ -45,15 +52,15 @@ export const sets: GeneratedSetDef[] = [
     coversBookSets: ['ch5-subtraction-guesstimation'],
     generate(difficulty, rng) {
       const d = difficulty === 'easy' ? 4 : difficulty === 'medium' ? 5 : 7
-      let a = bigNumber(rng, d)
-      let b = bigNumber(rng, rng.int(d - 1, d))
-      if (b >= a) [a, b] = [b + 1, a]
+      const a = bigNumber(rng, d)
+      // keep the difference at least a fifth of a, so a two-digit rounding still lands near the answer
+      const b = rng.int(10 ** (d - 2), Math.floor(a * 0.8))
       const ra = round2(a)
       const rb = round2(b)
       return {
         difficulty,
         prompt: { kind: 'binary', a, b, op: '-' },
-        answer: estimate(a - b, 0.03),
+        answer: estimate(a - b, ra - rb, 0.03),
         solution: { steps: [`${a} ≈ ${ra}`, `${b} ≈ ${rb}`, `${ra} ${MINUS} ${rb} = ${ra - rb}`, `Exact: ${a - b}`] },
       }
     },
@@ -71,11 +78,12 @@ export const sets: GeneratedSetDef[] = [
       const exact = a / b
       const value = Math.round(exact * 10) / 10
       const rb = round2(b)
+      const shown = Math.round((a / rb) * 10) / 10
       return {
         difficulty,
         prompt: { kind: 'binary', a, b, op: '÷' },
-        answer: estimate(value, 0.05),
-        solution: { steps: [`${b} ≈ ${rb}`, `${a} ÷ ${rb} ≈ ${Math.round((a / rb) * 10) / 10}`, `Exact to one decimal: ${value}`] },
+        answer: estimate(value, shown, 0.05),
+        solution: { steps: [`${b} ≈ ${rb}`, `${a} ÷ ${rb} ≈ ${shown}`, `Exact to one decimal: ${value}`] },
       }
     },
   },
@@ -87,14 +95,15 @@ export const sets: GeneratedSetDef[] = [
     description: 'Round one number up and the other down, then multiply.',
     coversBookSets: ['ch5-multiplication-guesstimation'],
     generate(difficulty, rng) {
-      const a = bigNumber(rng, difficulty === 'easy' ? 2 : difficulty === 'medium' ? 3 : 5)
-      const b = bigNumber(rng, difficulty === 'easy' ? 2 : difficulty === 'medium' ? 3 : 4)
+      // easy factors start at 20 so rounding to the nearest 5 means something
+      const a = difficulty === 'easy' ? rng.int(20, 99) : bigNumber(rng, difficulty === 'medium' ? 3 : 5)
+      const b = difficulty === 'easy' ? rng.int(20, 99) : bigNumber(rng, difficulty === 'medium' ? 3 : 4)
       const ra = round2(a)
       const rb = round2(b)
       return {
         difficulty,
         prompt: { kind: 'binary', a, b, op: '×' },
-        answer: estimate(a * b, 0.05),
+        answer: estimate(a * b, ra * rb, 0.05),
         solution: { steps: [`${a} ≈ ${ra}`, `${b} ≈ ${rb}`, `${ra} × ${rb} = ${ra * rb}`, `Exact: ${a * b}`] },
       }
     },
@@ -118,7 +127,7 @@ export const sets: GeneratedSetDef[] = [
       return {
         difficulty,
         prompt: { kind: 'root', radicand, degree: 2 },
-        answer: estimate(value, 0.02),
+        answer: estimate(value, avg, 0.02),
         solution: { steps: [`Guess ${guess} (${guess}² = ${guess * guess})`, `${radicand} ÷ ${guess} ≈ ${q}`, `Average: (${guess} + ${q}) ÷ 2 ≈ ${avg}`, `√${radicand} ≈ ${value}`] },
       }
     },
@@ -135,12 +144,14 @@ export const sets: GeneratedSetDef[] = [
       const cents = difficulty === 'easy' ? 0 : rng.pick([0, 25, 50, 75, rng.int(0, 99)])
       const bill = dollars + cents / 100
       const ten = Math.round(bill * 10) / 100
-      const value = Math.round(bill * percent) / 100
+      const half = Math.round(ten * 50) / 100
+      const value = percent === 15 ? Math.round((ten + half) * 100) / 100 : Math.round(ten * 200) / 100
       const steps =
         percent === 15
-          ? [`10% of ${bill.toFixed(2)} = ${ten.toFixed(2)}`, `Half of that = ${(ten / 2).toFixed(2)}`, `${ten.toFixed(2)} + ${(ten / 2).toFixed(2)} = ${value.toFixed(2)}`]
+          ? [`10% of ${bill.toFixed(2)} = ${ten.toFixed(2)}`, `Half of that = ${half.toFixed(2)}`, `${ten.toFixed(2)} + ${half.toFixed(2)} = ${value.toFixed(2)}`]
           : [`10% of ${bill.toFixed(2)} = ${ten.toFixed(2)}`, `Double it: ${value.toFixed(2)}`]
-      return { difficulty, prompt: { kind: 'percent', percent, of: bill }, answer: { kind: 'decimal', value, tolerance: 0.01 }, solution: { steps } }
+      // The 10%-and-half method lands within a couple of cents of the exact tip; accept both.
+      return { difficulty, prompt: { kind: 'percent', percent, of: bill }, answer: { kind: 'decimal', value, tolerance: 0.02 }, solution: { steps } }
     },
   },
   {
@@ -169,12 +180,12 @@ export const sets: GeneratedSetDef[] = [
     description: 'Rule of 70: years to double ≈ 70 ÷ the interest rate.',
     generate(difficulty, rng) {
       const rate = rng.pick(difficulty === 'easy' ? [5, 7, 10] : difficulty === 'medium' ? [2, 4, 6, 8, 14] : [3, 9, 11, 12, 15])
-      const value = Math.round(70 / rate)
+      const value = Math.round((70 / rate) * 10) / 10
       return {
         difficulty,
         prompt: { kind: 'text', text: `At ${rate}% interest, about how many years does money take to double?` },
-        answer: { kind: 'integer', value },
-        solution: { steps: [`Rule of 70: 70 ÷ ${rate} ≈ ${(70 / rate).toFixed(1)}`, `About ${value} years`] },
+        answer: { kind: 'decimal', value, tolerance: 0.5 },
+        solution: { steps: [`Rule of 70: 70 ÷ ${rate} = ${value}`, `About ${Math.round(value)} years (70 ÷ ${rate} ≈ ${value})`] },
       }
     },
   },
