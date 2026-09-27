@@ -65,6 +65,9 @@ export function extract(bytes: Uint8Array, opts: ExtractOptions): ExtractResult 
       title: parsed.doc.title,
       kicker: parsed.doc.kicker,
       sections: parsed.doc.sections.map((s) => ({ id: s.id, title: s.title })),
+      sets: parsed.doc.sections.flatMap((s) =>
+        s.blocks.flatMap((b) => (b.type === 'exercise' ? [{ id: b.setId, sectionId: s.id }] : [])),
+      ),
     })
     result.units.push({
       id: plan.id,

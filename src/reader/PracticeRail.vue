@@ -1,11 +1,17 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useProgress } from '@/app/progress'
-import { practiceSetsFor } from '@/practice/registry'
+import { allSetsFor } from '@/exercises/registry'
 
 const props = defineProps<{ chapterId: string }>()
 const { bestScore, isUnlocked } = useProgress()
-const sets = computed(() => practiceSetsFor(props.chapterId))
+const sets = computed(() =>
+  allSetsFor(props.chapterId).map((s) =>
+    s.kind === 'book'
+      ? { id: s.ref.id, sectionId: s.ref.sectionId, title: s.ref.title, kind: 'book' as const }
+      : { id: s.def.id, sectionId: s.def.sectionId, title: s.def.title, kind: 'generated' as const },
+  ),
+)
 </script>
 
 <template>
@@ -20,10 +26,7 @@ const sets = computed(() => practiceSetsFor(props.chapterId))
         :class="{ locked: !isUnlocked(chapterId, s.sectionId) }"
       >
         <strong>{{ s.kind === 'book' ? '📖 ' : '' }}{{ s.title }}</strong>
-        <span class="meta"
-          >{{ s.kind === 'book' ? 'Book set' : 'Generated'
-          }}<template v-if="s.count"> · {{ s.count }} problems</template></span
-        >
+        <span class="meta">{{ s.kind === 'book' ? 'Book set' : 'Generated' }}</span>
         <span v-if="bestScore(s.id) !== undefined" class="meta">Best {{ bestScore(s.id) }}</span>
         <RouterLink
           v-if="isUnlocked(chapterId, s.sectionId)"

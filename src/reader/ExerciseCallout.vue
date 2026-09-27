@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useProgress } from '@/app/progress'
-import { setTitle } from '@/practice/registry'
+import { setTitle } from '@/exercises/registry'
 
 const props = defineProps<{ setId: string; chapterId: string; sectionId: string }>()
 const { isUnlocked } = useProgress()
