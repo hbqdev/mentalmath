@@ -1,7 +1,7 @@
 import type { BookSetData } from '@/exercises/bookSets'
 import { add, sub } from './helpers'
 
-// Prompts from figures ch1-f008, f024/f025, f031, f050; answers and steps are the book's own
+// Prompts from figures ch1-f008, f024/f025, f033, f052; answers and steps are the book's own
 // (Answers section, chapter 1, given as text in the EPUB).
 export const sets: BookSetData[] = [
   {
@@ -29,7 +29,12 @@ export const sets: BookSetData[] = [
       add(5, 912, 475, ['912 + 400 = 1312', '1312 + 70 = 1382', '1382 + 5 = 1387']),
       add(6, 852, 378, ['852 + 300 = 1152', '1152 + 70 = 1222', '1222 + 8 = 1230']),
       add(7, 457, 269, ['457 + 200 = 657', '657 + 60 = 717', '717 + 9 = 726']),
-      add(8, 878, 797, ['878 + 700 = 1578', '1578 + 90 = 1668', '1668 + 7 = 1675', 'or 878 + 800 − 3 = 1678 − 3 = 1675']),
+      add(8, 878, 797, [
+        '878 + 700 = 1578',
+        '1578 + 90 = 1668',
+        '1668 + 7 = 1675',
+        'or 878 + 800 − 3 = 1678 − 3 = 1675',
+      ]),
       add(9, 276, 689, ['276 + 600 = 876', '876 + 80 = 956', '956 + 9 = 965']),
       add(10, 877, 539, ['877 + 500 = 1377', '1377 + 30 = 1407', '1407 + 9 = 1416']),
       add(11, 5400, 252, ['5400 + 200 = 5600', '5600 + 52 = 5652']),

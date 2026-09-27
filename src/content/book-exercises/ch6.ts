@@ -6,8 +6,15 @@ export const sets: BookSetData[] = [
   {
     id: 'ch6-columns-of-numbers',
     problems: [
-      columns(1, [672, 1367, 107, 7845, 358, 210, 916], ['Mod sums: 6, 8, 8, 6, 7, 3, 7 → 45 → 9', 'Total 11,475 has mod sum 9 ✓']),
-      colCents(2, [21.56, 19.38, 211.02, 9.16, 26.17, 1.43], 288.72, ['Mod sums of the digits: 5, 3, 6, 7, 7, 3 → 31 → 4', 'Digits of 28872 → 27 → 9; the book\u2019s check uses the cents as digits']),
+      columns(
+        1,
+        [672, 1367, 107, 7845, 358, 210, 916],
+        ['Mod sums: 6, 8, 8, 6, 7, 3, 7 → 45 → 9', 'Total 11,475 has mod sum 9 ✓'],
+      ),
+      colCents(2, [21.56, 19.38, 211.02, 9.16, 26.17, 1.43], 288.72, [
+        'Mod sums of the digits: 5, 3, 6, 7, 7, 3 → 31 → 4',
+        'Mod-sum check per the book',
+      ]),
     ],
   },
   {
@@ -22,10 +29,31 @@ export const sets: BookSetData[] = [
   {
     id: 'ch6-square-root-guesstimation',
     problems: [
-      sqrtExact(1, 15, 3.87, ['3² = 9, remainder 6 → 600', '68 × 8 = 544, remainder 56 → 5600', '767 × 7 = 5369', '√15 ≈ 3.87']),
-      sqrtExact(2, 502, 22.4, ['2² = 4, remainder 1 → 102', '42 × 2 = 84, remainder 18 → 1800', '444 × 4 = 1776, remainder 24 → 2400', '4480 × 0 = 0', '√502 ≈ 22.40']),
-      sqrtExact(3, 439.2, 20.95, ['2² = 4, remainder 0 → 039', '40 × 0 = 0 → 3920', '409 × 9 = 3681, remainder 239 → 23900', '4185 × 5 = 20925', '√439.2 ≈ 20.95']),
-      sqrtExact(4, 361, 19, ['1² = 1, remainder 2 → 261', '29 × 9 = 261, remainder 0', '√361 = 19 exactly']),
+      sqrtExact(1, 15, 3.87, [
+        '3² = 9, remainder 6 → 600',
+        '68 × 8 = 544, remainder 56 → 5600',
+        '767 × 7 = 5369',
+        '√15 ≈ 3.87',
+      ]),
+      sqrtExact(2, 502, 22.4, [
+        '2² = 4, remainder 1 → 102',
+        '42 × 2 = 84, remainder 18 → 1800',
+        '444 × 4 = 1776, remainder 24 → 2400',
+        '4480 × 0 = 0',
+        '√502 ≈ 22.40',
+      ]),
+      sqrtExact(3, 439.2, 20.95, [
+        '2² = 4, remainder 0 → 039',
+        '40 × 0 = 0 → 3920',
+        '409 × 9 = 3681, remainder 239 → 23900',
+        '4185 × 5 = 20925',
+        '√439.2 ≈ 20.95',
+      ]),
+      sqrtExact(4, 361, 19, [
+        '1² = 1, remainder 2 → 261',
+        '29 × 9 = 261, remainder 0',
+        '√361 = 19 exactly',
+      ]),
     ],
   },
   {

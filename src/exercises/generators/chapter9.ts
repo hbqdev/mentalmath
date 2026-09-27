@@ -178,7 +178,7 @@ export const sets: GeneratedSetDef[] = [
           : difficulty === 'medium'
             ? randomIso(rng, 1900, 1999)
             : (() => {
-                const c = rng.pick([1600, 1700, 1800, 2100, 2200, 2300])
+                const c = rng.pick([1800, 2100, 2200, 2300]) // Gregorian only: the book's method starts after 1752
                 return randomIso(rng, c, c + 99)
               })()
       return {
