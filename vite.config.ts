@@ -11,14 +11,7 @@ export default defineConfig({
     vueDevTools(),
     VitePWA({
       registerType: 'autoUpdate',
-      // Public-dir files to precache besides the built bundle: every figure image and the icons.
-      includeAssets: [
-        'favicon.svg',
-        'favicon.ico',
-        'book-cover.jpg',
-        'icons/*.png',
-        'book/figures/**/*.jpeg',
-      ],
+      // Everything under public/ (figures, icons) is precached through workbox.globPatterns below.
       manifest: {
         name: 'Mental Math Trainer',
         short_name: 'MentalMath',

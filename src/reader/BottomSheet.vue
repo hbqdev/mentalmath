@@ -15,19 +15,26 @@ function onKey(e: KeyboardEvent) {
 watch(
   () => props.open,
   async (open) => {
+    const app = document.getElementById('app')
     if (open) {
       opener = document.activeElement instanceof HTMLElement ? document.activeElement : null
       window.addEventListener('keydown', onKey)
+      app?.setAttribute('inert', '') // the page behind the sheet is out of the tab order while it is open
       await nextTick()
       closeBtn.value?.focus()
     } else {
       window.removeEventListener('keydown', onKey)
+      app?.removeAttribute('inert')
       opener?.focus()
       opener = null
     }
   },
+  { immediate: true },
 )
-onBeforeUnmount(() => window.removeEventListener('keydown', onKey))
+onBeforeUnmount(() => {
+  window.removeEventListener('keydown', onKey)
+  document.getElementById('app')?.removeAttribute('inert')
+})
 </script>
 
 <template>

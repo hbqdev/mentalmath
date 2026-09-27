@@ -5,16 +5,16 @@ defineProps<{ spec: FigureSpec }>()
 
 <template>
   <!-- column: label | op | value | note -->
-  <div v-if="spec.kind === 'column'" class="fl column" role="math">
+  <div v-if="spec.kind === 'column'" class="fl column">
     <template v-for="(line, i) in spec.lines" :key="i">
       <span class="lbl">{{ line.label ?? '' }}</span>
       <span class="op" :class="{ rule: line.rule }">{{ line.op ?? '' }}</span>
-      <span class="value" :class="{ rule: line.rule }">{{ line.value }}</span>
+      <span class="value" :class="{ rule: line.rule, carry: line.carry }">{{ line.value }}</span>
       <span class="note">{{ line.note ?? '' }}</span>
     </template>
   </div>
 
-  <div v-else-if="spec.kind === 'chain'" class="fl chain" role="math">
+  <div v-else-if="spec.kind === 'chain'" class="fl chain">
     <template v-for="(step, i) in spec.steps" :key="i">
       <span v-if="i === 0" class="step">{{ step }}</span>
       <span v-else class="link">
@@ -44,15 +44,15 @@ defineProps<{ spec: FigureSpec }>()
     </tbody>
   </table>
 
-  <div v-else-if="spec.kind === 'split'" class="fl split" role="math">
+  <div v-else-if="spec.kind === 'split'" class="fl split">
     <span class="base">{{ spec.base }}</span>
     <svg class="fan out" viewBox="0 0 40 40" aria-hidden="true">
       <line x1="2" y1="20" x2="34" y2="6" />
       <polygon points="36,5 32.2,8.8 30.6,5.2" />
       <line x1="2" y1="20" x2="34" y2="34" />
       <polygon points="36,35 32.2,31.2 30.6,34.8" />
-      <text x="17" y="8">{{ spec.upLabel }}</text>
-      <text x="17" y="38">{{ spec.downLabel }}</text>
+      <text x="16" y="9">{{ spec.upLabel }}</text>
+      <text x="16" y="39">{{ spec.downLabel }}</text>
     </svg>
     <span class="branches">
       <span class="branch">{{ spec.up }}</span>
@@ -69,7 +69,7 @@ defineProps<{ spec: FigureSpec }>()
     </template>
   </div>
 
-  <div v-else-if="spec.kind === 'eleven'" class="fl eleven" role="math">
+  <div v-else-if="spec.kind === 'eleven'" class="fl eleven">
     <span class="col">
       <span class="value">{{ spec.n }}</span>
       <span class="value rule">× 11</span>
@@ -133,6 +133,12 @@ small,
 .column .value {
   text-align: right;
   padding-right: 0.1em;
+}
+.column .carry {
+  font-size: 0.7em;
+  line-height: 1;
+  color: var(--muted);
+  white-space: pre;
 }
 .column .rule {
   border-bottom: 0.09em solid currentColor;
@@ -246,8 +252,8 @@ small,
   fill: var(--muted);
   stroke: none;
   font-family: var(--font-sans);
-  font-size: 8.5px;
-  font-weight: 400;
+  font-size: 11px;
+  font-weight: 500;
   text-anchor: middle;
 }
 .split .branches {
@@ -332,6 +338,10 @@ small,
   .split .fan {
     width: 2.2em;
     height: 2.2em;
+  }
+  .table.grid td,
+  .table.grid th {
+    padding: 0.12em 0.3em;
   }
 }
 </style>

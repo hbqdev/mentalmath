@@ -248,7 +248,7 @@ test.describe('screenshots', () => {
         page,
         info,
         '/read/3/2-by-2-multiplication-problems',
-        'ch3-f024',
+        'ch3-f025',
         'chapter-3-or-routes',
       )
       await figureShot(
