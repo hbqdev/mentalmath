@@ -1,0 +1,753 @@
+{
+  "id": "4",
+  "number": 4,
+  "title": "Divide and Conquer: Mental Division",
+  "kicker": "Chapter 4",
+  "sections": [
+    {
+      "id": "overview",
+      "title": "Overview",
+      "blocks": [
+        {
+          "type": "html",
+          "html": "<p>Mental division is a particularly handy skill to have, both in business and in daily life. How many times a week are you confronted with situations that call on you to evenly divide things, such as a check at a restaurant? This same skill comes in handy when you want to figure out the cost per unit of a case of dog food on sale, or to split the pot in poker, or to figure out how many gallons of gas you can buy with a $20 bill. The ability to divide in your head can save you the inconvenience of having to pull out a calculator every time you need to compute something.</p><p>With mental division, the left-to-right method of calculation comes into its own. This is the same method we all learned in school, so you will be doing what comes naturally. I remember as a kid thinking that this left-to-right method of division is the way all arithmetic should be done. I have often speculated that if the schools could have figured out a way to teach division right-to-left, they probably would have done so!</p>",
+          "page": 80
+        }
+      ]
+    },
+    {
+      "id": "one-digit-division",
+      "title": "One-Digit Division",
+      "blocks": [
+        {
+          "type": "html",
+          "html": "<p>The first step when dividing mentally is to figure out how many digits will be in your answer. To see what I mean, try on the following problem for size:</p><p class=\"center\"><strong>179 ÷ 7</strong></p><p>To solve 179 ÷ 7, we’re looking for a number, <em>Q</em>, such that 7 times <em>Q</em> is 179. Now, since 179 lies between 7 × 10 = 70 and 7 × 100 = 700, <em>Q</em> must lie between 10 and 100, which means our answer must be a two-digit number. Knowing that, we first determine the largest multiple of 10 that can be multiplied by 7 whose answer is below 179. We know that 7 × 20 = 140 and 7 × 30 = 210, so our answer must be in the twenties. At this point we can actually <em>say</em> the number 20 since that part of our answer will certainly not change. Next we subtract 179 − 140 = 39. Our problem has now been reduced to the division problem 39 ÷ 7. Since 7 × 5 = 35, which is 4 away from 39, we have the rest of our answer, namely 5 with a remainder of 4, or 5 and <img src=\"/book/figures/4/ch4-f001.jpeg\" width=\"11\" height=\"25\" alt=\"\" class=\"inline\">. Altogether, we have our answer, 25 with a remainder of 4, or if you prefer, 25<img src=\"/book/figures/4/ch4-f002.jpeg\" width=\"11\" height=\"25\" alt=\"\" class=\"inline\">. Here’s what the process looks like:</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f003",
+          "src": "/book/figures/4/ch4-f003.jpeg",
+          "width": 371,
+          "height": 220
+        },
+        {
+          "type": "html",
+          "html": "<p>Let’s try a similar division problem using the same method of mental computation:</p><p class=\"center\"><strong>675</strong> ÷ <strong>8</strong></p><p>As before, since 675 falls between 8 × 10 = 80 and 8 × 100 = 800, your answer must be below 100 and therefore is a two-digit number. To divide 8 into 675, notice that 8 × 80 = 640 and 8 × 90 = 720. Therefore, your answer is 80 something. But what is that “something”? To find out, subtract 640 from 675 for a remainder of 35. After saying the 80, our problem has been reduced to 35 ÷ 8. Since 8 × 4 = 32, the final answer is 84 with a remainder of 3, or 84⅜. We illustrate this problem as follows:</p>",
+          "page": 82
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f004",
+          "src": "/book/figures/4/ch4-f004.jpeg",
+          "width": 371,
+          "height": 218
+        },
+        {
+          "type": "html",
+          "html": "<p>Like most mental calculations, division can be thought of as a process of simplification. The more you calculate, the simpler the problem becomes. What began as 675 ÷ 8 was simplified to a smaller problem, 35 ÷ 8.</p><p>Now let’s try a division problem that results in a three-digit answer:</p><p class=\"center\"><strong>947</strong> ÷ <strong>4</strong></p><p>This time, your answer will have three digits because 947 falls between 4 × 100 = 400 and 4 × 1000 = 4000. Thus we must first find the largest multiple of 100 that can be <em>squeezed</em> into 947. Since 4 × 200 = 800, our answer is definitely in the 200s, so go ahead and say it! Subtracting 800 from 947 gives us our new division problem, 147 ÷ 4. Since 4 × 30 = 120, we can now say the 30. After subtracting 120 from 147, we compute 27 ÷ 4 to obtain the rest of the answer: 6 with a remainder of 3. Altogether, we have 236 with a remainder of 3, or 236¾.</p>",
+          "page": 83
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f005",
+          "src": "/book/figures/4/ch4-f005.jpeg",
+          "width": 220,
+          "height": 289
+        },
+        {
+          "type": "html",
+          "html": "<p>The process is just as easy when dividing a one-digit number into a four-digit number, as in our next example.</p><p class=\"center\"><strong>2196</strong> ÷ <strong>5</strong></p><p>Here the answer will be in the hundreds because 2196 is between 5 <strong>×</strong> 100 = 500 and 5 <strong>×</strong> 1000 = 5000. After subtracting 5 <strong>×</strong> 400 = 2000, we can say the 400, and our problem has reduced to 196 ÷ 5, which can be solved as in the previous examples.</p>",
+          "page": 84
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f006",
+          "src": "/book/figures/4/ch4-f006.jpeg",
+          "width": 128,
+          "height": 272
+        },
+        {
+          "type": "html",
+          "html": "<p>Actually, there is a much easier way to solve this last problem. We can simplify our problem by doubling both numbers. Since 2196 × 2 = 4392, we have 2196 ÷ 5 = 4392 ÷ 10 = 439.2 or <img src=\"/book/figures/4/ch4-f007.jpeg\" width=\"49\" height=\"25\" alt=\"\" class=\"inline\">. We’ll see more division shortcuts in the next section.</p>"
+        },
+        {
+          "type": "exercise",
+          "setId": "ch4-one-digit-division"
+        }
+      ]
+    },
+    {
+      "id": "the-rule-of-thumb",
+      "title": "The Rule of “thumb”",
+      "blocks": [
+        {
+          "type": "html",
+          "html": "<p>When dividing in your head instead of on paper, you may find it difficult to remember parts of the answer as you continue to calculate. One option, as you’ve seen, is to say the answer out loud as you go. But for greater dramatic effect, you may prefer, as I do, to hold the answer on your fingers and say it all together at the end. In that case, you may run into problems remembering digits greater than five if, like most of us, you have only five fingers on each hand. The solution is to use a special technique, based on sign language, which I call the Rule of “Thumb.” It is most effective for remembering three-digit and greater numbers. This technique not only is useful in this chapter but also will come in handy (pardon the pun) in subsequent chapters dealing with larger problems and longer numbers to remember.</p><p>You already know that to represent numbers 0 through 5, all you have to do is raise the equivalent number of fingers on your hand. When you get your thumb involved, it’s just as easy to represent numbers 6 through 9. Here are the Rules of “Thumb”:</p><div class=\"block\"><p class=\"hanging\">• To hold on to 6, place your thumb on top of your pinky.</p><p class=\"hanging\">• To hold on to 7, place your thumb on top of your ring finger.</p><p class=\"hanging\">• To hold on to 8, place your thumb on top of your middle finger.</p><p class=\"hanging\">• To hold on to 9, place your thumb on top of your index finger.</p></div><p>With three-digit answers, hold the hundreds digit on your left hand and the tens digit on your right. When you get to the ones digit, you’ve reached the end of the problem (except for a possible remainder). Now say the number on your left hand, the number on your right hand, the one-digit you’ve just computed, and the remainder (in your head). Presto—you’ve said your answer!</p><p>For practice, try to compute the following four-digit division problem:</p>",
+          "page": 85
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f009",
+          "src": "/book/figures/4/ch4-f009.jpeg",
+          "width": 128,
+          "height": 301
+        },
+        {
+          "type": "html",
+          "html": "<p>In using the Rule of “Thumb” to remember the answer, you’ll hold the 7 on your left hand by placing your thumb and ring finger together and the 6 on your right hand by placing your thumb and little finger together. Once you’ve calculated the ones digit (which is 3) and the remainder (which is 1), you can “read” the final answer off your hands from left to right: “seven … six … three with a remainder of one, or one-sixth.”</p><p>Some four-digit division problems yield four-digit answers. In that case, since you have only two hands, you will have to say the thousands digit of the answer out loud and use the rule of thumb to remember the rest of the answer. For example:</p><p class=\"center\"><strong>8352</strong> ÷ <strong>3</strong></p>",
+          "page": 86
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f010",
+          "src": "/book/figures/4/ch4-f010.jpeg",
+          "width": 119,
+          "height": 361
+        },
+        {
+          "type": "html",
+          "html": "<p>For this problem, you divide 3 into 8 to get your thousands digit of 2, say “two thousand” out loud, then divide 3 into 2352 in the usual way.</p>"
+        }
+      ]
+    },
+    {
+      "id": "two-digit-division",
+      "title": "Two-Digit Division",
+      "blocks": [
+        {
+          "type": "html",
+          "html": "<p>This section assumes you already have mastered the art of dividing by a one-digit number. Naturally, division problems become harder as the number you divide by gets larger. Fortunately, I have some magic up my sleeve to make your life easier.</p><p>Let’s start with a relatively easy problem first:</p><p class=\"center\"><strong>597</strong> ÷ <strong>14</strong></p><p>Since 597 lies between 14 × 10 and 14 × 100, the answer (also called the quotient) lies between 10 and 100. To determine the answer, your first step is to ask how many times 14 goes into 590. Because 14 × 40 = 560, you know that the answer is 40 something, and so you can say “forty” out loud.</p><p>Next, subtract 560 from 597, which is 37 and reduces your problem to dividing 14 into 37. Since 14 × 2 = 28, your answer is 42. Subtracting 28 from 37 leaves you a remainder of 9. The process of deriving the solution to this problem may be illustrated as follows:</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f011",
+          "src": "/book/figures/4/ch4-f011.jpeg",
+          "width": 128,
+          "height": 216
+        },
+        {
+          "type": "html",
+          "html": "<p>The following problem is slightly harder because the two-digit divisor (here 23) is larger.</p><p class=\"center\"><strong>682</strong> ÷ <strong>23</strong></p><p>In this problem, the answer is a two-digit number because 682 falls between 23 × 10 = 230 and 23 × 100 = 2300. To figure out the tens digit of the two-digit answer, you need to ask how many times 23 goes into 680. If you try 30, you’ll see that it’s slightly too much, as 30 × 23 = 690. Now you know that the answer is 20 something, and you can say so. Then subtract 23 × 20 = 460 from 682 to obtain 222. Since 23 × 9 = 207, the answer is 29 with a remainder of 222 − 207 = 15.</p>",
+          "page": 88
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f012",
+          "src": "/book/figures/4/ch4-f012.jpeg",
+          "width": 128,
+          "height": 218
+        },
+        {
+          "type": "html",
+          "html": "<p>Now consider:</p><p class=\"center\"><strong>491</strong> ÷ <strong>62</strong></p><p>Since 491 is less than 62 × 10 = 620, your answer will simply be a one-digit number with a remainder. You might guess 8, but 62 × 8 = 496, which is a little high. Since 62 × 7 = 434, the answer is 7 with a remainder of 491 − 434 = 57, or</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f013",
+          "src": "/book/figures/4/ch4-f013.jpeg",
+          "width": 58,
+          "height": 98
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f014",
+          "src": "/book/figures/4/ch4-f014.jpeg",
+          "width": 118,
+          "height": 40
+        },
+        {
+          "type": "html",
+          "html": "<p>Actually, there’s a nifty trick to make problems like this easier. Remember how you first tried multiplying 62 × 8, but found it came out a little high at 496? Well, that wasn’t a wasted effort. Aside from knowing that the answer is 7, you can also compute the remainder right away. Since 496 is 5 more than 491, the remainder will be 5 less than 62, the divisor. Since 62 − 5 = 57, your answer is 7<img src=\"/book/figures/4/ch4-f015.jpeg\" width=\"18\" height=\"25\" alt=\"\" class=\"inline\">. The reason this trick works is because 491 = (62 × 8) − 5 = 62 × (7 + 1) − 5 = (62 × 7 + 62) − 5 = (62 × 7) + (62 − 5) = 62 × 7 + 57.</p><p>Now try 380 ÷ 39 using the shortcut we just learned. So 39 <strong>×</strong> 10 = 390, which is too high by 10. Hence the answer is 9 with a remainder of 39 − 10 = 29.</p><p>Your next challenge is to divide a two-digit number into a four-digit number:</p><p class=\"center\"><strong>3657</strong> ÷ <strong>54</strong></p><p>Since 54 × 100 = 5400, you know your answer will be a two-digit number. To arrive at the first digit of the answer, you need to figure how many times 54 goes into 3657. Since 54 × 70 = 3780 is a little high, you know the answer must be 60 something.</p><p>Next, multiply 54 × 60 = 3240 and subtract 3657 − 3240 = 417. Once you say the 60, your problem has been simplified to 417 ÷ 54. Since 54 × 8 = 432 is a little too high, your last digit is 7 with the remainder 54 − 15 = 39.</p>",
+          "page": 90
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f016",
+          "src": "/book/figures/4/ch4-f016.jpeg",
+          "width": 128,
+          "height": 224
+        },
+        {
+          "type": "html",
+          "html": "<p>Now try your hand at a problem with a three-digit answer:</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f017",
+          "src": "/book/figures/4/ch4-f017.jpeg",
+          "width": 138,
+          "height": 323
+        },
+        {
+          "type": "html",
+          "html": "<h3>Simplifying Division Problems</h3><p>If by this point you’re suffering from brain strain, relax. As promised, I want to share with you a couple of tricks for simplifying certain mental division problems. These tricks are based on the principle of dividing both parts of the problem by a common factor. If both numbers in the problem are even numbers, you can make the problem twice as easy by dividing each number by 2 before you begin. For example, 858 ÷ 16 has two even numbers, and dividing each by 2 yields the much simpler problem of 429 ÷ 8:</p>",
+          "page": 91
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f018",
+          "src": "/book/figures/4/ch4-f018.jpeg",
+          "width": 429,
+          "height": 221
+        },
+        {
+          "type": "html",
+          "html": "<p>As you can see, the remainders 10 and 5 are not the same; but if you write the remainder in the form of a fraction, you get that <img src=\"/book/figures/4/ch4-f019.jpeg\" width=\"17\" height=\"25\" alt=\"\" class=\"inline\">is the same as ⅝. Therefore, when using this method, you must always express the answer in fractional form.</p><p>We’ve done both sets of calculations for you to see how much easier it is. Now you try one for practice:</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f020",
+          "src": "/book/figures/4/ch4-f020.jpeg",
+          "width": 375,
+          "height": 230
+        },
+        {
+          "type": "html",
+          "html": "<p>The problem on the right is much easier to calculate mentally. If you’re really alert, you could divide both sides of the original problem by 18 to arrive at an even simpler problem: 201 ÷ 3 = 67.</p><p>Watch for problems that can be divided by 2 twice, such as 1652 ÷ 36:</p>",
+          "page": 92
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f021",
+          "src": "/book/figures/4/ch4-f021.jpeg",
+          "width": 511,
+          "height": 211
+        },
+        {
+          "type": "html",
+          "html": "<p>I usually find it easier to divide the problem by 2 twice than to divide both numbers by 4. Next, when both numbers end in 0, you can divide each by 10:</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f022",
+          "src": "/book/figures/4/ch4-f022.jpeg",
+          "width": 331,
+          "height": 154
+        },
+        {
+          "type": "html",
+          "html": "<p>But if both numbers end in 5, double them and then divide both by 10 to simplify the problem. For example:</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f023",
+          "src": "/book/figures/4/ch4-f023.jpeg",
+          "width": 484,
+          "height": 155
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f024",
+          "src": "/book/figures/4/ch4-f024.jpeg",
+          "width": 117,
+          "height": 40
+        },
+        {
+          "type": "html",
+          "html": "<p>Finally, if the divisor ends in 5 and the number you’re dividing into ends in 0, multiply both by 2 and then divide by 10, just as you did above:</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f025",
+          "src": "/book/figures/4/ch4-f025.jpeg",
+          "width": 521,
+          "height": 218
+        },
+        {
+          "type": "html",
+          "html": "<p class=\"center\"><span class=\"boxed\">EXERCISE:TWO-DIGIT DIVISION</span></p><p>Here you’ll find a variety of two-digit division problems that will test your mental prowess, using the simplification techniques explained earlier in this chapter. Check the end of the book for answers and explanations.</p>"
+        },
+        {
+          "type": "exercise",
+          "setId": "ch4-two-digit-division"
+        }
+      ]
+    },
+    {
+      "id": "matching-wits-with-a-calculator-learning-decimalization",
+      "title": "Matching Wits with a Calculator:learning Decimalization",
+      "blocks": [
+        {
+          "type": "html",
+          "html": "<p>As you might guess, I like to work some magic when I convert fractions to decimals. In the case of one-digit fractions, the best way is to commit the following fractions—from halves through elevenths—to memory. This isn’t as hard as it sounds. As you’ll see below, most one-digit fractions have special properties that make them hard to forget. Anytime you can reduce a fraction to one you already know, you’ll speed up the process.</p><p>Chances are you already know the decimal equivalent of the following fractions:</p>",
+          "page": 94
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f027",
+          "src": "/book/figures/4/ch4-f027.jpeg",
+          "width": 409,
+          "height": 42
+        },
+        {
+          "type": "html",
+          "html": "<p>Likewise:</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f028",
+          "src": "/book/figures/4/ch4-f028.jpeg",
+          "width": 388,
+          "height": 40
+        },
+        {
+          "type": "html",
+          "html": "<p>The fifths are easy to remember:</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f029",
+          "src": "/book/figures/4/ch4-f029.jpeg",
+          "width": 428,
+          "height": 40
+        },
+        {
+          "type": "html",
+          "html": "<p>The sixths require memorizing only two new answers:</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f030",
+          "src": "/book/figures/4/ch4-f030.jpeg",
+          "width": 527,
+          "height": 123
+        },
+        {
+          "type": "html",
+          "html": "<p>I’ll return to the sevenths in a moment. The eighths are a breeze:</p>"
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f031",
+          "src": "/book/figures/4/ch4-f031.jpeg",
+          "width": 527,
+          "height": 123
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f032",
+          "src": "/book/figures/4/ch4-f032.jpeg",
+          "width": 527,
+          "height": 125
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f033",
+          "src": "/book/figures/4/ch4-f033.jpeg",
+          "width": 524,
+          "height": 125
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f034",
+          "src": "/book/figures/4/ch4-f034.jpeg",
+          "width": 528,
+          "height": 209
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f035",
+          "src": "/book/figures/4/ch4-f035.jpeg",
+          "width": 17,
+          "height": 25
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f036",
+          "src": "/book/figures/4/ch4-f036.jpeg",
+          "width": 524,
+          "height": 124
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f037",
+          "src": "/book/figures/4/ch4-f037.jpeg",
+          "width": 385,
+          "height": 104
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f038",
+          "src": "/book/figures/4/ch4-f038.jpeg",
+          "width": 11,
+          "height": 25
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f039",
+          "src": "/book/figures/4/ch4-f039.jpeg",
+          "width": 524,
+          "height": 105
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f040",
+          "src": "/book/figures/4/ch4-f040.jpeg",
+          "width": 11,
+          "height": 25
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f041",
+          "src": "/book/figures/4/ch4-f041.jpeg",
+          "width": 10,
+          "height": 25
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f042",
+          "src": "/book/figures/4/ch4-f042.jpeg",
+          "width": 18,
+          "height": 25
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f043",
+          "src": "/book/figures/4/ch4-f043.jpeg",
+          "width": 17,
+          "height": 25
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f044",
+          "src": "/book/figures/4/ch4-f044.jpeg",
+          "width": 17,
+          "height": 25
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f045",
+          "src": "/book/figures/4/ch4-f045.jpeg",
+          "width": 91,
+          "height": 40
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f046",
+          "src": "/book/figures/4/ch4-f046.jpeg",
+          "width": 20,
+          "height": 25
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f047",
+          "src": "/book/figures/4/ch4-f047.jpeg",
+          "width": 105,
+          "height": 102
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f048",
+          "src": "/book/figures/4/ch4-f048.jpeg",
+          "width": 344,
+          "height": 62
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f049",
+          "src": "/book/figures/4/ch4-f049.jpeg",
+          "width": 376,
+          "height": 174
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f050",
+          "src": "/book/figures/4/ch4-f050.jpeg",
+          "width": 71,
+          "height": 98
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f051",
+          "src": "/book/figures/4/ch4-f051.jpeg",
+          "width": 18,
+          "height": 25
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f052",
+          "src": "/book/figures/4/ch4-f052.jpeg",
+          "width": 11,
+          "height": 25
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f053",
+          "src": "/book/figures/4/ch4-f053.jpeg",
+          "width": 18,
+          "height": 25
+        },
+        {
+          "type": "exercise",
+          "setId": "ch4-decimalization"
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f056",
+          "src": "/book/figures/4/ch4-f056.jpeg",
+          "width": 10,
+          "height": 25
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f057",
+          "src": "/book/figures/4/ch4-f057.jpeg",
+          "width": 304,
+          "height": 25
+        },
+        {
+          "type": "exercise",
+          "setId": "ch4-testing-for-divisibility"
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f060",
+          "src": "/book/figures/4/ch4-f060.jpeg",
+          "width": 342,
+          "height": 41
+        },
+        {
+          "type": "exercise",
+          "setId": "ch4-multiplying-fractions"
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f062",
+          "src": "/book/figures/4/ch4-f062.jpeg",
+          "width": 11,
+          "height": 25
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f063",
+          "src": "/book/figures/4/ch4-f063.jpeg",
+          "width": 220,
+          "height": 112
+        },
+        {
+          "type": "exercise",
+          "setId": "ch4-dividing-fractions"
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f066",
+          "src": "/book/figures/4/ch4-f066.jpeg",
+          "width": 11,
+          "height": 25
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f067",
+          "src": "/book/figures/4/ch4-f067.jpeg",
+          "width": 11,
+          "height": 25
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f068",
+          "src": "/book/figures/4/ch4-f068.jpeg",
+          "width": 11,
+          "height": 25
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f069",
+          "src": "/book/figures/4/ch4-f069.jpeg",
+          "width": 11,
+          "height": 25
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f070",
+          "src": "/book/figures/4/ch4-f070.jpeg",
+          "width": 10,
+          "height": 25
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f071",
+          "src": "/book/figures/4/ch4-f071.jpeg",
+          "width": 11,
+          "height": 25
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f072",
+          "src": "/book/figures/4/ch4-f072.jpeg",
+          "width": 11,
+          "height": 25
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f073",
+          "src": "/book/figures/4/ch4-f073.jpeg",
+          "width": 11,
+          "height": 25
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f074",
+          "src": "/book/figures/4/ch4-f074.jpeg",
+          "width": 10,
+          "height": 25
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f075",
+          "src": "/book/figures/4/ch4-f075.jpeg",
+          "width": 17,
+          "height": 25
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f076",
+          "src": "/book/figures/4/ch4-f076.jpeg",
+          "width": 11,
+          "height": 25
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f077",
+          "src": "/book/figures/4/ch4-f077.jpeg",
+          "width": 17,
+          "height": 25
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f078",
+          "src": "/book/figures/4/ch4-f078.jpeg",
+          "width": 11,
+          "height": 25
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f079",
+          "src": "/book/figures/4/ch4-f079.jpeg",
+          "width": 120,
+          "height": 25
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f080",
+          "src": "/book/figures/4/ch4-f080.jpeg",
+          "width": 172,
+          "height": 40
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f081",
+          "src": "/book/figures/4/ch4-f081.jpeg",
+          "width": 182,
+          "height": 112
+        },
+        {
+          "type": "exercise",
+          "setId": "ch4-simplifying-fractions"
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f085",
+          "src": "/book/figures/4/ch4-f085.jpeg",
+          "width": 328,
+          "height": 41
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f086",
+          "src": "/book/figures/4/ch4-f086.jpeg",
+          "width": 161,
+          "height": 40
+        },
+        {
+          "type": "exercise",
+          "setId": "ch4-adding-fractions-equal-denominators"
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f088",
+          "src": "/book/figures/4/ch4-f088.jpeg",
+          "width": 75,
+          "height": 41
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f089",
+          "src": "/book/figures/4/ch4-f089.jpeg",
+          "width": 75,
+          "height": 41
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f090",
+          "src": "/book/figures/4/ch4-f090.jpeg",
+          "width": 252,
+          "height": 41
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f091",
+          "src": "/book/figures/4/ch4-f091.jpeg",
+          "width": 64,
+          "height": 41
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f092",
+          "src": "/book/figures/4/ch4-f092.jpeg",
+          "width": 64,
+          "height": 41
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f093",
+          "src": "/book/figures/4/ch4-f093.jpeg",
+          "width": 220,
+          "height": 40
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f094",
+          "src": "/book/figures/4/ch4-f094.jpeg",
+          "width": 64,
+          "height": 40
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f095",
+          "src": "/book/figures/4/ch4-f095.jpeg",
+          "width": 198,
+          "height": 40
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f096",
+          "src": "/book/figures/4/ch4-f096.jpeg",
+          "width": 241,
+          "height": 40
+        },
+        {
+          "type": "exercise",
+          "setId": "ch4-adding-fractions-unequal-denominators"
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f098",
+          "src": "/book/figures/4/ch4-f098.jpeg",
+          "width": 522,
+          "height": 40
+        },
+        {
+          "type": "figure",
+          "id": "ch4-f099",
+          "src": "/book/figures/4/ch4-f099.jpeg",
+          "width": 523,
+          "height": 288
+        },
+        {
+          "type": "exercise",
+          "setId": "ch4-subtracting-fractions"
+        }
+      ]
+    }
+  ]
+}
