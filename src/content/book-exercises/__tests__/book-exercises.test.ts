@@ -13,7 +13,7 @@ const bookMap = JSON.parse(readFileSync(new URL('../../../../scripts/book-map.js
 const mappedIds = [...new Set([...Object.values(bookMap.exerciseSets), ...Object.values(bookMap.exerciseAfter)])].sort()
 
 // Sets whose data lands in later tasks of this plan; each task removes its ids from here.
-const PENDING = new Set<string>(mappedIds.filter((id) => !/^ch[123]-/.test(id)))
+const PENDING = new Set<string>(mappedIds.filter((id) => !/^ch[1234]-/.test(id)))
 
 describe('book exercise data', () => {
   it('covers every curated set id and nothing else', () => {
@@ -83,6 +83,29 @@ describe('book exercise data', () => {
     expect(p.steps).toEqual(['50 × 9 = 450', '1 × 9 = 9', '450 − 9 = 441'])
     const f = allBookSets().find((s) => s.id === 'ch3-2-by-2-factoring-method')!.problems[0]!
     expect(f.steps[0]).toBe('14 = 7 × 2')
+  })
+
+  it('has the expected problem counts for chapter 4 and exact twelfths', () => {
+    const counts = Object.fromEntries(allBookSets().filter((s) => /^ch4-/.test(s.id)).map((s) => [s.id, s.problems.length]))
+    expect(counts).toEqual({
+      'ch4-one-digit-division': 6,
+      'ch4-two-digit-division': 6,
+      'ch4-decimalization': 12,
+      'ch4-testing-for-divisibility': 40,
+      'ch4-multiplying-fractions': 4,
+      'ch4-dividing-fractions': 3,
+      'ch4-simplifying-fractions': 8,
+      'ch4-adding-fractions-equal-denominators': 4,
+      'ch4-adding-fractions-unequal-denominators': 7,
+      'ch4-subtracting-fractions': 9,
+    })
+    const twelfths = allBookSets().find((s) => s.id === 'ch4-simplifying-fractions')!.problems[0]!
+    expect(twelfths.prompt).toEqual({ kind: 'fraction-task', value: { num: 1, den: 3 }, task: 'rewrite', den: 12 })
+    expect(check(twelfths.answer, '4/12').correct).toBe(true)
+    expect(check(twelfths.answer, '1/3').correct).toBe(false)
+    const div = allBookSets().find((s) => s.id === 'ch4-one-digit-division')!.problems[0]!
+    expect(check(div.answer, '35 3/9').correct).toBe(true)
+    expect(check(div.answer, '35 r 3').correct).toBe(true)
   })
 
   it('has the expected problem counts for chapter 1', () => {
