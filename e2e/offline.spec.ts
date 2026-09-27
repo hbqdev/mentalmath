@@ -24,11 +24,14 @@ test('a chapter reads offline after one visit', async ({ page, context, browserN
   try {
     await page.goto('/read/4/one-digit-division')
     await expect(page.locator('#one-digit-division')).toBeVisible()
-    const img = page.locator('figure[data-figure] img').first()
-    await img.scrollIntoViewIfNeeded()
-    await expect
-      .poll(() => img.evaluate((el) => (el as HTMLImageElement).naturalWidth))
-      .toBeGreaterThan(0)
+    // every figure is typeset now; the precached JPEG must still come out of the worker's cache
+    await expect(page.locator('[data-figure="ch4-f003"]')).toHaveAttribute('data-override', /.+/)
+    const cached = await page.evaluate(() =>
+      fetch('/book/figures/4/ch4-f003.jpeg')
+        .then((r) => r.ok && r.headers.get('content-type'))
+        .catch(() => false),
+    )
+    expect(String(cached)).toContain('image/jpeg')
     // typeset figures need no network at all
     await page.goto('/read/1/left-to-right-addition')
     await expect(page.locator('[data-figure="ch1-f001"]')).toHaveAttribute(

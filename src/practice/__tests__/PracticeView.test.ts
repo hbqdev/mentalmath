@@ -25,7 +25,7 @@ beforeEach(() => {
 
 describe('PracticeView', () => {
   it('runs a seeded generated session to the results and records the attempt', async () => {
-    useProgress().state.value.settings.unlockAll = true
+    useProgress().state.value.settings.lockUntilRead = false
     const { w } = await mountAt('/practice/1/gen1-two-digit-addition?mode=generated&seed=42')
     const expected = generateMany(
       findGenerated('gen1-two-digit-addition')!,
@@ -51,7 +51,7 @@ describe('PracticeView', () => {
   })
 
   it('shows the canonical answer and steps after a wrong answer', async () => {
-    useProgress().state.value.settings.unlockAll = true
+    useProgress().state.value.settings.lockUntilRead = false
     const { w } = await mountAt('/practice/1/gen1-two-digit-addition?mode=generated&seed=7')
     const expected = generateMany(
       findGenerated('gen1-two-digit-addition')!,
@@ -67,7 +67,8 @@ describe('PracticeView', () => {
     expect(w.find('[data-testid="solution-steps"]').findAll('li').length).toBeGreaterThan(0)
   })
 
-  it('shows a locked state with a link to the section when the set is not unlocked yet', async () => {
+  it('shows a locked state with a link to the section when the reading gate is on', async () => {
+    useProgress().state.value.settings.lockUntilRead = true
     const { w } = await mountAt('/practice/1/ch1-two-digit-addition')
     expect(w.find('[data-testid="locked"]').exists()).toBe(true)
     expect(w.find('a[href="/read/1/left-to-right-addition"]').exists()).toBe(true)
@@ -84,7 +85,7 @@ describe('PracticeView', () => {
 
 describe('review fixes: practice flow', () => {
   it('Enter advances after feedback and focus stays usable', async () => {
-    useProgress().state.value.settings.unlockAll = true
+    useProgress().state.value.settings.lockUntilRead = false
     const { w } = await mountAt('/practice/1/gen1-two-digit-addition?mode=generated&seed=42')
     const input = w.find('input[data-testid="answer-input"]')
     await input.setValue('0')
@@ -98,7 +99,7 @@ describe('review fixes: practice flow', () => {
   })
 
   it('a book set opened in generated mode redirects to its generated twin', async () => {
-    useProgress().state.value.settings.unlockAll = true
+    useProgress().state.value.settings.lockUntilRead = false
     const { router } = await mountAt('/practice/1/ch1-two-digit-addition?mode=generated')
     await flushPromises()
     expect(router.currentRoute.value.params.set).toBe('gen1-two-digit-addition')
@@ -109,7 +110,7 @@ describe('book sessions', () => {
   it("runs a book set with the authors' steps and records an attempt with the set length", async () => {
     const { bookExercises } = await import('@/exercises/bookSets')
     await import('@/content/book-exercises')
-    useProgress().state.value.settings.unlockAll = true
+    useProgress().state.value.settings.lockUntilRead = false
     const { w } = await mountAt('/practice/3/ch3-multiplying-by-11')
     const problems = bookExercises('ch3-multiplying-by-11')
     expect(problems).toHaveLength(3)
@@ -141,7 +142,7 @@ describe('book sessions', () => {
 
   it('answers a weekday choice in the chapter 9 book set', async () => {
     await import('@/content/book-exercises')
-    useProgress().state.value.settings.unlockAll = true
+    useProgress().state.value.settings.lockUntilRead = false
     const { w } = await mountAt('/practice/9/ch9-a-day-for-any-date')
     expect(w.find('[data-testid="choice-friday"]').exists()).toBe(true)
     await w.find('[data-testid="choice-friday"]').trigger('click')

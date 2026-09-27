@@ -19,7 +19,9 @@ function crissCrossSteps(a: number, b: number): string[] {
       terms.push(`${A[i]} × ${B[j]}`)
       sum += A[i]! * B[j]!
     }
-    steps.push(`${terms.join(' + ')}${carry ? ` + ${carry}` : ''} = ${sum}, write ${sum % 10}${sum >= 10 ? `, carry ${Math.floor(sum / 10)}` : ''}`)
+    steps.push(
+      `${terms.join(' + ')}${carry ? ` + ${carry}` : ''} = ${sum}, write ${sum % 10}${sum >= 10 ? `, carry ${Math.floor(sum / 10)}` : ''}`,
+    )
     out.push(sum % 10)
     carry = Math.floor(sum / 10)
   }
@@ -38,15 +40,24 @@ export const sets: GeneratedSetDef[] = [
     coversBookSets: ['ch6-columns-of-numbers'],
     generate(difficulty, rng) {
       const count = difficulty === 'easy' ? 4 : difficulty === 'medium' ? 6 : 8
-      const numbers = Array.from({ length: count }, () => bigNumber(rng, rng.int(2, difficulty === 'hard' ? 4 : 3)))
+      const numbers = Array.from({ length: count }, () =>
+        bigNumber(rng, rng.int(2, difficulty === 'hard' ? 4 : 3)),
+      )
       let running = 0
       const steps = numbers.map((n) => {
         running += n
         return `+ ${n} → ${running}`
       })
       const total = numbers.reduce((s, n) => s + n, 0)
-      steps.push(`Mod sum check: ${digitRoot(numbers.reduce((s, n) => s + digitRoot(n), 0))} = ${digitRoot(total)}; total ${total}`)
-      return { difficulty, prompt: { kind: 'columns', numbers }, answer: integer(total), solution: { steps } }
+      steps.push(
+        `Mod sum check: ${digitRoot(numbers.reduce((s, n) => s + digitRoot(n), 0))} = ${digitRoot(total)}; total ${total}`,
+      )
+      return {
+        difficulty,
+        prompt: { kind: 'columns', numbers },
+        answer: integer(total),
+        solution: { steps },
+      }
     },
   },
   {
@@ -62,7 +73,12 @@ export const sets: GeneratedSetDef[] = [
       const steps = [`Digits of ${n} add to ${s1}`]
       if (s1 >= 10) steps.push(`Digits of ${s1} add to ${digitRoot(s1)}`)
       steps.push(`Mod sum: ${value}`)
-      return { difficulty, prompt: { kind: 'text', text: `What is the mod sum of ${n}?` }, answer: integer(value), solution: { steps } }
+      return {
+        difficulty,
+        prompt: { kind: 'text', text: `What is the mod sum of ${n}?` },
+        answer: integer(value),
+        solution: { steps },
+      }
     },
   },
   {
@@ -108,7 +124,14 @@ export const sets: GeneratedSetDef[] = [
           difficulty,
           prompt: { kind: 'root', radicand, degree: 2 },
           answer: integer(root),
-          solution: { steps: [`${tens}² = ${tens * tens} fits under ${radicand}`, `Remainder ${radicand - tens * tens}, double ${tens} → ${2 * tens}`, `${2 * tens + root % 10} × ${root % 10} = ${(2 * tens + (root % 10)) * (root % 10)}`, `√${radicand} = ${root}`] },
+          solution: {
+            steps: [
+              `${tens}² = ${tens * tens} fits under ${radicand}`,
+              `Remainder ${radicand - tens * tens}, double ${tens} → ${2 * tens}`,
+              `${2 * tens + (root % 10)} × ${root % 10} = ${(2 * tens + (root % 10)) * (root % 10)}`,
+              `√${radicand} = ${root}`,
+            ],
+          },
         }
       }
       let radicand: number
@@ -120,7 +143,13 @@ export const sets: GeneratedSetDef[] = [
         difficulty,
         prompt: { kind: 'root', radicand, degree: 2 },
         answer: { kind: 'decimal', value, tolerance: 0.01 },
-        solution: { steps: [`${g}² = ${g * g} fits under ${radicand}`, `Continue with decimals: ${radicand} ÷ ${g} ≈ ${(radicand / g).toFixed(2)}, average with ${g}`, `√${radicand} ≈ ${value}`] },
+        solution: {
+          steps: [
+            `${g}² = ${g * g} fits under ${radicand}`,
+            `Continue with decimals: ${radicand} ÷ ${g} ≈ ${(radicand / g).toFixed(2)}, average with ${g}`,
+            `√${radicand} ≈ ${value}`,
+          ],
+        },
       }
     },
   },
@@ -134,7 +163,12 @@ export const sets: GeneratedSetDef[] = [
     generate(difficulty, rng) {
       const a = bigNumber(rng, difficulty === 'easy' ? 2 : 3)
       const b = bigNumber(rng, difficulty === 'hard' ? 3 : 2)
-      return { difficulty, prompt: { kind: 'binary', a, b, op: '×' }, answer: integer(a * b), solution: { steps: crissCrossSteps(a, b) } }
+      return {
+        difficulty,
+        prompt: { kind: 'binary', a, b, op: '×' },
+        answer: integer(a * b),
+        solution: { steps: crissCrossSteps(a, b) },
+      }
     },
   },
   {
@@ -148,7 +182,9 @@ export const sets: GeneratedSetDef[] = [
       const ds = digits(n).reverse()
       const alt = ds.reduce((s, d, i) => s + (i % 2 === 0 ? d : -d), 0)
       const value = ((alt % 11) + 11) % 11
-      const expr = ds.map((d, i) => (i === 0 ? `${d}` : `${i % 2 === 0 ? '+' : MINUS} ${d}`)).join(' ')
+      const expr = ds
+        .map((d, i) => (i === 0 ? `${d}` : `${i % 2 === 0 ? '+' : MINUS} ${d}`))
+        .join(' ')
       return {
         difficulty,
         prompt: { kind: 'text', text: `What does ${n} leave when you cast out elevens?` },

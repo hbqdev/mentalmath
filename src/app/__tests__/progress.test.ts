@@ -40,14 +40,14 @@ describe('useProgress', () => {
     expect(p.chapterCompletion('1', 4)).toBeCloseTo(0.5)
   })
 
-  it('unlocks a set when its section is visited or unlockAll is on', () => {
+  it('leaves every set open by default and gates on reading only when asked', () => {
     const p = useProgress()
+    expect(p.isUnlocked('0', 'instant-multiplication')).toBe(true)
+    p.state.value.settings.lockUntilRead = true
     expect(p.isUnlocked('0', 'instant-multiplication')).toBe(false)
     p.markVisited('0', 'instant-multiplication')
     expect(p.isUnlocked('0', 'instant-multiplication')).toBe(true)
     expect(p.isUnlocked('0', 'squaring-and-more')).toBe(false)
-    p.state.value.settings.unlockAll = true
-    expect(p.isUnlocked('0', 'squaring-and-more')).toBe(true)
   })
 
   it('keeps best score and attempt history per set', () => {

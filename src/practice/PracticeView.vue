@@ -143,6 +143,17 @@ function onEnter() {
   if (state.value?.phase === 'feedback') onNext()
 }
 
+/** Draw a fresh generated set: a new seed, same technique and difficulty. */
+function newSet() {
+  router.replace({ query: { ...route.query, mode: 'generated', seed: String(createRng().seed) } })
+}
+function setDifficulty(e: Event) {
+  const d = (e.target as HTMLSelectElement).value
+  router.replace({
+    query: { ...route.query, mode: 'generated', difficulty: d, seed: String(createRng().seed) },
+  })
+}
+
 function again() {
   const fresh = createRng().seed
   router.replace({
@@ -193,6 +204,49 @@ const focusMode = computed(() => progress.value.settings.focus)
           >
         </div>
       </header>
+      <div v-if="status === 'running'" class="tools">
+        <template v-if="mode === 'generated'">
+          <button
+            type="button"
+            class="tool primary"
+            data-testid="new-set"
+            title="Ten new problems for this technique"
+            @click="newSet"
+          >
+            Generate new set
+          </button>
+          <label class="tool-label"
+            >Difficulty
+            <select data-testid="difficulty" :value="difficulty" @change="setDifficulty">
+              <option value="mixed">mixed</option>
+              <option value="easy">easy</option>
+              <option value="medium">medium</option>
+              <option value="hard">hard</option>
+            </select>
+          </label>
+          <RouterLink
+            v-if="set?.kind === 'generated' && set.def.coversBookSets?.[0]"
+            class="tool"
+            :to="{
+              name: 'practice',
+              params: { chapter: chapterId, set: set.def.coversBookSets[0] },
+              query: { mode: 'book' },
+            }"
+            >📖 Book set</RouterLink
+          >
+        </template>
+        <RouterLink
+          v-else-if="twin"
+          class="tool primary"
+          data-testid="generate-similar"
+          :to="{
+            name: 'practice',
+            params: { chapter: chapterId, set: twin.id },
+            query: { mode: 'generated' },
+          }"
+          >Generate similar problems</RouterLink
+        >
+      </div>
 
       <section v-if="status === 'empty'" class="state" data-testid="set-empty">
         <p>The book's problems for this set arrive soon.</p>
@@ -291,6 +345,47 @@ const focusMode = computed(() => progress.value.settings.focus)
   margin: 0;
   font-family: var(--font-sans);
   font-size: 0.95rem;
+}
+.tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.6rem;
+  margin: -0.25rem 0 1rem;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+}
+.tool {
+  padding: 0.4rem 0.8rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--accent);
+  color: var(--accent);
+  background: transparent;
+  font-weight: 700;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+}
+.tool.primary {
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+.tool:hover {
+  text-decoration: none;
+  filter: brightness(1.08);
+}
+.tool-label {
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+}
+.tool-label select {
+  font: inherit;
+  padding: 0.3rem 0.4rem;
+  border-radius: var(--radius);
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  color: var(--ink);
 }
 .hud {
   display: flex;

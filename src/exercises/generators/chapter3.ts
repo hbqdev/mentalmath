@@ -10,7 +10,9 @@ import {
   times,
 } from './shared'
 
-const FACTORABLE = Array.from({ length: 88 }, (_, i) => i + 12).filter((n) => nearestFactorPair(n) !== null)
+const FACTORABLE = Array.from({ length: 88 }, (_, i) => i + 12).filter(
+  (n) => nearestFactorPair(n) !== null,
+)
 
 function cubeSteps(n: number): string[] {
   const near = Math.round(n / 10) * 10
@@ -36,8 +38,18 @@ export const sets: GeneratedSetDef[] = [
     description: 'The neighbour-sum trick, now with three and four digits.',
     coversBookSets: ['ch3-multiplying-by-11'],
     generate(difficulty, rng) {
-      const a = difficulty === 'easy' ? rng.int(10, 99) : difficulty === 'medium' ? rng.int(100, 999) : rng.int(1000, 9999)
-      return { difficulty, prompt: times(a, 11), answer: integer(a * 11), solution: { steps: stepsTimes11(a) } }
+      const a =
+        difficulty === 'easy'
+          ? rng.int(10, 99)
+          : difficulty === 'medium'
+            ? rng.int(100, 999)
+            : rng.int(1000, 9999)
+      return {
+        difficulty,
+        prompt: times(a, 11),
+        answer: integer(a * 11),
+        solution: { steps: stepsTimes11(a) },
+      }
     },
   },
   {
@@ -50,7 +62,12 @@ export const sets: GeneratedSetDef[] = [
     generate(difficulty, rng) {
       const a = difficulty === 'easy' ? rng.int(12, 49) : rng.int(12, 99)
       const b = (difficulty === 'hard' ? rng.int(4, 9) : rng.int(1, 5)) * 10 + rng.int(1, 3)
-      return { difficulty, prompt: times(a, b), answer: integer(a * b), solution: { steps: stepsAdditionMethod(a, b) } }
+      return {
+        difficulty,
+        prompt: times(a, b),
+        answer: integer(a * b),
+        solution: { steps: stepsAdditionMethod(a, b) },
+      }
     },
   },
   {
@@ -63,7 +80,12 @@ export const sets: GeneratedSetDef[] = [
     generate(difficulty, rng) {
       const a = difficulty === 'easy' ? rng.int(12, 49) : rng.int(12, 99)
       const b = (difficulty === 'hard' ? rng.int(5, 10) : rng.int(2, 6)) * 10 - rng.int(1, 3)
-      return { difficulty, prompt: times(a, b), answer: integer(a * b), solution: { steps: stepsSubtractionMethod(a, b) } }
+      return {
+        difficulty,
+        prompt: times(a, b),
+        answer: integer(a * b),
+        solution: { steps: stepsSubtractionMethod(a, b) },
+      }
     },
   },
   {
@@ -78,7 +100,12 @@ export const sets: GeneratedSetDef[] = [
       const pool = difficulty === 'easy' ? FACTORABLE.filter((n) => n <= 48) : FACTORABLE
       const b = rng.pick(pool)
       const [f1, f2] = nearestFactorPair(b)!
-      return { difficulty, prompt: times(a, b), answer: integer(a * b), solution: { steps: stepsFactoring(a, b, f1, f2) } }
+      return {
+        difficulty,
+        prompt: times(a, b),
+        answer: integer(a * b),
+        solution: { steps: stepsFactoring(a, b, f1, f2) },
+      }
     },
   },
   {
@@ -108,7 +135,12 @@ export const sets: GeneratedSetDef[] = [
     description: 'Round to the nearest hundred, multiply up and down, add the small square.',
     coversBookSets: ['ch3-three-digit-squares'],
     generate(difficulty, rng) {
-      const base = difficulty === 'easy' ? rng.int(101, 399) : difficulty === 'medium' ? rng.int(300, 699) : rng.int(600, 999)
+      const base =
+        difficulty === 'easy'
+          ? rng.int(101, 399)
+          : difficulty === 'medium'
+            ? rng.int(300, 699)
+            : rng.int(600, 999)
       return {
         difficulty,
         prompt: { kind: 'power', base, exp: 2 },
@@ -125,7 +157,12 @@ export const sets: GeneratedSetDef[] = [
     description: 'n³ = (n − d) × n × (n + d) + d² × n, with d chosen to round n.',
     coversBookSets: ['ch3-two-digit-cubes'],
     generate(difficulty, rng) {
-      const base = difficulty === 'easy' ? rng.int(11, 30) : difficulty === 'medium' ? rng.int(25, 60) : rng.int(50, 99)
+      const base =
+        difficulty === 'easy'
+          ? rng.int(11, 30)
+          : difficulty === 'medium'
+            ? rng.int(25, 60)
+            : rng.int(50, 99)
       return {
         difficulty,
         prompt: { kind: 'power', base, exp: 3 },

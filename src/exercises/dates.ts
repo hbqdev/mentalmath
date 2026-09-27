@@ -3,13 +3,39 @@
  * Weekday numbering matches JavaScript's getDay(): 0 Sunday … 6 Saturday, which is also the book's
  * (1 Monday … 6 Saturday, 0 Sunday).
  */
-export const WEEKDAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'] as const
+export const WEEKDAYS = [
+  'Sunday',
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+] as const
 export type Weekday = (typeof WEEKDAYS)[number]
-export const WEEKDAY_OPTIONS: Weekday[] = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+export const WEEKDAY_OPTIONS: Weekday[] = [
+  'Monday',
+  'Tuesday',
+  'Wednesday',
+  'Thursday',
+  'Friday',
+  'Saturday',
+  'Sunday',
+]
 
 const MONTHS = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December',
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
 ]
 const MONTH_CODES = [6, 2, 2, 5, 0, 3, 5, 1, 4, 6, 2, 4]
 
@@ -68,6 +94,8 @@ export function daySteps(iso: string): string[] {
     `${y} → year code: ${y % 100} + ${Math.floor((y % 100) / 4)} = ${(y % 100) + Math.floor((y % 100) / 4)} → mod 7 = ${yc}`,
   ]
   if (cc) steps.push(`${Math.floor(y / 100)}00s: add ${cc}`)
-  steps.push(`${mc} + ${d} + ${yc}${cc ? ` + ${cc}` : ''} = ${total} → mod 7 = ${total % 7} → ${dayOfWeek(iso)}`)
+  steps.push(
+    `${mc} + ${d} + ${yc}${cc ? ` + ${cc}` : ''} = ${total} → mod 7 = ${total % 7} → ${dayOfWeek(iso)}`,
+  )
   return steps
 }

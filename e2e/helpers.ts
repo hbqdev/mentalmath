@@ -16,7 +16,7 @@ export async function seedProgress(page: Page, partial: Record<string, unknown>)
 }
 
 export async function unlockAll(page: Page, extra: Record<string, unknown> = {}) {
-  await seedProgress(page, { settings: { unlockAll: true }, ...extra })
+  await seedProgress(page, { settings: { lockUntilRead: false }, ...extra })
 }
 
 export async function freezeClock(page: Page, iso = '2026-09-27T12:00:00Z') {
@@ -25,19 +25,36 @@ export async function freezeClock(page: Page, iso = '2026-09-27T12:00:00Z') {
 
 export const sampleProgress = {
   reading: {
-    '0': { lastSection: 'squaring-and-more', visited: ['overview', 'instant-multiplication', 'squaring-and-more'], updatedAt: '2026-09-26T10:00:00.000Z' },
-    '1': { lastSection: 'left-to-right-addition', visited: ['overview', 'left-to-right-addition'], updatedAt: '2026-09-27T09:00:00.000Z' },
+    '0': {
+      lastSection: 'squaring-and-more',
+      visited: ['overview', 'instant-multiplication', 'squaring-and-more'],
+      updatedAt: '2026-09-26T10:00:00.000Z',
+    },
+    '1': {
+      lastSection: 'left-to-right-addition',
+      visited: ['overview', 'left-to-right-addition'],
+      updatedAt: '2026-09-27T09:00:00.000Z',
+    },
   },
   practice: {
     'gen1-two-digit-addition': {
-      attempts: [{ at: '2026-09-27T09:30:00.000Z', correct: 8, total: 10, seconds: 95, mode: 'generated' }],
+      attempts: [
+        { at: '2026-09-27T09:30:00.000Z', correct: 8, total: 10, seconds: 95, mode: 'generated' },
+      ],
       best: 8,
     },
     'gen0-multiply-by-11': {
-      attempts: [{ at: '2026-09-26T10:30:00.000Z', correct: 10, total: 10, seconds: 61, mode: 'generated' }],
+      attempts: [
+        { at: '2026-09-26T10:30:00.000Z', correct: 10, total: 10, seconds: 61, mode: 'generated' },
+      ],
       best: 10,
     },
   },
   streak: { current: 2, lastActiveDay: '2026-09-27' },
-  settings: { theme: 'light', focus: false, fontScale: 1, unlockAll: false },
+  settings: { theme: 'light', focus: false, fontScale: 1, lockUntilRead: false },
+}
+
+/** Opt into the reading gate so locked-set behaviour can be exercised. */
+export async function lockUntilRead(page: Page) {
+  await seedProgress(page, { settings: { lockUntilRead: true } })
 }

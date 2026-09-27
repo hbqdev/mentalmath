@@ -17,7 +17,8 @@ export interface ProgressState {
     theme: 'system' | 'light' | 'dark'
     focus: boolean
     fontScale: 0 | 1 | 2
-    unlockAll: boolean
+    /** Off by default: every set is open. On, a set opens once its section has been read. */
+    lockUntilRead: boolean
   }
 }
 
@@ -28,7 +29,7 @@ export function defaultProgress(): ProgressState {
     reading: {},
     practice: {},
     streak: { current: 0, lastActiveDay: '' },
-    settings: { theme: 'system', focus: false, fontScale: 1, unlockAll: false },
+    settings: { theme: 'system', focus: false, fontScale: 1, lockUntilRead: false },
   }
 }
 
@@ -157,7 +158,7 @@ export function useProgress() {
   }
 
   function isUnlocked(chapterId: string, sectionId: string) {
-    return state.value.settings.unlockAll || isVisited(chapterId, sectionId)
+    return !state.value.settings.lockUntilRead || isVisited(chapterId, sectionId)
   }
 
   function reset() {

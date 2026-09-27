@@ -1,3 +1,4 @@
+import { lockUntilRead } from './helpers'
 import { expect, test } from '@playwright/test'
 
 test.describe('reader', () => {
@@ -5,27 +6,38 @@ test.describe('reader', () => {
     await page.goto('/read/1')
     await expect(page.getByRole('heading', { level: 1 })).toContainText('A Little Give and Take')
     await expect(page.locator('section.book-section')).toHaveCount(3)
-    await expect(page.locator('.prose').first()).toContainText('add and subtract numbers from left to right')
+    await expect(page.locator('.prose').first()).toContainText(
+      'add and subtract numbers from left to right',
+    )
   })
 
   test('outline navigation updates the section in the URL', async ({ page }, testInfo) => {
     test.skip(testInfo.project.name !== 'desktop', 'outline column is desktop only')
     await page.goto('/read/1')
-    await page.getByTestId('outline').getByRole('link', { name: 'Left-to-Right Subtraction' }).click()
+    await page
+      .getByTestId('outline')
+      .getByRole('link', { name: 'Left-to-Right Subtraction' })
+      .click()
     await expect(page).toHaveURL(/\/read\/1\/left-to-right-subtraction$/)
     await expect(page.locator('#left-to-right-subtraction h2')).toBeInViewport()
   })
 
   test('reading a section unlocks its exercise callout after two seconds', async ({ page }) => {
+    await lockUntilRead(page)
     await page.goto('/read/1/left-to-right-addition')
     const callout = page.getByTestId('exercise-callout').first()
     await expect(callout).toContainText('Unlocks after you read')
     await callout.scrollIntoViewIfNeeded()
     await expect(callout.getByRole('link', { name: 'Book set' })).toBeVisible({ timeout: 6_000 })
-    await expect(callout.getByRole('link', { name: 'Generate' })).toHaveAttribute('href', /gen1-two-digit-addition\?mode=generated/)
+    await expect(callout.getByRole('link', { name: 'Generate' })).toHaveAttribute(
+      'href',
+      /gen1-two-digit-addition\?mode=generated/,
+    )
   })
 
-  test('focus mode hides the practice rail and the theme toggle switches palettes', async ({ page }, testInfo) => {
+  test('focus mode hides the practice rail and the theme toggle switches palettes', async ({
+    page,
+  }, testInfo) => {
     test.skip(testInfo.project.name !== 'desktop', 'rail is hidden on phones anyway')
     await page.goto('/read/1')
     await expect(page.getByTestId('practice-rail')).toBeVisible()

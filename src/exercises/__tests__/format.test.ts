@@ -12,7 +12,10 @@ const cases: Array<[Prompt, string]> = [
   [{ kind: 'root', radicand: 1728, degree: 3 }, '∛1728'],
   [{ kind: 'fraction-binary', a: { num: 3, den: 5 }, b: { num: 2, den: 7 }, op: '×' }, '3/5 × 2/7'],
   [{ kind: 'fraction-task', value: { num: 14, den: 24 }, task: 'simplify' }, 'Simplify 14/24'],
-  [{ kind: 'fraction-task', value: { num: 2, den: 5 }, task: 'to-decimal' }, 'Convert 2/5 to a decimal'],
+  [
+    { kind: 'fraction-task', value: { num: 2, den: 5 }, task: 'to-decimal' },
+    'Convert 2/5 to a decimal',
+  ],
   [{ kind: 'percent', percent: 15, of: 88 }, '15% of 88'],
   [{ kind: 'divisible', n: 3932, by: 4 }, 'Is 3932 divisible by 4?'],
   [{ kind: 'date', iso: '2007-01-19' }, 'January 19, 2007'],

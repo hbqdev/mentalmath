@@ -1,16 +1,27 @@
 import { expect } from 'vitest'
 import { formatAnswer, reduce } from '../../checker'
 import { createRng } from '../../rng'
-import type { AnswerSpec, Difficulty, ExerciseDraft, Frac, GeneratedSetDef, Prompt } from '../../types'
+import type {
+  AnswerSpec,
+  Difficulty,
+  ExerciseDraft,
+  Frac,
+  GeneratedSetDef,
+  Prompt,
+} from '../../types'
 
 const DIFFS: Difficulty[] = ['easy', 'medium', 'hard']
 
 function fracOp(a: Frac, b: Frac, op: string): Frac {
   switch (op) {
-    case '+': return reduce({ num: a.num * b.den + b.num * a.den, den: a.den * b.den })
-    case '-': return reduce({ num: a.num * b.den - b.num * a.den, den: a.den * b.den })
-    case '×': return reduce({ num: a.num * b.num, den: a.den * b.den })
-    default: return reduce({ num: a.num * b.den, den: a.den * b.num })
+    case '+':
+      return reduce({ num: a.num * b.den + b.num * a.den, den: a.den * b.den })
+    case '-':
+      return reduce({ num: a.num * b.den - b.num * a.den, den: a.den * b.den })
+    case '×':
+      return reduce({ num: a.num * b.num, den: a.den * b.den })
+    default:
+      return reduce({ num: a.num * b.den, den: a.den * b.num })
   }
 }
 
@@ -18,7 +29,13 @@ function fracOp(a: Frac, b: Frac, op: string): Frac {
 export function referenceFor(p: Prompt): number | Frac | null {
   switch (p.kind) {
     case 'binary':
-      return p.op === '+' ? p.a + p.b : p.op === '-' ? p.a - p.b : p.op === '×' ? p.a * p.b : p.a / p.b
+      return p.op === '+'
+        ? p.a + p.b
+        : p.op === '-'
+          ? p.a - p.b
+          : p.op === '×'
+            ? p.a * p.b
+            : p.a / p.b
     case 'columns':
       return p.numbers.reduce((s, n) => s + n, 0)
     case 'power':
@@ -28,7 +45,11 @@ export function referenceFor(p: Prompt): number | Frac | null {
     case 'fraction-binary':
       return fracOp(p.a, p.b, p.op)
     case 'fraction-task':
-      if (p.task === 'rewrite') return { num: (p.value.num * (p.den ?? p.value.den)) / p.value.den, den: p.den ?? p.value.den }
+      if (p.task === 'rewrite')
+        return {
+          num: (p.value.num * (p.den ?? p.value.den)) / p.value.den,
+          den: p.den ?? p.value.den,
+        }
       return p.task === 'simplify' ? reduce(p.value) : p.value.num / p.value.den
     case 'percent':
       return (p.percent / 100) * p.of
@@ -46,9 +67,16 @@ export function answerMatchesReference(p: Prompt, a: AnswerSpec): boolean {
     case 'decimal':
       return typeof ref === 'number' && Math.abs(ref - a.value) <= a.tolerance + 1e-9
     case 'estimate':
-      return typeof ref === 'number' && Math.abs(ref - a.value) <= a.relTolerance * Math.abs(ref) + 1e-9
+      return (
+        typeof ref === 'number' && Math.abs(ref - a.value) <= a.relTolerance * Math.abs(ref) + 1e-9
+      )
     case 'quotient-remainder':
-      return p.kind === 'binary' && a.q === Math.floor(p.a / p.b) && a.r === p.a % p.b && a.divisor === p.b
+      return (
+        p.kind === 'binary' &&
+        a.q === Math.floor(p.a / p.b) &&
+        a.r === p.a % p.b &&
+        a.divisor === p.b
+      )
     case 'fraction': {
       if (typeof ref === 'number') return Math.abs(ref - a.value.num / a.value.den) < 1e-9
       if (a.exact) return a.value.num === ref.num && a.value.den === ref.den
@@ -85,8 +113,12 @@ export function checkSet(def: GeneratedSetDef, opts: SuiteOptions = {}) {
       const label = `${def.id} [${difficulty}] #${i} ${JSON.stringify(d.prompt)}`
       expect(answerMatchesReference(d.prompt, d.answer), `answer vs reference: ${label}`).toBe(true)
       expect(d.solution?.steps.length ?? 0, `steps present: ${label}`).toBeGreaterThan(0)
-      expect(lastStepMentionsAnswer(d), `last step ends with answer: ${label} :: ${d.solution?.steps.at(-1)}`).toBe(true)
-      if (opts.precondition) expect(opts.precondition(d, difficulty), `precondition: ${label}`).toBe(true)
+      expect(
+        lastStepMentionsAnswer(d),
+        `last step ends with answer: ${label} :: ${d.solution?.steps.at(-1)}`,
+      ).toBe(true)
+      if (opts.precondition)
+        expect(opts.precondition(d, difficulty), `precondition: ${label}`).toBe(true)
       const range = opts.ranges?.[difficulty]
       if (range) expect(range(d), `range: ${label}`).toBe(true)
     }

@@ -34,7 +34,12 @@ export const sets: GeneratedSetDef[] = [
     coversBookSets: ['ch1-two-digit-addition'],
     generate(difficulty, rng) {
       const [a, b] = twoDigitPair(difficulty, rng)
-      return { difficulty, prompt: plus(a, b), answer: integer(a + b), solution: { steps: stepsLeftToRightAdd(a, b) } }
+      return {
+        difficulty,
+        prompt: plus(a, b),
+        answer: integer(a + b),
+        solution: { steps: stepsLeftToRightAdd(a, b) },
+      }
     },
   },
   {
@@ -45,9 +50,19 @@ export const sets: GeneratedSetDef[] = [
     description: 'Hundreds, then tens, then ones, simplifying as you go.',
     coversBookSets: ['ch1-three-digit-addition'],
     generate(difficulty, rng) {
-      const a = difficulty === 'easy' ? rng.int(100, 499) : difficulty === 'medium' ? rng.int(100, 999) : rng.int(1000, 9999)
+      const a =
+        difficulty === 'easy'
+          ? rng.int(100, 499)
+          : difficulty === 'medium'
+            ? rng.int(100, 999)
+            : rng.int(1000, 9999)
       const b = difficulty === 'easy' ? rng.int(100, 499) : rng.int(100, 999)
-      return { difficulty, prompt: plus(a, b), answer: integer(a + b), solution: { steps: stepsLeftToRightAdd(a, b) } }
+      return {
+        difficulty,
+        prompt: plus(a, b),
+        answer: integer(a + b),
+        solution: { steps: stepsLeftToRightAdd(a, b) },
+      }
     },
   },
   {
@@ -55,7 +70,8 @@ export const sets: GeneratedSetDef[] = [
     chapterId: '1',
     sectionId: 'left-to-right-subtraction',
     title: 'Two-digit subtraction',
-    description: 'Subtract left to right; when the ones borrow, round up and add back the difference.',
+    description:
+      'Subtract left to right; when the ones borrow, round up and add back the difference.',
     coversBookSets: ['ch1-two-digit-subtraction'],
     generate(difficulty, rng) {
       let a: number
@@ -77,7 +93,12 @@ export const sets: GeneratedSetDef[] = [
         a = rng.int(100, 199)
         b = rng.int(20, 99)
       }
-      return { difficulty, prompt: minus(a, b), answer: integer(a - b), solution: { steps: stepsLeftToRightSub(a, b) } }
+      return {
+        difficulty,
+        prompt: minus(a, b),
+        answer: integer(a - b),
+        solution: { steps: stepsLeftToRightSub(a, b) },
+      }
     },
   },
   {
@@ -97,7 +118,12 @@ export const sets: GeneratedSetDef[] = [
       }
       if (difficulty === 'easy' && a % 10 < b % 10) a = a - (a % 10) + (b % 10)
       if (a <= b) a = b + 101
-      return { difficulty, prompt: minus(a, b), answer: integer(a - b), solution: { steps: stepsLeftToRightSub(a, b) } }
+      return {
+        difficulty,
+        prompt: minus(a, b),
+        answer: integer(a - b),
+        solution: { steps: stepsLeftToRightSub(a, b) },
+      }
     },
   },
 ]
