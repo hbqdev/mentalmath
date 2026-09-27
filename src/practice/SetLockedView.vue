@@ -7,7 +7,10 @@ defineProps<{ chapterId: string; sectionId: string; sectionTitle: string; title:
     <p class="kicker">Locked</p>
     <h1>{{ title }}</h1>
     <p>This set unlocks once you have read its section of the chapter.</p>
-    <RouterLink class="btn" :to="{ name: 'read', params: { chapter: chapterId, section: sectionId } }">
+    <RouterLink
+      class="btn"
+      :to="{ name: 'read', params: { chapter: chapterId, section: sectionId } }"
+    >
       Read “{{ sectionTitle }}” ›
     </RouterLink>
   </section>

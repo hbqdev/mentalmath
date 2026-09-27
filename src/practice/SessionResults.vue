@@ -23,12 +23,24 @@ const clock = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2,
     </p>
     <p v-if="seed !== undefined" class="meta seed">Seed {{ seed }} · {{ mode }}</p>
     <div class="btns">
-      <button type="button" class="btn primary" data-testid="practice-again" @click="emit('again')">Practice again</button>
-      <button type="button" class="btn ghost" data-testid="back-to-chapter" @click="emit('back')">Back to chapter</button>
+      <button type="button" class="btn primary" data-testid="practice-again" @click="emit('again')">
+        Practice again
+      </button>
+      <button type="button" class="btn ghost" data-testid="back-to-chapter" @click="emit('back')">
+        Back to chapter
+      </button>
     </div>
     <p v-if="twin" class="twin">
       Keep going with endless generated problems:
-      <RouterLink data-testid="generated-twin" :to="{ name: 'practice', params: { chapter: twin.chapterId, set: twin.setId }, query: { mode: 'generated' } }">{{ twin.title }} ›</RouterLink>
+      <RouterLink
+        data-testid="generated-twin"
+        :to="{
+          name: 'practice',
+          params: { chapter: twin.chapterId, set: twin.setId },
+          query: { mode: 'generated' },
+        }"
+        >{{ twin.title }} ›</RouterLink
+      >
     </p>
   </section>
 </template>

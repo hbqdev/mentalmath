@@ -10,7 +10,12 @@ const sets = computed(() =>
   allSetsFor(props.chapterId).map((s) =>
     s.kind === 'book'
       ? { id: s.ref.id, sectionId: s.ref.sectionId, title: s.ref.title, kind: 'book' as const }
-      : { id: s.def.id, sectionId: s.def.sectionId, title: s.def.title, kind: 'generated' as const },
+      : {
+          id: s.def.id,
+          sectionId: s.def.sectionId,
+          title: s.def.title,
+          kind: 'generated' as const,
+        },
   ),
 )
 </script>
@@ -29,7 +34,8 @@ const sets = computed(() =>
         <strong>{{ s.kind === 'book' ? '📖 ' : '' }}{{ s.title }}</strong>
         <span class="meta">{{ s.kind === 'book' ? 'Book set' : 'Generated' }}</span>
         <span v-if="bestScore(s.id) !== undefined" class="meta"
-          >Best {{ bestScore(s.id) }}<template v-if="lastAttempt(s.id)">
+          >Best {{ bestScore(s.id)
+          }}<template v-if="lastAttempt(s.id)">
             · last {{ lastAttempt(s.id)!.correct }} / {{ lastAttempt(s.id)!.total }}</template
           ></span
         >

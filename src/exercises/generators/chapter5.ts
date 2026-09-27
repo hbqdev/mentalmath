@@ -148,8 +148,8 @@ export const sets: GeneratedSetDef[] = [
       const value = percent === 15 ? Math.round((ten + half) * 100) / 100 : Math.round(ten * 200) / 100
       const steps =
         percent === 15
-          ? [`10% of ${bill.toFixed(2)} = ${ten.toFixed(2)}`, `Half of that = ${half.toFixed(2)}`, `${ten.toFixed(2)} + ${half.toFixed(2)} = ${value.toFixed(2)}`]
-          : [`10% of ${bill.toFixed(2)} = ${ten.toFixed(2)}`, `Double it: ${value.toFixed(2)}`]
+          ? [`10% of $${bill.toFixed(2)} = $${ten.toFixed(2)}`, `Half of that = $${half.toFixed(2)}`, `$${ten.toFixed(2)} + $${half.toFixed(2)} = $${value.toFixed(2)}`]
+          : [`10% of $${bill.toFixed(2)} = $${ten.toFixed(2)}`, `Double it: $${value.toFixed(2)}`]
       // The 10%-and-half method lands within a couple of cents of the exact tip; accept both.
       return { difficulty, prompt: { kind: 'percent', percent, of: bill }, answer: { kind: 'decimal', value, tolerance: 0.02 }, solution: { steps } }
     },
@@ -168,7 +168,7 @@ export const sets: GeneratedSetDef[] = [
         difficulty,
         prompt: { kind: 'percent', percent, of: price },
         answer: { kind: 'decimal', value, tolerance: 0.01 },
-        solution: { steps: [`${price} × ${percent} = ${price * percent}`, `Move the point two places: ${value.toFixed(2)}`] },
+        solution: { steps: [`$${price} × ${percent} = ${price * percent}`, `Move the point two places: $${value.toFixed(2)}`] },
       }
     },
   },

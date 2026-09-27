@@ -25,11 +25,21 @@ const setId = computed(() => String(route.params.set ?? ''))
 const set = computed<SetRef | undefined>(() => findSet(chapterId.value, setId.value))
 const meta = computed(() => getChapterMeta(chapterId.value))
 
-const sectionId = computed(() => (set.value?.kind === 'book' ? set.value.ref.sectionId : set.value?.def.sectionId) ?? '')
-const sectionTitle = computed(() => meta.value?.sections.find((s) => s.id === sectionId.value)?.title ?? sectionId.value)
-const title = computed(() => (set.value?.kind === 'book' ? set.value.ref.title : set.value?.def.title) ?? '')
-const description = computed(() => (set.value?.kind === 'generated' ? set.value.def.description : 'Problems from the book.'))
-const twin = computed(() => (set.value?.kind === 'book' ? generatedTwin(set.value.ref.id) : undefined))
+const sectionId = computed(
+  () => (set.value?.kind === 'book' ? set.value.ref.sectionId : set.value?.def.sectionId) ?? '',
+)
+const sectionTitle = computed(
+  () => meta.value?.sections.find((s) => s.id === sectionId.value)?.title ?? sectionId.value,
+)
+const title = computed(
+  () => (set.value?.kind === 'book' ? set.value.ref.title : set.value?.def.title) ?? '',
+)
+const description = computed(() =>
+  set.value?.kind === 'generated' ? set.value.def.description : 'Problems from the book.',
+)
+const twin = computed(() =>
+  set.value?.kind === 'book' ? generatedTwin(set.value.ref.id) : undefined,
+)
 
 const timed = computed(() => route.query.timed === '1')
 const difficulty = computed<Difficulty | 'mixed'>(() => {
@@ -71,7 +81,11 @@ function begin() {
   if (set.value.kind === 'book' && route.query.mode === 'generated') {
     const t = generatedTwin(set.value.ref.id)
     if (t) {
-      router.replace({ name: 'practice', params: { chapter: chapterId.value, set: t.id }, query: route.query })
+      router.replace({
+        name: 'practice',
+        params: { chapter: chapterId.value, set: t.id },
+        query: route.query,
+      })
       return
     }
   }
@@ -86,7 +100,15 @@ function begin() {
 }
 
 watch(
-  () => [chapterId.value, setId.value, route.query.mode, route.query.seed, route.query.difficulty, route.query.timed, locked.value],
+  () => [
+    chapterId.value,
+    setId.value,
+    route.query.mode,
+    route.query.seed,
+    route.query.difficulty,
+    route.query.timed,
+    locked.value,
+  ],
   begin,
   { immediate: true },
 )
@@ -123,7 +145,9 @@ function onEnter() {
 
 function again() {
   const fresh = createRng().seed
-  router.replace({ query: { ...route.query, seed: mode.value === 'generated' ? String(fresh) : undefined } })
+  router.replace({
+    query: { ...route.query, seed: mode.value === 'generated' ? String(fresh) : undefined },
+  })
   if (mode.value !== 'generated') begin()
 }
 
@@ -140,10 +164,18 @@ const focusMode = computed(() => progress.value.settings.focus)
     <section v-if="!set" class="state" data-testid="set-not-found">
       <p class="kicker">Not found</p>
       <h1>No such practice set in this chapter.</h1>
-      <RouterLink :to="{ name: 'read', params: { chapter: chapterId } }">Back to the chapter</RouterLink>
+      <RouterLink :to="{ name: 'read', params: { chapter: chapterId } }"
+        >Back to the chapter</RouterLink
+      >
     </section>
 
-    <SetLockedView v-else-if="locked" :chapter-id="chapterId" :section-id="sectionId" :section-title="sectionTitle" :title="title" />
+    <SetLockedView
+      v-else-if="locked"
+      :chapter-id="chapterId"
+      :section-id="sectionId"
+      :section-title="sectionTitle"
+      :title="title"
+    />
 
     <template v-else>
       <header class="head">
@@ -153,8 +185,12 @@ const focusMode = computed(() => progress.value.settings.focus)
           <p class="desc">{{ description }}</p>
         </div>
         <div v-if="status === 'running' && state" class="hud">
-          <span data-testid="practice-progress">{{ Math.min(state.index + 1, state.total) }} / {{ state.total }}</span>
-          <span v-if="timed || state.phase === 'done'" class="clock">{{ Math.floor(seconds / 60) }}:{{ String(seconds % 60).padStart(2, '0') }}</span>
+          <span data-testid="practice-progress"
+            >{{ Math.min(state.index + 1, state.total) }} / {{ state.total }}</span
+          >
+          <span v-if="timed || state.phase === 'done'" class="clock"
+            >{{ Math.floor(seconds / 60) }}:{{ String(seconds % 60).padStart(2, '0') }}</span
+          >
         </div>
       </header>
 
@@ -163,21 +199,42 @@ const focusMode = computed(() => progress.value.settings.focus)
         <RouterLink
           v-if="twin"
           class="btn"
-          :to="{ name: 'practice', params: { chapter: chapterId, set: twin.id }, query: { mode: 'generated' } }"
+          :to="{
+            name: 'practice',
+            params: { chapter: chapterId, set: twin.id },
+            query: { mode: 'generated' },
+          }"
           >Practice generated problems instead ›</RouterLink
         >
       </section>
 
       <section v-else-if="state && state.phase !== 'done' && state.current" class="card">
         <PromptRenderer :prompt="state.current.prompt" />
-        <AnswerInput ref="answerBox" :spec="state.current.answer" :disabled="state.phase === 'feedback'" @submit="onSubmit" />
+        <AnswerInput
+          ref="answerBox"
+          :spec="state.current.answer"
+          :disabled="state.phase === 'feedback'"
+          @submit="onSubmit"
+        />
 
-        <div v-if="state.phase === 'feedback' && state.lastResult" class="feedback" :class="state.lastResult.correct ? 'ok' : 'bad'" data-testid="feedback" aria-live="polite">
+        <div
+          v-if="state.phase === 'feedback' && state.lastResult"
+          class="feedback"
+          :class="state.lastResult.correct ? 'ok' : 'bad'"
+          data-testid="feedback"
+          aria-live="polite"
+        >
           <p class="verdict">
             <template v-if="state.lastResult.correct">Correct.</template>
-            <template v-else>Not quite. The answer is <strong>{{ state.lastResult.shown }}</strong>.</template>
+            <template v-else
+              >Not quite. The answer is <strong>{{ state.lastResult.shown }}</strong
+              >.</template
+            >
           </p>
-          <SolutionSteps v-if="state.current.solution?.steps?.length" :steps="state.current.solution.steps" />
+          <SolutionSteps
+            v-if="state.current.solution?.steps?.length"
+            :steps="state.current.solution.steps"
+          />
           <button type="button" class="btn next" data-testid="next-button" @click="onNext">
             {{ state.index < state.total - 1 ? 'Next ›' : 'See results ›' }}
           </button>
@@ -192,7 +249,11 @@ const focusMode = computed(() => progress.value.settings.focus)
         :seed="mode === 'generated' ? seed : undefined"
         :mode="timed ? 'timed' : mode"
         :best="bestScore(setId)"
-        :twin="set?.kind === 'book' && twin ? { chapterId, setId: twin.id, title: twin.title } : undefined"
+        :twin="
+          set?.kind === 'book' && twin
+            ? { chapterId, setId: twin.id, title: twin.title }
+            : undefined
+        "
         @again="again"
         @back="back"
       />

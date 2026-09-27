@@ -27,7 +27,12 @@ describe('PracticeView', () => {
   it('runs a seeded generated session to the results and records the attempt', async () => {
     useProgress().state.value.settings.unlockAll = true
     const { w } = await mountAt('/practice/1/gen1-two-digit-addition?mode=generated&seed=42')
-    const expected = generateMany(findGenerated('gen1-two-digit-addition')!, 10, 'mixed', createRng(42))
+    const expected = generateMany(
+      findGenerated('gen1-two-digit-addition')!,
+      10,
+      'mixed',
+      createRng(42),
+    )
     for (let i = 0; i < 10; i++) {
       expect(w.find('[data-testid="practice-progress"]').text()).toContain(`${i + 1} / 10`)
       const input = w.find('input[data-testid="answer-input"]')
@@ -48,7 +53,12 @@ describe('PracticeView', () => {
   it('shows the canonical answer and steps after a wrong answer', async () => {
     useProgress().state.value.settings.unlockAll = true
     const { w } = await mountAt('/practice/1/gen1-two-digit-addition?mode=generated&seed=7')
-    const expected = generateMany(findGenerated('gen1-two-digit-addition')!, 10, 'mixed', createRng(7))
+    const expected = generateMany(
+      findGenerated('gen1-two-digit-addition')!,
+      10,
+      'mixed',
+      createRng(7),
+    )
     const input = w.find('input[data-testid="answer-input"]')
     await input.setValue('0')
     await input.trigger('keyup.enter')
@@ -96,7 +106,7 @@ describe('review fixes: practice flow', () => {
 })
 
 describe('book sessions', () => {
-  it('runs a book set with the authors\' steps and records an attempt with the set length', async () => {
+  it("runs a book set with the authors' steps and records an attempt with the set length", async () => {
     const { bookExercises } = await import('@/exercises/bookSets')
     await import('@/content/book-exercises')
     useProgress().state.value.settings.unlockAll = true
@@ -109,7 +119,9 @@ describe('book sessions', () => {
     await input.trigger('keyup.enter')
     await flushPromises()
     expect(w.find('[data-testid="feedback"]').text()).toContain(formatAnswer(problems[0]!.answer))
-    expect(w.find('[data-testid="solution-steps"]').text()).toContain(problems[0]!.solution!.steps[0]!)
+    expect(w.find('[data-testid="solution-steps"]').text()).toContain(
+      problems[0]!.solution!.steps[0]!,
+    )
     await w.find('[data-testid="next-button"]').trigger('click')
     for (let i = 1; i < 3; i++) {
       const box = w.find('input[data-testid="answer-input"]')
@@ -120,7 +132,9 @@ describe('book sessions', () => {
       await flushPromises()
     }
     expect(w.find('[data-testid="results-score"]').text()).toContain('2 / 3')
-    expect(w.find('[data-testid="generated-twin"]').attributes('href')).toContain('/practice/3/gen3-multiplying-by-11')
+    expect(w.find('[data-testid="generated-twin"]').attributes('href')).toContain(
+      '/practice/3/gen3-multiplying-by-11',
+    )
     const attempt = useProgress().state.value.practice['ch3-multiplying-by-11']?.attempts.at(-1)
     expect(attempt).toMatchObject({ correct: 2, total: 3, mode: 'book' })
   })

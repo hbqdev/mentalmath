@@ -32,7 +32,10 @@ describe('useProgress', () => {
     p.markVisited('1', 'two-digit-addition')
     p.markVisited('1', 'three-digit-addition')
     expect(p.isVisited('1', 'two-digit-addition')).toBe(true)
-    expect(p.state.value.reading['1']?.visited).toEqual(['two-digit-addition', 'three-digit-addition'])
+    expect(p.state.value.reading['1']?.visited).toEqual([
+      'two-digit-addition',
+      'three-digit-addition',
+    ])
     expect(p.lastSection('1')).toBe('three-digit-addition')
     expect(p.chapterCompletion('1', 4)).toBeCloseTo(0.5)
   })
@@ -49,9 +52,27 @@ describe('useProgress', () => {
 
   it('keeps best score and attempt history per set', () => {
     const p = useProgress()
-    p.recordAttempt('ch1-two-digit-addition', { at: 'a', correct: 6, total: 10, seconds: 90, mode: 'book' })
-    p.recordAttempt('ch1-two-digit-addition', { at: 'b', correct: 9, total: 10, seconds: 80, mode: 'book' })
-    p.recordAttempt('ch1-two-digit-addition', { at: 'c', correct: 7, total: 10, seconds: 70, mode: 'book' })
+    p.recordAttempt('ch1-two-digit-addition', {
+      at: 'a',
+      correct: 6,
+      total: 10,
+      seconds: 90,
+      mode: 'book',
+    })
+    p.recordAttempt('ch1-two-digit-addition', {
+      at: 'b',
+      correct: 9,
+      total: 10,
+      seconds: 80,
+      mode: 'book',
+    })
+    p.recordAttempt('ch1-two-digit-addition', {
+      at: 'c',
+      correct: 7,
+      total: 10,
+      seconds: 70,
+      mode: 'book',
+    })
     expect(p.bestScore('ch1-two-digit-addition')).toBe(9)
     expect(p.state.value.practice['ch1-two-digit-addition']?.attempts).toHaveLength(3)
   })
