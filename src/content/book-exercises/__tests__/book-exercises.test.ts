@@ -13,7 +13,7 @@ const bookMap = JSON.parse(readFileSync(new URL('../../../../scripts/book-map.js
 const mappedIds = [...new Set([...Object.values(bookMap.exerciseSets), ...Object.values(bookMap.exerciseAfter)])].sort()
 
 // Sets whose data lands in later tasks of this plan; each task removes its ids from here.
-const PENDING = new Set<string>(mappedIds.filter((id) => !/^ch[1-6]-/.test(id)))
+const PENDING = new Set<string>()
 
 describe('book exercise data', () => {
   it('covers every curated set id and nothing else', () => {
@@ -144,6 +144,25 @@ describe('book exercise data', () => {
     const roots = allBookSets().find((s) => s.id === 'ch6-square-root-guesstimation')!.problems
     expect(check(roots[3]!.answer, '19').correct).toBe(true)
     expect(check(roots[0]!.answer, '3.87').correct).toBe(true)
+  })
+
+  it('has the expected problem counts for chapters 8 and 9', () => {
+    const counts = Object.fromEntries(allBookSets().filter((s) => /^ch[89]-/.test(s.id)).map((s) => [s.id, s.problems.length]))
+    expect(counts).toEqual({
+      'ch8-four-digit-squares': 6,
+      'ch8-3-by-2-multiplication': 34,
+      'ch8-five-digit-squares': 6,
+      'ch8-3-by-3-multiplication': 19,
+      'ch8-5-by-5-multiplication': 4,
+      'ch9-a-day-for-any-date': 10,
+    })
+    const dates = allBookSets().find((s) => s.id === 'ch9-a-day-for-any-date')!.problems
+    expect(dates[0]!.answer).toMatchObject({ kind: 'choice', correct: 'Friday' })
+    expect(dates[6]!.answer).toMatchObject({ kind: 'choice', correct: 'Thursday' })
+    expect(dates[8]!.prompt).toMatchObject({ kind: 'text' })
+    expect(check(dates[8]!.answer, 'No such date').correct).toBe(true)
+    const big = allBookSets().find((s) => s.id === 'ch8-5-by-5-multiplication')!.problems[0]!
+    expect(big.answer).toEqual({ kind: 'integer', value: 65154 * 19423 })
   })
 
   it('has the expected problem counts for chapter 1', () => {
