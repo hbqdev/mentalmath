@@ -13,6 +13,7 @@ import PromptRenderer from './PromptRenderer.vue'
 import SessionResults from './SessionResults.vue'
 import SetLockedView from './SetLockedView.vue'
 import SolutionSteps from './SolutionSteps.vue'
+import WorksheetView from './WorksheetView.vue'
 import { usePracticeSession } from './usePracticeSession'
 
 const route = useRoute()
@@ -52,6 +53,21 @@ const mode = computed<'book' | 'generated'>(() => {
   return set.value?.kind === 'book' ? 'book' : 'generated'
 })
 const locked = computed(() => !!set.value && !isUnlocked(chapterId.value, sectionId.value))
+/** Book sets show the whole exercise page at once, like the book; generated sets go one at a time. Either can be switched. */
+const view = computed<'sheet' | 'one'>(() => {
+  const v = route.query.view
+  if (v === 'sheet' || v === 'one') return v
+  return mode.value === 'book' ? 'sheet' : 'one'
+})
+const sheetExercises = ref<Exercise[]>([])
+function setView(v: 'sheet' | 'one') {
+  router.replace({ query: { ...route.query, view: v } })
+}
+function onSheetDone(summary: { correct: number; total: number; seconds: number }) {
+  if (recorded) return
+  recorded = true
+  recordAttempt(setId.value, { at: new Date().toISOString(), ...summary, mode: mode.value })
+}
 
 const seed = ref<number | undefined>(undefined)
 const status = ref<'idle' | 'running' | 'empty'>('idle')
@@ -95,6 +111,10 @@ function begin() {
     return
   }
   status.value = 'running'
+  if (view.value === 'sheet') {
+    sheetExercises.value = exercises
+    return
+  }
   start(exercises)
   nextTick(() => answerBox.value?.focus())
 }
@@ -195,7 +215,7 @@ const focusMode = computed(() => progress.value.settings.focus)
           <h1>{{ title }}</h1>
           <p class="desc">{{ description }}</p>
         </div>
-        <div v-if="status === 'running' && state" class="hud">
+        <div v-if="status === 'running' && view === 'one' && state" class="hud">
           <span data-testid="practice-progress"
             >{{ Math.min(state.index + 1, state.total) }} / {{ state.total }}</span
           >
@@ -205,6 +225,28 @@ const focusMode = computed(() => progress.value.settings.focus)
         </div>
       </header>
       <div v-if="status === 'running'" class="tools">
+        <span class="seg" role="group" aria-label="Layout">
+          <button
+            type="button"
+            class="segbtn"
+            :class="{ on: view === 'sheet' }"
+            :aria-pressed="view === 'sheet'"
+            data-testid="view-sheet"
+            @click="setView('sheet')"
+          >
+            All at once
+          </button>
+          <button
+            type="button"
+            class="segbtn"
+            :class="{ on: view === 'one' }"
+            :aria-pressed="view === 'one'"
+            data-testid="view-one"
+            @click="setView('one')"
+          >
+            One at a time
+          </button>
+        </span>
         <template v-if="mode === 'generated'">
           <button
             type="button"
@@ -261,6 +303,8 @@ const focusMode = computed(() => progress.value.settings.focus)
           >Practice generated problems instead ›</RouterLink
         >
       </section>
+
+      <WorksheetView v-else-if="view === 'sheet'" :exercises="sheetExercises" @done="onSheetDone" />
 
       <section v-else-if="state && state.phase !== 'done' && state.current" class="card">
         <PromptRenderer :prompt="state.current.prompt" />
@@ -372,6 +416,26 @@ const focusMode = computed(() => progress.value.settings.focus)
 .tool:hover {
   text-decoration: none;
   filter: brightness(1.08);
+}
+.seg {
+  display: inline-flex;
+  border: 1px solid var(--rule);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+.segbtn {
+  font: inherit;
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  padding: 0.35rem 0.7rem;
+  background: transparent;
+  color: var(--muted);
+  border: 0;
+}
+.segbtn.on {
+  background: var(--card);
+  color: var(--ink);
+  font-weight: 700;
 }
 .tool-label {
   color: var(--muted);

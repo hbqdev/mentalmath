@@ -49,7 +49,7 @@ test.describe('practice', () => {
 
   test('a locked set explains itself and links to its section', async ({ page }) => {
     await lockUntilRead(page)
-    await page.goto('/practice/1/ch1-two-digit-addition')
+    await page.goto('/practice/1/ch1-two-digit-addition?view=one')
     await expect(page.getByTestId('locked')).toBeVisible()
     await page.getByRole('link', { name: /Read “Left-to-Right Addition”/ }).click()
     await expect(page).toHaveURL(/\/read\/1\/left-to-right-addition$/)
