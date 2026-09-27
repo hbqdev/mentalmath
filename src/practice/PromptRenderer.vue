@@ -36,7 +36,9 @@ const textParts = computed(() => {
     </div>
 
     <div v-else-if="prompt.kind === 'fraction-task'" class="task">
-      <p class="lead">{{ prompt.task === 'simplify' ? 'Simplify' : 'As a decimal' }}</p>
+      <p class="lead">
+        {{ prompt.task === 'simplify' ? 'Simplify' : prompt.task === 'rewrite' ? `Write with denominator ${prompt.den}` : 'As a decimal' }}
+      </p>
       <div class="big"><FractionGlyph :value="prompt.value" /></div>
     </div>
 

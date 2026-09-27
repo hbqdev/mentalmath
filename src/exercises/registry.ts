@@ -1,4 +1,5 @@
 import { chapterIndex } from '@/content/loader'
+import '@/content/book-exercises'
 import { generatedSets } from './generators'
 import type { BookSetRef, GeneratedSetDef } from './types'
 

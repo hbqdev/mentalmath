@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import type { Prompt } from '@/exercises/types'
-defineProps<{ prompt: Extract<Prompt, { kind: 'columns' }> }>()
-const fmt = (n: number) => n.toLocaleString('en-US')
+const props = defineProps<{ prompt: Extract<Prompt, { kind: 'columns' }> }>()
+const fmt = (n: number) =>
+  props.prompt.unit === '$' ? n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) : n.toLocaleString('en-US')
 </script>
 
 <template>
   <div class="stack" aria-label="column of numbers to add">
     <div v-for="(n, i) in prompt.numbers" :key="i" class="row" :class="{ last: i === prompt.numbers.length - 1 }">
-      <span v-if="i === prompt.numbers.length - 1" class="op">+</span>{{ fmt(n) }}
+      <span v-if="i === prompt.numbers.length - 1" class="op">+</span><span v-if="prompt.unit === '$' && i === 0" class="unit">$ </span>{{ fmt(n) }}
     </div>
   </div>
 </template>

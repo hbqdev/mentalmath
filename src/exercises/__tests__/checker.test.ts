@@ -104,3 +104,11 @@ describe('review fixes: checker', () => {
     ok({ kind: 'quotient-remainder', q: 1000, r: 1, divisor: 3 }, '1,000 r 1')
   })
 })
+
+describe('exact fractions (rewrite-in-twelfths style)', () => {
+  it('requires the same numerator and denominator when exact is set', () => {
+    const s: AnswerSpec = { kind: 'fraction', value: { num: 4, den: 12 }, acceptDecimal: false, exact: true }
+    ok(s, '4/12'); ok(s, '4 / 12'); bad(s, '1/3'); bad(s, '8/24')
+    expect(formatAnswer(s)).toBe('4/12')
+  })
+})

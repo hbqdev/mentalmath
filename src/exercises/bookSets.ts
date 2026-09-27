@@ -1,16 +1,37 @@
-import type { Exercise } from './types'
+import type { AnswerSpec, Exercise, Prompt } from './types'
 
-/**
- * Book problem sets with the authors' answers. Plan 3 fills `src/content/book-exercises/`
- * and registers the data here; until then every set is empty and the practice view offers
- * the generated twin instead.
- */
-const registry = new Map<string, Exercise[]>()
+export interface BookProblem {
+  n: number
+  prompt: Prompt
+  answer: AnswerSpec
+  steps: string[]
+}
 
-export function registerBookExercises(setId: string, exercises: Exercise[]) {
-  registry.set(setId, exercises)
+export interface BookSetData {
+  id: string
+  problems: BookProblem[]
+}
+
+/** The book's own problem sets with the authors' answers, registered by src/content/book-exercises/index.ts. */
+const registry = new Map<string, BookSetData>()
+
+export function registerBookSets(sets: BookSetData[]) {
+  for (const s of sets) registry.set(s.id, s)
+}
+
+export function allBookSets(): BookSetData[] {
+  return [...registry.values()]
 }
 
 export function bookExercises(setId: string): Exercise[] {
-  return registry.get(setId) ?? []
+  const set = registry.get(setId)
+  if (!set) return []
+  return set.problems.map((p) => ({
+    id: `${setId}-${p.n}`,
+    setId,
+    source: 'book',
+    prompt: p.prompt,
+    answer: p.answer,
+    solution: { steps: p.steps },
+  }))
 }
