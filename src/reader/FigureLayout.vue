@@ -7,7 +7,7 @@ defineProps<{ spec: FigureSpec }>()
   <!-- column: label | op | value | note -->
   <div v-if="spec.kind === 'column'" class="fl column" role="math">
     <template v-for="(line, i) in spec.lines" :key="i">
-      <span class="label">{{ line.label ?? '' }}</span>
+      <span class="lbl">{{ line.label ?? '' }}</span>
       <span class="op" :class="{ rule: line.rule }">{{ line.op ?? '' }}</span>
       <span class="value" :class="{ rule: line.rule }">{{ line.value }}</span>
       <span class="note">{{ line.note ?? '' }}</span>
@@ -16,10 +16,13 @@ defineProps<{ spec: FigureSpec }>()
 
   <div v-else-if="spec.kind === 'chain'" class="fl chain" role="math">
     <template v-for="(step, i) in spec.steps" :key="i">
-      <span class="step">{{ step }}</span>
-      <span v-if="i < spec.steps.length - 1" class="eq">
-        <span class="sign">=</span>
-        <span v-if="spec.notes?.[i]" class="under">{{ spec.notes[i] }}</span>
+      <span v-if="i === 0" class="step">{{ step }}</span>
+      <span v-else class="link">
+        <span class="eq">
+          <span class="sign">=</span>
+          <span v-if="spec.notes?.[i - 1]" class="under">{{ spec.notes[i - 1] }}</span>
+        </span>
+        <span class="step">{{ step }}</span>
       </span>
     </template>
   </div>
@@ -31,7 +34,7 @@ defineProps<{ spec: FigureSpec }>()
   <table v-else-if="spec.kind === 'table'" class="fl table" :class="{ grid: spec.grid }">
     <thead>
       <tr>
-        <th v-for="(h, i) in spec.head" :key="i">{{ h }}</th>
+        <th v-for="(h, i) in spec.head" :key="i" :colspan="spec.headSpan?.[i] ?? 1">{{ h }}</th>
       </tr>
     </thead>
     <tbody>
@@ -44,23 +47,23 @@ defineProps<{ spec: FigureSpec }>()
   <div v-else-if="spec.kind === 'split'" class="fl split" role="math">
     <span class="base">{{ spec.base }}</span>
     <svg class="fan out" viewBox="0 0 40 40" aria-hidden="true">
-      <line x1="2" y1="20" x2="36" y2="5" />
-      <line x1="2" y1="20" x2="36" y2="35" />
+      <line x1="2" y1="20" x2="34" y2="6" />
+      <polygon points="36,5 32.2,8.8 30.6,5.2" />
+      <line x1="2" y1="20" x2="34" y2="34" />
+      <polygon points="36,35 32.2,31.2 30.6,34.8" />
+      <text x="17" y="8">{{ spec.upLabel }}</text>
+      <text x="17" y="38">{{ spec.downLabel }}</text>
     </svg>
     <span class="branches">
-      <span class="branch up"
-        ><small>{{ spec.upLabel }}</small
-        >{{ spec.up }}</span
-      >
-      <span class="branch down"
-        ><small>{{ spec.downLabel }}</small
-        >{{ spec.down }}</span
-      >
+      <span class="branch">{{ spec.up }}</span>
+      <span class="branch">{{ spec.down }}</span>
     </span>
     <template v-if="spec.result">
       <svg class="fan in" viewBox="0 0 40 40" aria-hidden="true">
-        <line x1="2" y1="5" x2="36" y2="20" />
-        <line x1="2" y1="35" x2="36" y2="20" />
+        <line x1="2" y1="5" x2="34" y2="19" />
+        <line x1="2" y1="35" x2="34" y2="21" />
+        <polygon points="36,20 30.6,19.8 32.2,16.2" />
+        <polygon points="36,20 30.6,20.2 32.2,23.8" />
       </svg>
       <span class="result">{{ spec.result }}</span>
     </template>
@@ -115,16 +118,16 @@ small,
 .column {
   display: inline-grid;
   grid-template-columns: auto auto auto auto;
-  column-gap: 0.35em;
   align-items: baseline;
 }
-.column .label {
+.column .lbl {
   text-align: right;
   white-space: pre;
+  padding-right: 0.4em;
 }
 .column .op {
   text-align: left;
-  min-width: 0.7em;
+  min-width: 0.9em;
   padding-left: 0.1em;
 }
 .column .value {
@@ -138,10 +141,10 @@ small,
 .column .note {
   text-align: left;
   white-space: nowrap;
-  padding-left: 0.2em;
+  padding-left: 0.5em;
 }
 .column .note:empty,
-.column .label:empty {
+.column .lbl:empty {
   padding: 0;
 }
 
@@ -155,6 +158,10 @@ small,
 }
 .chain .step {
   white-space: nowrap;
+}
+.chain .link {
+  display: inline-flex;
+  align-items: flex-start;
 }
 .chain .eq {
   display: inline-flex;
@@ -223,12 +230,25 @@ small,
   gap: 0.15em;
 }
 .split .fan {
-  width: 2.2em;
-  height: 2.2em;
+  width: 2.6em;
+  height: 2.6em;
   stroke: currentColor;
-  stroke-width: 1.6;
+  stroke-width: 1.4;
   fill: none;
   flex: none;
+  overflow: visible;
+}
+.split .fan polygon {
+  fill: currentColor;
+  stroke: none;
+}
+.split .fan text {
+  fill: var(--muted);
+  stroke: none;
+  font-family: var(--font-sans);
+  font-size: 8.5px;
+  font-weight: 400;
+  text-anchor: middle;
 }
 .split .branches {
   display: inline-flex;
@@ -236,21 +256,7 @@ small,
   gap: 0.9em;
 }
 .split .branch {
-  position: relative;
   line-height: 1.1;
-}
-.split .branch small {
-  position: absolute;
-  left: -1.6em;
-  font-size: 0.65em;
-  line-height: 1;
-  color: var(--muted);
-}
-.split .branch.up small {
-  top: -1.1em;
-}
-.split .branch.down small {
-  bottom: -1.1em;
 }
 .split .result {
   white-space: nowrap;

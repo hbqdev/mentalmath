@@ -25,7 +25,7 @@ describe('FigureLayout', () => {
       notes: ['(first add 30)', '(then add 2)'],
     })
     expect(w.findAll('.step').map((s) => s.text())).toEqual(['47 + 32', '77 + 2', '79'])
-    expect(w.findAll('.eq').length).toBe(2)
+    expect(w.findAll('.link').length).toBe(2)
     expect(w.findAll('.under').map((u) => u.text())).toEqual(['(first add 30)', '(then add 2)'])
   })
 

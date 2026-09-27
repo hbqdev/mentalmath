@@ -12,11 +12,21 @@ import { freezeClock, sampleProgress, seedProgress, unlockAll } from './helpers'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'screenshots')
 
-async function shot(page: Page, info: TestInfo, area: string, scene: string, opts: { fullPage?: boolean } = {}) {
+async function shot(
+  page: Page,
+  info: TestInfo,
+  area: string,
+  scene: string,
+  opts: { fullPage?: boolean } = {},
+) {
   const dir = path.join(ROOT, area)
   mkdirSync(dir, { recursive: true })
   await page.evaluate(() => document.fonts.ready)
-  await page.screenshot({ path: path.join(dir, `${scene}-${info.project.name}.png`), animations: 'disabled', fullPage: opts.fullPage ?? false })
+  await page.screenshot({
+    path: path.join(dir, `${scene}-${info.project.name}.png`),
+    animations: 'disabled',
+    fullPage: opts.fullPage ?? false,
+  })
 }
 
 test.describe('screenshots', () => {
@@ -44,7 +54,10 @@ test.describe('screenshots', () => {
 
   test('reader focus and dark', async ({ page }, info) => {
     test.skip(info.project.name !== 'desktop')
-    await seedProgress(page, { ...sampleProgress, settings: { ...sampleProgress.settings, focus: true } })
+    await seedProgress(page, {
+      ...sampleProgress,
+      settings: { ...sampleProgress.settings, focus: true },
+    })
     await page.goto('/read/0/instant-multiplication')
     await expect(page.locator('#instant-multiplication')).toBeVisible()
     await shot(page, info, 'reader', 'chapter-0-focus')
@@ -132,5 +145,92 @@ test.describe('screenshots', () => {
     await page.goto('/practice/1/ch1-two-digit-addition')
     await expect(page.getByTestId('locked')).toBeVisible()
     await shot(page, info, 'practice', 'set-locked')
+  })
+
+  test.describe('figures', () => {
+    // Typeset worked examples replace the EPUB images; each scene scrolls one figure into view.
+    async function figureShot(
+      page: Page,
+      info: TestInfo,
+      url: string,
+      figureId: string,
+      scene: string,
+    ) {
+      await page.goto(url)
+      const fig = page.locator(`[data-figure="${figureId}"]`)
+      await expect(fig).toHaveAttribute('data-override', /.+/)
+      await fig.evaluate((el) => el.scrollIntoView({ block: 'center' }))
+      await shot(page, info, 'figures', scene)
+    }
+
+    test('chapter 1 worked examples', async ({ page }, info) => {
+      await seedProgress(page, sampleProgress)
+      await figureShot(
+        page,
+        info,
+        '/read/1/left-to-right-addition',
+        'ch1-f018',
+        'chapter-1-worked-examples',
+      )
+    })
+
+    test('chapter 1 dark and large font', async ({ page }, info) => {
+      test.skip(info.project.name !== 'desktop')
+      await seedProgress(page, {
+        ...sampleProgress,
+        settings: { ...sampleProgress.settings, theme: 'dark' },
+      })
+      await figureShot(
+        page,
+        info,
+        '/read/1/left-to-right-subtraction',
+        'ch1-f043',
+        'chapter-1-dark',
+      )
+      await page.evaluate(() => {
+        const raw = JSON.parse(localStorage.getItem('mentalmath.v1') ?? '{}')
+        raw.settings = { ...raw.settings, theme: 'light', fontScale: 2 }
+        localStorage.setItem('mentalmath.v1', JSON.stringify(raw))
+      })
+      await figureShot(
+        page,
+        info,
+        '/read/1/left-to-right-addition',
+        'ch1-f019',
+        'chapter-1-large-font',
+      )
+    })
+
+    test('chapter 2 table, partial products and squares', async ({ page }, info) => {
+      await seedProgress(page, sampleProgress)
+      await figureShot(
+        page,
+        info,
+        '/read/2/multiplication-table-of-numbers-1-10',
+        'ch2-f001',
+        'chapter-2-multiplication-table',
+      )
+      await figureShot(
+        page,
+        info,
+        '/read/2/3-by-1-multiplication-problems',
+        'ch2-f019',
+        'chapter-2-partial-products',
+      )
+      await figureShot(
+        page,
+        info,
+        '/read/2/be-there-or-b2-squaring-two-digit-numbers',
+        'ch2-f029',
+        'chapter-2-distance-table',
+      )
+      await figureShot(
+        page,
+        info,
+        '/read/2/be-there-or-b2-squaring-two-digit-numbers',
+        'ch2-f035',
+        'chapter-2-squares',
+      )
+    })
   })
 })
