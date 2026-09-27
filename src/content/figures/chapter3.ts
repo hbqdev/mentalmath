@@ -3,8 +3,9 @@ import { chain, mul, pair, row, split, stack } from './helpers'
 
 /** A multiplication whose last printed line is ruled but has no total under it (the text continues). */
 const open = (spec: FigureSpec): FigureSpec => {
-  if (spec.kind === 'column') spec.lines[spec.lines.length - 1]!.rule = true
-  return spec
+  if (spec.kind !== 'column') return spec
+  const lines = spec.lines.map((l, i) => (i === spec.lines.length - 1 ? { ...l, rule: true } : l))
+  return { kind: 'column', lines }
 }
 const eleven = (n: string, sum: string, result: string): FigureSpec => ({
   kind: 'eleven',
@@ -107,20 +108,20 @@ export const chapter3: FigureOverrides = {
     [['60 × 67 =', '4020'], ['−1 × 67 =', '67', '−'], '3953'],
     true,
   ),
-  'ch3-f024': row(
+  'ch3-f024': pair('46', '×', '42', '= 7 × 6'),
+  'ch3-f025': row(
     [
       mul('57', '24', '(20 + 4)', [['20 × 57 =', '1140'], ['4 × 57 =', '228', '+'], '1368'], true),
       mul('57', '24', '(50 + 7)', [['50 × 24 =', '1200'], ['7 × 24 =', '168', '+'], '1368']),
     ],
     'or',
   ),
-  'ch3-f025': pair('89', '×', '72'),
-  'ch3-f026': mul('73', '49', '(70 + 3)', [
+  'ch3-f026': pair('89', '×', '72'),
+  'ch3-f028': mul('73', '49', '(70 + 3)', [
     ['70 × 49 =', '3430'],
     ['3 × 49 =', '147', '+'],
     '3577',
   ]),
-  'ch3-f028': pair('46', '×', '42', '= 7 × 6'),
   'ch3-f029': mul(
     '73',
     '49',

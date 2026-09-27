@@ -58,4 +58,25 @@ describe('ExerciseCallout links', () => {
     expect(gen.exists()).toBe(true)
     expect(gen.text()).toBe('Generate')
   })
+
+  it('keeps a typeset worked example ahead of the callout that follows it (ch3-f041)', async () => {
+    const doc = (await import('@/content/chapters/3.json')).default as {
+      sections: Array<{ id: string; blocks: Block[] }>
+    }
+    const sec = doc.sections.find((s) => s.id === 'three-digit-squares')!
+    const i = sec.blocks.findIndex((b) => b.type === 'figure' && b.id === 'ch3-f041')
+    expect(sec.blocks[i + 1]?.type).toBe('exercise')
+    const w = mount(ContentBlocks, {
+      props: {
+        blocks: sec.blocks.slice(i, i + 2),
+        chapterId: '3',
+        sectionId: 'three-digit-squares',
+      },
+      global: { plugins: [router] },
+    })
+    const kids = [...w.element.children]
+    expect(kids[0]?.getAttribute('data-figure')).toBe('ch3-f041')
+    expect(kids[0]?.getAttribute('data-override')).toBe('stack')
+    expect(kids[1]?.getAttribute('data-testid')).toBe('exercise-callout')
+  })
 })
