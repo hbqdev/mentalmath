@@ -27,7 +27,8 @@ function toggleFocus() {
         <button
           v-if="inReader"
           type="button"
-          class="tgl"
+          class="tgl focus-toggle"
+          data-testid="focus-toggle"
           :aria-pressed="state.settings.focus"
           @click="toggleFocus"
         >
@@ -36,6 +37,7 @@ function toggleFocus() {
         <button
           type="button"
           class="tgl"
+          data-testid="theme-toggle"
           :title="`Theme: ${state.settings.theme}`"
           @click="cycleTheme"
         >
@@ -94,6 +96,10 @@ function toggleFocus() {
   display: flex;
   justify-content: center;
 }
+.center > * {
+  min-width: 0;
+  max-width: 100%;
+}
 .controls {
   display: flex;
   align-items: center;
@@ -123,8 +129,16 @@ function toggleFocus() {
   min-width: 0;
 }
 @media (max-width: 719px) {
-  .about {
+  .about,
+  .focus-toggle {
     display: none;
+  }
+  .top {
+    gap: 0.5rem;
+    padding: 0 0.75rem;
+  }
+  .controls {
+    gap: 0.35rem;
   }
 }
 </style>

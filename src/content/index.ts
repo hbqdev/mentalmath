@@ -222,7 +222,7 @@ export const chapterIndex: ChapterMeta[] = [
       },
       {
         "id": "matching-wits-with-a-calculator-learning-decimalization",
-        "title": "Matching Wits with a Calculator:learning Decimalization"
+        "title": "Matching Wits with a Calculator: Learning Decimalization"
       }
     ],
     "sets": [

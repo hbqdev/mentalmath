@@ -16,7 +16,7 @@ const sets = computed(() =>
 </script>
 
 <template>
-  <aside class="rail" aria-label="Practice">
+  <aside class="rail" data-testid="practice-rail" aria-label="Practice">
     <p class="label">Practice · this chapter</p>
     <p v-if="sets.length === 0" class="empty">No practice sets in this chapter.</p>
     <ul v-else>

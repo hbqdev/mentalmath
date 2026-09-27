@@ -221,3 +221,12 @@ describe('parseUnit figures nested in block divs', () => {
     expect(figures.map((f) => f.sourcePath)).toEqual(['images/a.jpeg', 'images/b.jpeg'])
   })
 })
+
+describe('parseUnit heading text', () => {
+  it('turns a line break inside a section heading into a space', () => {
+    const html = `<html><body><h2 class="section"><strong>MATCHING WITS WITH A CALCULATOR:<br class="calibre3"/>LEARNING DECIMALIZATION</strong></h2><p class="indent">x</p></body></html>`
+    const { doc } = parseUnit({ id: '4', kicker: 'Chapter 4', files: [{ path: 'text/x.html', html }] }, { ...opts, exerciseSets: {} })
+    expect(doc.sections[0]?.title).toBe('Matching Wits with a Calculator: Learning Decimalization')
+    expect(doc.sections[0]?.id).toBe('matching-wits-with-a-calculator-learning-decimalization')
+  })
+})

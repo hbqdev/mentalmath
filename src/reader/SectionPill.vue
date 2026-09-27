@@ -18,7 +18,7 @@ const emit = defineEmits<{ prev: []; next: []; practice: [] }>()
       ›
     </button>
     <span class="sep" />
-    <button type="button" class="pr" @click="emit('practice')">
+    <button type="button" class="pr" data-testid="pill-practice" @click="emit('practice')">
       Practice<template v-if="practiceCount"> · {{ practiceCount }}</template>
     </button>
   </div>

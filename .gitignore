@@ -35,3 +35,8 @@ coverage
 
 # book source, never commit
 *.epub
+
+# playwright
+e2e/.results/
+test-results/
+playwright-report/
