@@ -22,10 +22,17 @@ export interface SectionMeta {
   title: string
 }
 
+export interface BookSetAnchor {
+  id: string
+  sectionId: string
+}
+
 export interface ChapterMeta {
   id: string
   number: number | null
   title: string
   kicker: string
   sections: SectionMeta[]
+  /** Book exercise sets found in the text, in reading order, with the section that holds each. */
+  sets: BookSetAnchor[]
 }
