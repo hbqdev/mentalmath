@@ -14,3 +14,13 @@ createApp(App).use(router).mount('#app')
 
 // Installable and readable offline after the first visit; updates apply on the next load.
 registerSW({ immediate: true })
+
+// After a deploy, a page that still runs the old bundle may ask for a chunk that no longer
+// exists; reloading once picks up the new build instead of leaving a blank view.
+window.addEventListener('vite:preloadError', (event) => {
+  event.preventDefault()
+  const key = 'mentalmath.reloaded-for-chunk'
+  if (sessionStorage.getItem(key)) return
+  sessionStorage.setItem(key, '1')
+  window.location.reload()
+})
