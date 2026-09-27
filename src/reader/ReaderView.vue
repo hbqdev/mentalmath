@@ -5,7 +5,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { useProgress } from '@/app/progress'
 import { getChapterMeta, loadChapter, neighbours, readableChapters } from '@/content/loader'
 import type { ChapterDoc } from '@/content/types'
-import { practiceSetsFor, registerDiscoveredSets, setTitle } from '@/practice/registry'
+import { allSetsFor } from '@/exercises/registry'
 import BottomSheet from './BottomSheet.vue'
 import ChapterOutline from './ChapterOutline.vue'
 import ContentBlocks from './ContentBlocks.vue'
@@ -36,7 +36,7 @@ const activeIndex = computed(() =>
     sections.value.findIndex((s) => s.id === activeId.value),
   ),
 )
-const practiceSets = computed(() => practiceSetsFor(chapterId.value))
+const practiceSets = computed(() => allSetsFor(chapterId.value))
 const nav = computed(() => neighbours(chapterId.value))
 const allChapters = readableChapters()
 
@@ -110,16 +110,6 @@ async function load() {
     const d = await loadChapter(chapterId.value)
     if (my !== loadSeq) return
     doc.value = d
-    registerDiscoveredSets(
-      d.id,
-      d.sections.flatMap((s) =>
-        s.blocks.flatMap((b) =>
-          b.type === 'exercise'
-            ? [{ id: b.setId, chapterId: d.id, sectionId: s.id, title: setTitle(b.setId), kind: 'book' as const }]
-            : [],
-        ),
-      ),
-    )
     status.value = 'ready'
     const wanted = String(route.params.section ?? '')
     const known = wanted && d.sections.some((s) => s.id === wanted)

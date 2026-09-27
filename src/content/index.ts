@@ -24,7 +24,8 @@ export const chapterIndex: ChapterMeta[] = [
         "id": "introduction-by-arthur-benjamin",
         "title": "Introduction by Arthur Benjamin"
       }
-    ]
+    ],
+    "sets": []
   },
   {
     "id": "0",
@@ -52,7 +53,8 @@ export const chapterIndex: ChapterMeta[] = [
         "id": "improve-your-memory",
         "title": "Improve Your Memory"
       }
-    ]
+    ],
+    "sets": []
   },
   {
     "id": "1",
@@ -71,6 +73,24 @@ export const chapterIndex: ChapterMeta[] = [
       {
         "id": "left-to-right-subtraction",
         "title": "Left-to-Right Subtraction"
+      }
+    ],
+    "sets": [
+      {
+        "id": "ch1-two-digit-addition",
+        "sectionId": "left-to-right-addition"
+      },
+      {
+        "id": "ch1-three-digit-addition",
+        "sectionId": "left-to-right-addition"
+      },
+      {
+        "id": "ch1-two-digit-subtraction",
+        "sectionId": "left-to-right-subtraction"
+      },
+      {
+        "id": "ch1-three-digit-subtraction",
+        "sectionId": "left-to-right-subtraction"
       }
     ]
   },
@@ -104,6 +124,20 @@ export const chapterIndex: ChapterMeta[] = [
         "id": "why-these-tricks-work",
         "title": "Why These Tricks Work"
       }
+    ],
+    "sets": [
+      {
+        "id": "ch2-2-by-1-multiplication",
+        "sectionId": "2-by-1-multiplication-problems"
+      },
+      {
+        "id": "ch2-3-by-1-multiplication",
+        "sectionId": "3-by-1-multiplication-problems"
+      },
+      {
+        "id": "ch2-two-digit-squares",
+        "sectionId": "be-there-or-b2-squaring-two-digit-numbers"
+      }
     ]
   },
   {
@@ -132,6 +166,36 @@ export const chapterIndex: ChapterMeta[] = [
         "id": "cubing",
         "title": "Cubing"
       }
+    ],
+    "sets": [
+      {
+        "id": "ch3-multiplying-by-11",
+        "sectionId": "2-by-2-multiplication-problems"
+      },
+      {
+        "id": "ch3-2-by-2-addition-method",
+        "sectionId": "2-by-2-multiplication-problems"
+      },
+      {
+        "id": "ch3-2-by-2-subtraction-method",
+        "sectionId": "2-by-2-multiplication-problems"
+      },
+      {
+        "id": "ch3-2-by-2-factoring-method",
+        "sectionId": "2-by-2-multiplication-problems"
+      },
+      {
+        "id": "ch3-2-by-2-general-multiplication",
+        "sectionId": "approaching-multiplication-creatively"
+      },
+      {
+        "id": "ch3-three-digit-squares",
+        "sectionId": "three-digit-squares"
+      },
+      {
+        "id": "ch3-two-digit-cubes",
+        "sectionId": "cubing"
+      }
     ]
   },
   {
@@ -159,6 +223,48 @@ export const chapterIndex: ChapterMeta[] = [
       {
         "id": "matching-wits-with-a-calculator-learning-decimalization",
         "title": "Matching Wits with a Calculator:learning Decimalization"
+      }
+    ],
+    "sets": [
+      {
+        "id": "ch4-one-digit-division",
+        "sectionId": "one-digit-division"
+      },
+      {
+        "id": "ch4-two-digit-division",
+        "sectionId": "two-digit-division"
+      },
+      {
+        "id": "ch4-decimalization",
+        "sectionId": "matching-wits-with-a-calculator-learning-decimalization"
+      },
+      {
+        "id": "ch4-testing-for-divisibility",
+        "sectionId": "matching-wits-with-a-calculator-learning-decimalization"
+      },
+      {
+        "id": "ch4-multiplying-fractions",
+        "sectionId": "matching-wits-with-a-calculator-learning-decimalization"
+      },
+      {
+        "id": "ch4-dividing-fractions",
+        "sectionId": "matching-wits-with-a-calculator-learning-decimalization"
+      },
+      {
+        "id": "ch4-simplifying-fractions",
+        "sectionId": "matching-wits-with-a-calculator-learning-decimalization"
+      },
+      {
+        "id": "ch4-adding-fractions-equal-denominators",
+        "sectionId": "matching-wits-with-a-calculator-learning-decimalization"
+      },
+      {
+        "id": "ch4-adding-fractions-unequal-denominators",
+        "sectionId": "matching-wits-with-a-calculator-learning-decimalization"
+      },
+      {
+        "id": "ch4-subtracting-fractions",
+        "sectionId": "matching-wits-with-a-calculator-learning-decimalization"
       }
     ]
   },
@@ -208,6 +314,32 @@ export const chapterIndex: ChapterMeta[] = [
         "id": "guesstimation-exercises",
         "title": "Guesstimation Exercises"
       }
+    ],
+    "sets": [
+      {
+        "id": "ch5-addition-guesstimation",
+        "sectionId": "guesstimation-exercises"
+      },
+      {
+        "id": "ch5-subtraction-guesstimation",
+        "sectionId": "guesstimation-exercises"
+      },
+      {
+        "id": "ch5-division-guesstimation",
+        "sectionId": "guesstimation-exercises"
+      },
+      {
+        "id": "ch5-multiplication-guesstimation",
+        "sectionId": "guesstimation-exercises"
+      },
+      {
+        "id": "ch5-square-root-guesstimation",
+        "sectionId": "guesstimation-exercises"
+      },
+      {
+        "id": "ch5-everyday-math",
+        "sectionId": "guesstimation-exercises"
+      }
     ]
   },
   {
@@ -244,6 +376,24 @@ export const chapterIndex: ChapterMeta[] = [
         "id": "casting-out-elevens",
         "title": "Casting Out Elevens"
       }
+    ],
+    "sets": [
+      {
+        "id": "ch6-columns-of-numbers",
+        "sectionId": "casting-out-elevens"
+      },
+      {
+        "id": "ch6-subtracting-on-paper",
+        "sectionId": "casting-out-elevens"
+      },
+      {
+        "id": "ch6-square-root-guesstimation",
+        "sectionId": "casting-out-elevens"
+      },
+      {
+        "id": "ch6-pencil-and-paper-multiplication",
+        "sectionId": "casting-out-elevens"
+      }
     ]
   },
   {
@@ -272,7 +422,8 @@ export const chapterIndex: ChapterMeta[] = [
         "id": "memory-magic",
         "title": "Memory Magic"
       }
-    ]
+    ],
+    "sets": []
   },
   {
     "id": "8",
@@ -303,6 +454,28 @@ export const chapterIndex: ChapterMeta[] = [
       {
         "id": "5-by-5-multiplication",
         "title": "5-by-5 Multiplication"
+      }
+    ],
+    "sets": [
+      {
+        "id": "ch8-four-digit-squares",
+        "sectionId": "four-digit-squares"
+      },
+      {
+        "id": "ch8-3-by-2-multiplication",
+        "sectionId": "3-by-2-multiplication"
+      },
+      {
+        "id": "ch8-five-digit-squares",
+        "sectionId": "five-digit-squares"
+      },
+      {
+        "id": "ch8-3-by-3-multiplication",
+        "sectionId": "3-by-3-multiplication"
+      },
+      {
+        "id": "ch8-5-by-5-multiplication",
+        "sectionId": "5-by-5-multiplication"
       }
     ]
   },
@@ -356,6 +529,12 @@ export const chapterIndex: ChapterMeta[] = [
         "id": "a-day-for-any-date",
         "title": "A Day for Any Date"
       }
+    ],
+    "sets": [
+      {
+        "id": "ch9-a-day-for-any-date",
+        "sectionId": "a-day-for-any-date"
+      }
     ]
   },
   {
@@ -368,7 +547,8 @@ export const chapterIndex: ChapterMeta[] = [
         "id": "overview",
         "title": "Epilogue"
       }
-    ]
+    ],
+    "sets": []
   }
 ]
 

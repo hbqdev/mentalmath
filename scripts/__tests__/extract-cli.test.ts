@@ -49,6 +49,12 @@ describe('extract()', () => {
     expect(existsSync(path.join(out, 'figures', '0', 'ch0-f002.jpeg'))).toBe(false)
     const index = readFileSync(path.join(out, 'content', 'index.ts'), 'utf8')
     expect(index).toContain(`'intro': () => import('./chapters/intro.json')`)
+    const meta = JSON.parse(readFileSync(path.join(out, 'content', 'chapters', '0.json'), 'utf8'))
+    expect(meta.id).toBe('0')
+    const indexJson = index.slice(index.indexOf('= [') + 2, index.indexOf('\n\nexport const chapterLoaders'))
+    const metas = JSON.parse(indexJson) as Array<{ id: string; sets: Array<{ id: string; sectionId: string }> }>
+    expect(metas.find((m) => m.id === '0')?.sets).toEqual([{ id: 'ch0-sample-set', sectionId: 'instant-multiplication' }])
+    expect(metas.find((m) => m.id === 'intro')?.sets).toEqual([])
     expect(result.candidates).toEqual([])
     expect(result.units.map((u) => u.id)).toEqual(['intro', '0', 'epilogue'])
     expect(result.answersHtml.length).toBeGreaterThan(0)
