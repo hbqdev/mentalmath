@@ -13,7 +13,7 @@ const bookMap = JSON.parse(readFileSync(new URL('../../../../scripts/book-map.js
 const mappedIds = [...new Set([...Object.values(bookMap.exerciseSets), ...Object.values(bookMap.exerciseAfter)])].sort()
 
 // Sets whose data lands in later tasks of this plan; each task removes its ids from here.
-const PENDING = new Set<string>(mappedIds.filter((id) => !/^ch[12345]-/.test(id)))
+const PENDING = new Set<string>(mappedIds.filter((id) => !/^ch[1-6]-/.test(id)))
 
 describe('book exercise data', () => {
   it('covers every curated set id and nothing else', () => {
@@ -127,6 +127,23 @@ describe('book exercise data', () => {
     const every = allBookSets().find((s) => s.id === 'ch5-everyday-math')!.problems
     expect(check(every[0]!.answer, '13.20').correct).toBe(true)
     expect(check(every[4]!.answer, '12').correct).toBe(true)
+  })
+
+  it('has the expected problem counts for chapter 6 and checks cents', () => {
+    const counts = Object.fromEntries(allBookSets().filter((s) => /^ch6-/.test(s.id)).map((s) => [s.id, s.problems.length]))
+    expect(counts).toEqual({
+      'ch6-columns-of-numbers': 2,
+      'ch6-subtracting-on-paper': 4,
+      'ch6-square-root-guesstimation': 4,
+      'ch6-pencil-and-paper-multiplication': 6,
+    })
+    const cols = allBookSets().find((s) => s.id === 'ch6-columns-of-numbers')!.problems
+    expect(cols[1]!.prompt).toMatchObject({ kind: 'columns', unit: '$' })
+    expect(check(cols[1]!.answer, '288.72').correct).toBe(true)
+    expect(check(cols[1]!.answer, '288.70').correct).toBe(false)
+    const roots = allBookSets().find((s) => s.id === 'ch6-square-root-guesstimation')!.problems
+    expect(check(roots[3]!.answer, '19').correct).toBe(true)
+    expect(check(roots[0]!.answer, '3.87').correct).toBe(true)
   })
 
   it('has the expected problem counts for chapter 1', () => {

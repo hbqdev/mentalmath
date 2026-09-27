@@ -4,6 +4,7 @@ import { sets as ch2 } from './ch2'
 import { sets as ch3 } from './ch3'
 import { sets as ch4 } from './ch4'
 import { sets as ch5 } from './ch5'
+import { sets as ch6 } from './ch6'
 
 // One import of this module registers every transcribed book set.
-registerBookSets([...ch1, ...ch2, ...ch3, ...ch4, ...ch5])
+registerBookSets([...ch1, ...ch2, ...ch3, ...ch4, ...ch5, ...ch6])
