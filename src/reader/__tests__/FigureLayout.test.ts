@@ -70,6 +70,65 @@ describe('FigureLayout', () => {
     expect(eleven.find('.sum').text()).toBe('6')
   })
 
+  it('renders long division, criss-cross lines, grids, pre and inline glyphs with rich markup', () => {
+    const ld = mountSpec({
+      kind: 'longdiv',
+      divisor: '7',
+      dividend: '179',
+      quotient: '25',
+      lines: [
+        { value: '− 140', rule: true },
+        { value: '39' },
+        { value: '− 35', rule: true },
+        { value: '4', note: '← remainder' },
+      ],
+      answer: 'Answer: 25 with a remainder of 4, or 25{4/7}',
+    })
+    expect(ld.find('.quot').text()).toBe('25')
+    expect(ld.findAll('.ldl.rule').length).toBe(2)
+    expect(ld.find('.ldl .note').text()).toBe('← remainder')
+    expect(ld.find('.answer .rt-num').text()).toBe('4')
+    expect(ld.find('.answer .rt-den').text()).toBe('7')
+    const cc = mountSpec({
+      kind: 'crisscross',
+      top: ['4', '7'],
+      bottom: ['3', '4'],
+      links: [
+        [0, 1],
+        [1, 0],
+      ],
+    })
+    expect(cc.findAll('line').length).toBe(2)
+    expect(cc.findAll('text').map((t) => t.text())).toEqual(['4', '7', '3', '4'])
+    const grid = mountSpec({
+      kind: 'grid',
+      rows: [
+        ['4328', '→', '17'],
+        ['884', '→', '20'],
+      ],
+    })
+    expect(grid.findAll('.gcell').length).toBe(6)
+    expect(grid.findAll('.gcell.arrow').length).toBe(2)
+    const pre = mountSpec({
+      kind: 'pre',
+      lines: ['   4. 3 5 8', ' √~19.000000~', '‹8›3 × ‹3› = 2 49'],
+    })
+    expect(pre.find('.rt-over').text()).toBe('19.000000')
+    expect(pre.findAll('.rt-under').map((u) => u.text())).toEqual(['8', '3'])
+    const inline = mountSpec({ kind: 'inline', text: '{1/2}' })
+    expect(inline.find('.rt-frac').exists()).toBe(true)
+    const chain = mountSpec({
+      kind: 'chain',
+      steps: ['{29/45}', '{58/90}', '≈ .6~44~'],
+      notes: ['× 2', '÷ 10'],
+    })
+    expect(chain.findAll('.rt-frac').length).toBe(2)
+    expect(chain.findAll('.sign').map((x) => x.text())).toEqual(['=', '≈'])
+    expect(chain.find('.rt-over').text()).toBe('44')
+    const sup = mountSpec({ kind: 'text', lines: ['M = {Pi(1 + i)^N^/(1 + i)^N^ − 1}'] })
+    expect(sup.findAll('.rt-sup').length).toBe(2)
+  })
+
   it('nests rows and stacks', () => {
     const w = mountSpec({
       kind: 'row',

@@ -11,7 +11,7 @@ const spec = computed(() => figureOverride(props.block.id))
 <template>
   <figure
     class="fig"
-    :class="{ typeset: spec }"
+    :class="{ typeset: spec, inline: spec?.kind === 'inline' }"
     :data-figure="block.id"
     :data-override="spec ? spec.kind : undefined"
   >
@@ -36,6 +36,9 @@ const spec = computed(() => figureOverride(props.block.id))
 .fig.typeset {
   overflow-x: auto;
   padding: 0.1em 0;
+}
+.fig.inline {
+  margin: 0.4em 0 0.6em;
 }
 /* The EPUB figures are small; scale them up to a readable size without exceeding the column. */
 .fig img {

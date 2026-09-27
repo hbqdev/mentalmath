@@ -19,13 +19,18 @@ export interface ColumnLine {
   carry?: boolean
 }
 
+/**
+ * Strings in `text`, `pre`, `grid`, `chain` steps, `inline` and long-division answers accept a
+ * small inline markup: `{3/4}` a stacked fraction, `~09~` an overline (repeating decimal or
+ * radicand), `‹8›` an underline, `^N^` a superscript.
+ */
 export type FigureSpec =
-  /** Vertical arithmetic, one grid: label | op | value | note. */
-  | { kind: 'column'; lines: ColumnLine[] }
+  /** Vertical arithmetic, one grid: label | op | value | note; `label` is a small caption above. */
+  | { kind: 'column'; lines: ColumnLine[]; caption?: string }
   /** "47 + 32 = 77 + 2 = 79" with an optional note under each equals sign. */
   | { kind: 'chain'; steps: string[]; notes?: Array<string | undefined> }
   /** Plain lines of text. */
-  | { kind: 'text'; lines: string[]; align?: 'left' | 'center' }
+  | { kind: 'text'; lines: string[]; align?: 'left' | 'center'; serif?: boolean }
   /** Header row plus body rows; `headSpan` gives a colspan per header cell; `highlight` marks a body row; `grid` draws cell borders. */
   | {
       kind: 'table'
@@ -34,6 +39,7 @@ export type FigureSpec =
       rows: string[][]
       highlight?: number
       grid?: boolean
+      plain?: boolean
     }
   /** The squaring diagram: base fans out to up/down, both fan in to the result. */
   | {
@@ -44,6 +50,7 @@ export type FigureSpec =
       upLabel: string
       downLabel: string
       result?: string
+      label?: string
     }
   /** Multiplying by 11: "42 / × 11", then "4 _ 2" with the digit sum below, then "= 462". */
   | { kind: 'eleven'; n: string; sum: string; result: string }
@@ -51,5 +58,22 @@ export type FigureSpec =
   | { kind: 'row'; items: FigureSpec[]; sep?: string }
   /** Items stacked; `indent` steps each following item to the right (nested squares). */
   | { kind: 'stack'; items: FigureSpec[]; indent?: boolean }
+  /** Long division: quotient over the bracket, then the subtraction lines right-aligned under the dividend (trailing spaces shift a line left). */
+  | {
+      kind: 'longdiv'
+      divisor: string
+      dividend: string
+      quotient: string
+      lines: Array<{ value: string; rule?: boolean; note?: string }>
+      answer?: string
+    }
+  /** Criss-cross multiplication: two rows of digits with the lines the method draws between them. */
+  | { kind: 'crisscross'; top: string[]; bottom: string[]; links: Array<[number, number]> }
+  /** Cells laid out on a grid, one string per cell (arrows such as → and ↓ are plain cells); rows may be ragged. */
+  | { kind: 'grid'; rows: string[][]; align?: 'left' | 'right' | 'center' }
+  /** Monospaced lines with their spacing kept (the square-root layout, phonetic digit rows). */
+  | { kind: 'pre'; lines: string[]; align?: 'left' | 'center' }
+  /** A glyph the book set inline in a sentence (a fraction, a mixed number). */
+  | { kind: 'inline'; text: string }
 
 export type FigureOverrides = Record<string, FigureSpec>
