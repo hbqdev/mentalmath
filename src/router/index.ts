@@ -34,8 +34,10 @@ export function createAppRouter(
         component: () => import('@/views/NotFoundView.vue'),
       },
     ],
-    scrollBehavior(to, _from, saved) {
+    scrollBehavior(to, from, saved) {
       if (saved) return saved
+      // Moving between sections of the same chapter is handled by the reader itself.
+      if (to.name === 'read' && from.name === 'read' && to.params.chapter === from.params.chapter) return false
       if (to.hash) return { el: to.hash, top: 80 }
       return { top: 0 }
     },

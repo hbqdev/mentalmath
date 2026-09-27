@@ -261,8 +261,14 @@ function selectFromSheet(id: string) {
   font-size: 1.6rem;
   margin: 0.25rem 0 1rem;
 }
+.switcher {
+  display: block;
+  width: 100%;
+}
 .switcher select {
-  max-width: 60vw;
+  width: 100%;
+  max-width: 100%;
+  text-overflow: ellipsis;
   font: inherit;
   font-size: 0.85rem;
   background: var(--surface);

@@ -174,6 +174,11 @@ function imagePath(fileDir: string, src: string): string {
   return path.posix.normalize(path.posix.join(fileDir, src))
 }
 
+/** Heading text with <br> treated as a space (calibre breaks long headings across lines). */
+function headingText($: CheerioAPI, el: Element): string {
+  return collapseWs(($(el).html() ?? '').replace(/<br[^>]*>/g, ' ').replace(/<[^>]+>/g, ''))
+}
+
 function pageOf(el: Element): number | undefined {
   const m = /^page(\d+)$/.exec(el.attribs.id ?? '')
   return m ? Number(m[1]) : undefined
@@ -322,7 +327,7 @@ function walkBody(
       continue
     }
     if (tag === 'h2') {
-      b.startSection($(el).text())
+      b.startSection(headingText($, el))
       continue
     }
     if (tag === 'h3') {
