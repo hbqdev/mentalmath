@@ -73,10 +73,13 @@ function divisibilityRule(by: number, n: number): string {
   }
 }
 
+/** A fraction in lowest terms, as the book always poses them. */
 function pickFrac(rng: Rng, maxDen: number, proper = true): Frac {
-  const den = rng.int(2, maxDen)
-  const num = proper ? rng.int(1, den - 1) : rng.int(1, maxDen)
-  return { num, den }
+  for (;;) {
+    const den = rng.int(2, maxDen)
+    const num = proper ? rng.int(1, den - 1) : rng.int(1, maxDen)
+    if (gcd(num, den) === 1) return { num, den }
+  }
 }
 
 export const sets: GeneratedSetDef[] = [
@@ -116,7 +119,8 @@ export const sets: GeneratedSetDef[] = [
     generate(difficulty, rng) {
       const dens = difficulty === 'easy' ? [2, 3, 4, 5, 10] : difficulty === 'medium' ? [3, 6, 8, 9, 11] : [7, 9, 11, 12]
       const den = rng.pick(dens)
-      const num = rng.int(1, den - 1)
+      let num = rng.int(1, den - 1)
+      while (gcd(num, den) !== 1) num = rng.int(1, den - 1)
       const value = num / den
       const rounded = Math.round(value * 1000) / 1000
       return {
@@ -136,7 +140,9 @@ export const sets: GeneratedSetDef[] = [
     coversBookSets: ['ch4-testing-for-divisibility'],
     generate(difficulty, rng) {
       const by = rng.pick(difficulty === 'easy' ? [2, 3, 4, 5, 9] : difficulty === 'medium' ? [3, 4, 6, 8, 9] : [7, 8, 11])
-      const n = difficulty === 'easy' ? rng.int(100, 9999) : difficulty === 'medium' ? rng.int(1000, 99999) : rng.int(1000, 999999)
+      const [lo, hi] = difficulty === 'easy' ? [100, 9999] : difficulty === 'medium' ? [1000, 99999] : [1000, 999999]
+      // Half the time build a true multiple so "No" is not the safe guess.
+      const n = rng.chance(0.5) ? by * rng.int(Math.ceil(lo / by), Math.floor(hi / by)) : rng.int(lo, hi)
       const yes = n % by === 0
       return {
         difficulty,
@@ -209,7 +215,9 @@ export const sets: GeneratedSetDef[] = [
     coversBookSets: ['ch4-adding-fractions-equal-denominators', 'ch4-adding-fractions-unequal-denominators'],
     generate(difficulty, rng) {
       const a = pickFrac(rng, difficulty === 'hard' ? 12 : 9)
-      const b = difficulty === 'easy' ? { num: rng.int(1, a.den - 1), den: a.den } : pickFrac(rng, difficulty === 'hard' ? 12 : 9)
+      let b: Frac
+      do b = difficulty === 'easy' ? { num: rng.int(1, a.den - 1), den: a.den } : pickFrac(rng, difficulty === 'hard' ? 12 : 9)
+      while (gcd(b.num, b.den) !== 1)
       const raw = a.den === b.den ? { num: a.num + b.num, den: a.den } : { num: a.num * b.den + b.num * a.den, den: a.den * b.den }
       const ans = reduce(raw)
       const steps =
@@ -229,10 +237,14 @@ export const sets: GeneratedSetDef[] = [
     description: 'Cross-multiply, subtract the tops, reduce.',
     coversBookSets: ['ch4-subtracting-fractions'],
     generate(difficulty, rng) {
-      let a = pickFrac(rng, difficulty === 'hard' ? 12 : 9)
-      let b = difficulty === 'easy' ? { num: rng.int(1, a.den - 1), den: a.den } : pickFrac(rng, difficulty === 'hard' ? 12 : 9)
-      if (a.num * b.den <= b.num * a.den) [a, b] = [b, a]
-      if (a.num * b.den === b.num * a.den) a = { num: a.num + 1, den: a.den }
+      let a: Frac
+      do a = pickFrac(rng, difficulty === 'hard' ? 12 : 9)
+      while (difficulty === 'easy' && a.den < 3) // halves leave no different same-denominator partner
+      let b: Frac
+      do {
+        b = difficulty === 'easy' ? { num: rng.int(1, a.den - 1), den: a.den } : pickFrac(rng, difficulty === 'hard' ? 12 : 9)
+      } while (a.num * b.den === b.num * a.den || gcd(b.num, b.den) !== 1)
+      if (a.num * b.den < b.num * a.den) [a, b] = [b, a]
       const raw = a.den === b.den ? { num: a.num - b.num, den: a.den } : { num: a.num * b.den - b.num * a.den, den: a.den * b.den }
       const ans = reduce(raw)
       const steps =

@@ -32,7 +32,7 @@ describe('AnswerInput', () => {
   })
   it('disables everything while feedback is shown', () => {
     const w = mount(AnswerInput, { props: { spec: { kind: 'integer', value: 1 }, disabled: true } })
-    expect(w.find('input').attributes('disabled')).toBeDefined()
+    expect(w.find('input').attributes('readonly')).toBeDefined()
     expect(w.find('[data-testid="answer-submit"]').attributes('disabled')).toBeDefined()
   })
 })

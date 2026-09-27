@@ -42,7 +42,7 @@ export function parseFraction(s: string): Frac | null {
 
 /** '45 r 8', '45R8', '45 remainder 8', '45 rem 8', '45' (r = 0). Not the fraction form. */
 export function parseQuotientRemainder(s: string): { q: number; r: number } | null {
-  const t = s.trim().toLowerCase()
+  const t = s.trim().toLowerCase().replace(/,/g, '').replace(/\.$/, '')
   const m = /^(\d+)\s*(?:r|rem|remainder)\.?\s*(\d+)$/.exec(t)
   if (m) return { q: Number(m[1]), r: Number(m[2]) }
   if (/^\d+$/.test(t)) return { q: Number(t), r: 0 }
@@ -61,6 +61,8 @@ export function phoneticDigits(word: string): string {
     let d = ''
     let skip = 0
     if (ch === ' ') { lastDigit = ''; lastLetter = ''; continue }
+    const atWordStart = i === 0 || w[i - 1] === ' '
+    if (atWordStart && ch === 'k' && next === 'n') continue // silent k (knee, knife)
     if (ch === 'c' && next === 'k') { d = '7'; skip = 1 }
     else if (ch === 'p' && next === 'h') { d = '8'; skip = 1 }
     else if (ch === 's' && next === 'h') { d = '6'; skip = 1 }
@@ -68,14 +70,14 @@ export function phoneticDigits(word: string): string {
     else if (ch === 't' && next === 'h') { d = '1'; skip = 1 }
     else if (ch === 'd' && next === 'g') { d = '6'; skip = 1 }
     else if ('sz'.includes(ch)) d = '0'
-    else if (ch === 'c') d = 'eiy'.includes(next) ? '0' : '7'
+    else if (ch === 'c') d = next !== '' && 'eiy'.includes(next) ? '0' : '7'
     else if ('td'.includes(ch)) d = '1'
     else if (ch === 'n') d = '2'
     else if (ch === 'm') d = '3'
     else if (ch === 'r') d = '4'
     else if (ch === 'l') d = '5'
     else if (ch === 'j') d = '6'
-    else if (ch === 'g') d = 'eiy'.includes(next) ? '6' : '7'
+    else if (ch === 'g') d = next !== '' && 'eiy'.includes(next) ? '6' : '7'
     else if ('kq'.includes(ch)) d = '7'
     else if ('fv'.includes(ch)) d = '8'
     else if ('pb'.includes(ch)) d = '9'
@@ -97,8 +99,10 @@ export function formatAnswer(spec: AnswerSpec): string {
       return String(spec.value)
     case 'decimal':
       return String(spec.value)
-    case 'fraction':
-      return `${spec.value.num}/${spec.value.den}`
+    case 'fraction': {
+      const r = reduce(spec.value)
+      return r.den === 1 ? String(r.num) : `${spec.value.num}/${spec.value.den}`
+    }
     case 'quotient-remainder':
       return spec.r === 0 ? String(spec.q) : `${spec.q} remainder ${spec.r}`
     case 'choice':
@@ -132,10 +136,11 @@ export function check(spec: AnswerSpec, input: string): CheckResult {
         const b = reduce(spec.value)
         return { correct: a.num === b.num && a.den === b.den, shown }
       }
-      if (spec.acceptDecimal) {
-        const n = normalizeNumber(raw)
-        return { correct: n !== null && Math.abs(n - spec.value.num / spec.value.den) <= 0.005, shown }
-      }
+      const n = normalizeNumber(raw)
+      if (n === null) return { correct: false, shown }
+      const b = reduce(spec.value)
+      if (b.den === 1 && n === b.num) return { correct: true, shown }
+      if (spec.acceptDecimal) return { correct: Math.abs(n - b.num / b.den) <= 0.005, shown }
       return { correct: false, shown }
     }
     case 'quotient-remainder': {

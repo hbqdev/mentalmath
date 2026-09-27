@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { check, formatAnswer, normalizeNumber, parseFraction, parseQuotientRemainder } from '../checker'
+import { check, formatAnswer, normalizeNumber, parseFraction, parseQuotientRemainder, phoneticDigits } from '../checker'
 import type { AnswerSpec } from '../types'
 
 describe('normalizeNumber', () => {
@@ -78,5 +78,29 @@ describe('check by kind', () => {
     const s: AnswerSpec = { kind: 'estimate', value: 2584, relTolerance: 0.02 }
     ok(s, '2600'); ok(s, '2550'); bad(s, '2700'); bad(s, 'lots')
     expect(formatAnswer(s)).toBe('≈ 2584')
+  })
+})
+
+describe('review fixes: checker', () => {
+  it('word-final hard c and g are 7, silent initial k is ignored', () => {
+    expect(phoneticDigits('dog')).toBe('17')
+    expect(phoneticDigits('bag')).toBe('97')
+    expect(phoneticDigits('mac')).toBe('37')
+    expect(phoneticDigits('pig')).toBe('97')
+    expect(phoneticDigits('jug')).toBe('67')
+    expect(phoneticDigits('knee')).toBe('2')
+    expect(phoneticDigits('cage')).toBe('76')
+  })
+  it('accepts a whole number for a fraction answer that reduces to n/1 and shows it as an integer', () => {
+    const s: AnswerSpec = { kind: 'fraction', value: { num: 2, den: 1 }, acceptDecimal: false }
+    ok(s, '2'); ok(s, '2/1'); ok(s, '4/2'); bad(s, '3')
+    expect(formatAnswer(s)).toBe('2')
+    const t: AnswerSpec = { kind: 'fraction', value: { num: 4, den: 4 }, acceptDecimal: false }
+    ok(t, '1')
+  })
+  it('quotient-remainder accepts thousands separators and a trailing dot on exact answers', () => {
+    expect(parseQuotientRemainder('1,000 r 1')).toEqual({ q: 1000, r: 1 })
+    ok({ kind: 'quotient-remainder', q: 45, r: 0, divisor: 9 }, '45.')
+    ok({ kind: 'quotient-remainder', q: 1000, r: 1, divisor: 3 }, '1,000 r 1')
   })
 })

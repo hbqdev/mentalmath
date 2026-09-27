@@ -67,6 +67,14 @@ function begin() {
     status.value = 'idle'
     return
   }
+  // A book set asked for in generated mode runs (and records) as its generated twin.
+  if (set.value.kind === 'book' && route.query.mode === 'generated') {
+    const t = generatedTwin(set.value.ref.id)
+    if (t) {
+      router.replace({ name: 'practice', params: { chapter: chapterId.value, set: t.id }, query: route.query })
+      return
+    }
+  }
   const exercises = buildExercises()
   if (exercises.length === 0) {
     status.value = 'empty'
@@ -108,6 +116,11 @@ function onNext() {
   nextTick(() => answerBox.value?.focus())
 }
 
+/** Enter submits while answering (handled by the input) and advances while feedback is shown. */
+function onEnter() {
+  if (state.value?.phase === 'feedback') onNext()
+}
+
 function again() {
   const fresh = createRng().seed
   router.replace({ query: { ...route.query, seed: mode.value === 'generated' ? String(fresh) : undefined } })
@@ -123,7 +136,7 @@ const focusMode = computed(() => progress.value.settings.focus)
 </script>
 
 <template>
-  <div class="practice" :class="{ focus: focusMode }">
+  <div class="practice" :class="{ focus: focusMode }" @keyup.enter="onEnter">
     <section v-if="!set" class="state" data-testid="set-not-found">
       <p class="kicker">Not found</p>
       <h1>No such practice set in this chapter.</h1>
@@ -165,7 +178,7 @@ const focusMode = computed(() => progress.value.settings.focus)
             <template v-else>Not quite. The answer is <strong>{{ state.lastResult.shown }}</strong>.</template>
           </p>
           <SolutionSteps v-if="state.current.solution?.steps?.length" :steps="state.current.solution.steps" />
-          <button type="button" class="btn next" data-testid="next-button" autofocus @click="onNext" @keyup.enter="onNext">
+          <button type="button" class="btn next" data-testid="next-button" @click="onNext">
             {{ state.index < state.total - 1 ? 'Next ›' : 'See results ›' }}
           </button>
         </div>
