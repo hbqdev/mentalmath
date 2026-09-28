@@ -9,6 +9,8 @@ body {
   padding: 0;
 }
 html {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
   background: var(--paper);
   color: var(--ink);
   font-size: var(--body-size);
