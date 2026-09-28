@@ -51,7 +51,7 @@ export const sampleProgress = {
     },
   },
   streak: { current: 2, lastActiveDay: '2026-09-27' },
-  settings: { theme: 'light', focus: false, fontScale: 1, lockUntilRead: false },
+  settings: { theme: 'light', focus: false, fontSize: 18, font: 'serif', lockUntilRead: false },
 }
 
 /** Opt into the reading gate so locked-set behaviour can be exercised. */

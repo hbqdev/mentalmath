@@ -27,9 +27,10 @@
                 ? 'dark'
                 : 'light'
           document.documentElement.dataset.theme = theme
-          document.documentElement.dataset.fontScale = String(
-            s.fontScale === 0 || s.fontScale === 2 ? s.fontScale : 1,
-          )
+          var px = Math.min(24, Math.max(14, Math.round(Number(s.fontSize) || 18)))
+          document.documentElement.style.setProperty('--body-size', px + 'px')
+          document.documentElement.dataset.font =
+            ['serif', 'sans', 'system', 'mono'].indexOf(s.font) >= 0 ? s.font : 'serif'
         } catch (e) {
           /* storage unavailable: the app applies the theme after mount */
         }

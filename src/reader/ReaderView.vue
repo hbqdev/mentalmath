@@ -364,6 +364,7 @@ function selectFromSheet(id: string) {
   border-color: var(--accent);
 }
 .col-text {
+  font-size: var(--body-size);
   max-width: var(--measure);
   padding-top: 1.5rem;
   justify-self: center;

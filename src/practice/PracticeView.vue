@@ -187,6 +187,23 @@ function back() {
 }
 
 const kicker = computed(() => `${meta.value?.kicker ?? ''} · ${sectionTitle.value}`)
+
+/**
+ * Where "back" goes: to the page the reader came from when that was this chapter or the hub
+ * (history.back keeps their scroll position), otherwise to the set's section of the chapter.
+ */
+const origin = computed<'reader' | 'hub' | 'none'>(() => {
+  const back =
+    typeof window !== 'undefined' ? (window.history.state?.back as string | null | undefined) : null
+  if (!back) return 'none'
+  if (back.startsWith(`/read/${chapterId.value}`)) return 'reader'
+  if (back === '/practice' || back.startsWith('/practice?')) return 'hub'
+  return 'none'
+})
+function goBack() {
+  if (origin.value === 'none') back()
+  else router.back()
+}
 const focusMode = computed(() => progress.value.settings.focus)
 </script>
 
@@ -209,6 +226,29 @@ const focusMode = computed(() => progress.value.settings.focus)
     />
 
     <template v-else>
+      <nav class="crumb" aria-label="Back">
+        <button
+          v-if="origin !== 'none'"
+          type="button"
+          class="back"
+          data-testid="practice-back"
+          @click="goBack"
+        >
+          ‹
+          {{
+            origin === 'reader'
+              ? `Back to ${meta?.kicker ?? 'the chapter'}`
+              : 'Back to all techniques'
+          }}
+        </button>
+        <RouterLink
+          v-else
+          class="back"
+          data-testid="practice-back"
+          :to="{ name: 'read', params: { chapter: chapterId, section: sectionId } }"
+          >‹ {{ meta?.kicker }} · {{ sectionTitle }}</RouterLink
+        >
+      </nav>
       <header class="head">
         <div>
           <p class="kicker">{{ kicker }}</p>
@@ -372,6 +412,23 @@ const focusMode = computed(() => progress.value.settings.focus)
 .state h1 {
   font-size: 1.5rem;
   margin: 0.25rem 0 1rem;
+}
+.crumb {
+  margin: -0.5rem 0 0.75rem;
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+}
+.back {
+  background: none;
+  border: 0;
+  padding: 0.3rem 0;
+  color: var(--accent);
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+.back:hover {
+  text-decoration: underline;
 }
 .head {
   display: flex;
