@@ -78,6 +78,7 @@ test.describe('screenshots', () => {
   })
 
   test('reader text settings open', async ({ page }, info) => {
+    test.skip(info.project.name !== 'desktop')
     await seedProgress(page, sampleProgress)
     await page.goto('/read/1/left-to-right-addition')
     await page.getByTestId('text-toggle').click()
@@ -173,6 +174,16 @@ test.describe('screenshots', () => {
     await page.getByTestId('sheet-check-2').click()
     await expect(page.getByTestId('sheet-verdict-2')).toBeVisible()
     await shot(page, info, 'practice', 'book-worksheet')
+  })
+
+  test('settings and progress', async ({ page }, info) => {
+    await seedProgress(page, sampleProgress)
+    await page.goto('/settings')
+    await expect(page.getByTestId('setting-paged')).toBeVisible()
+    await shot(page, info, 'home', 'settings')
+    await page.goto('/progress')
+    await expect(page.getByTestId('progress-totals')).toBeVisible()
+    await shot(page, info, 'home', 'progress')
   })
 
   test('practice hub', async ({ page }, info) => {

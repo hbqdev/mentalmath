@@ -23,6 +23,12 @@ export interface ProgressState {
     font: 'serif' | 'sans' | 'system' | 'mono'
     /** Off by default: every set is open. On, a set opens once its section has been read. */
     lockUntilRead: boolean
+    /** Show the clock during practice. */
+    showTimer: boolean
+    /** Vibrate on check (native app only). */
+    haptics: boolean
+    /** Phones read one section per page with swipe; off scrolls the whole chapter. */
+    pagedReader: boolean
   }
 }
 
@@ -33,7 +39,16 @@ export function defaultProgress(): ProgressState {
     reading: {},
     practice: {},
     streak: { current: 0, lastActiveDay: '' },
-    settings: { theme: 'system', focus: false, fontSize: 18, font: 'serif', lockUntilRead: false },
+    settings: {
+      theme: 'system',
+      focus: false,
+      fontSize: 18,
+      font: 'serif',
+      lockUntilRead: false,
+      showTimer: false,
+      haptics: true,
+      pagedReader: true,
+    },
   }
 }
 
@@ -168,6 +183,30 @@ export function useProgress() {
   function reset() {
     state.value = defaultProgress()
   }
+  /** Everything the app remembers, as JSON for a backup file. */
+  function exportJson() {
+    return JSON.stringify(
+      {
+        app: 'mentalmath',
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        progress: state.value,
+      },
+      null,
+      2,
+    )
+  }
+  /** Restore a backup made by exportJson; returns false when the text is not one. */
+  function importJson(text: string): boolean {
+    try {
+      const parsed = JSON.parse(text) as { app?: string; progress?: unknown }
+      if (parsed.app !== 'mentalmath' || !isPlainObject(parsed.progress)) return false
+      state.value = normalizeProgress(mergeWithDefaults(parsed.progress, defaultProgress()))
+      return true
+    } catch {
+      return false
+    }
+  }
 
   return {
     state,
@@ -181,5 +220,7 @@ export function useProgress() {
     touchStreak,
     localDay,
     reset,
+    exportJson,
+    importJson,
   }
 }

@@ -1,17 +1,37 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { RouterLink, RouterView, useRoute } from 'vue-router'
+import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import { getChapterMeta } from '@/content/loader'
 import { chapterCompletion } from './completion'
 import { useProgress } from './progress'
-import { useNativeBars } from './native'
+import { useAndroidBack, useNativeBars } from './native'
+import { useIsPhone } from './useIsPhone'
+import BottomTabs from './BottomTabs.vue'
 import ThemePicker from './ThemePicker.vue'
 import TextSettings from './TextSettings.vue'
 import AppLogo from './AppLogo.vue'
 
 const route = useRoute()
+const router = useRouter()
 const { state } = useProgress()
+const isPhone = useIsPhone()
 useNativeBars()
+useAndroidBack(router)
+
+const TITLES: Record<string, string> = {
+  home: 'Mental Math',
+  'practice-hub': 'Practice',
+  practice: 'Practice',
+  progress: 'Progress',
+  settings: 'Settings',
+  about: 'About',
+  privacy: 'Privacy',
+}
+const phoneTitle = computed(() => {
+  if (route.name === 'read')
+    return getChapterMeta(String(route.params.chapter ?? ''))?.kicker ?? 'Read'
+  return TITLES[String(route.name)] ?? 'Mental Math'
+})
 
 const inReader = computed(() => route.name === 'read')
 const completion = computed(() => {
@@ -28,13 +48,14 @@ function toggleFocus() {
 </script>
 
 <template>
-  <div class="shell" :class="{ focus: state.settings.focus && inReader }">
+  <div class="shell" :class="{ focus: state.settings.focus && inReader, phone: isPhone }">
     <header class="top">
       <RouterLink to="/" class="wordmark"
-        ><AppLogo /><span class="wm">Mental<em>Math</em></span></RouterLink
+        ><AppLogo /><span v-if="!isPhone" class="wm">Mental<em>Math</em></span></RouterLink
       >
+      <span v-if="isPhone" class="page-title" data-testid="page-title">{{ phoneTitle }}</span>
       <div id="shell-center" class="center" />
-      <nav class="controls" aria-label="Display">
+      <nav v-if="!isPhone" class="controls" aria-label="Display">
         <button
           v-if="inReader"
           type="button"
@@ -65,12 +86,33 @@ function toggleFocus() {
         <RouterLink :to="{ name: 'practice-hub' }" class="navlink" data-testid="nav-practice"
           >Practice</RouterLink
         >
-        <RouterLink to="/about" class="about">About</RouterLink>
+        <RouterLink :to="{ name: 'progress' }" class="about" data-testid="nav-progress"
+          >Progress</RouterLink
+        >
+        <RouterLink :to="{ name: 'settings' }" class="about" data-testid="nav-settings"
+          >Settings</RouterLink
+        >
+      </nav>
+      <nav v-else class="controls" aria-label="Status">
+        <span
+          v-if="completion"
+          class="ring"
+          role="img"
+          :aria-label="`${completion.done} of ${completion.total} sections read`"
+          :style="{ '--p': `${Math.round(completion.fraction * 100)}%` }"
+        />
+        <span
+          v-if="state.streak.current > 0"
+          class="streak"
+          :title="`${state.streak.current} day streak`"
+          >🔥 {{ state.streak.current }}</span
+        >
       </nav>
     </header>
     <main class="main">
       <RouterView />
     </main>
+    <BottomTabs v-if="isPhone" />
   </div>
 </template>
 
@@ -175,6 +217,20 @@ function toggleFocus() {
   flex: 1;
   min-width: 0;
 }
+.page-title {
+  font-weight: 700;
+  color: var(--ink);
+  font-size: 1.05rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.shell.phone {
+  --tabbar-h: 56px;
+}
+.shell.phone .main {
+  padding-bottom: calc(var(--tabbar-h) + env(safe-area-inset-bottom, 0px));
+}
 @media (max-width: 719px) {
   .about,
   .focus-toggle {
@@ -185,8 +241,9 @@ function toggleFocus() {
     display: none;
   }
   .top {
-    gap: 0.5rem;
+    gap: 0.6rem;
     padding: 0 0.75rem;
+    grid-template-columns: auto minmax(0, 1fr) auto;
   }
   .controls {
     gap: 0.35rem;
