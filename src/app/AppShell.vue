@@ -5,12 +5,14 @@ import { getChapterMeta } from '@/content/loader'
 import { chapterCompletion } from './completion'
 import { useProgress } from './progress'
 import { useTheme } from './theme'
+import { useNativeBars } from './native'
 import ThemePicker from './ThemePicker.vue'
 import AppLogo from './AppLogo.vue'
 
 const route = useRoute()
 const { state } = useProgress()
 const { cycleFontScale } = useTheme()
+useNativeBars()
 
 const inReader = computed(() => route.name === 'read')
 const completion = computed(() => {
@@ -87,8 +89,8 @@ function toggleFocus() {
   grid-template-columns: auto 1fr auto;
   align-items: center;
   gap: 1rem;
-  height: 52px;
-  padding: 0 var(--gutter);
+  height: calc(52px + env(safe-area-inset-top, 0px));
+  padding: env(safe-area-inset-top, 0px) var(--gutter) 0;
   background: var(--surface);
   border-bottom: 1px solid var(--rule);
   font-family: var(--font-sans);

@@ -9,6 +9,15 @@
 #   scripts/mentalmath.sh health     request a page and report the status code
 #   scripts/mentalmath.sh url        print the address
 #
+# Android (needs the toolchain from scripts/android-env.sh; keystore in ~/.mentalmath):
+#   scripts/mentalmath.sh android:sync     build the web app and copy it into android/
+#   scripts/mentalmath.sh android:debug    build android/app/build/outputs/apk/debug/app-debug.apk
+#   scripts/mentalmath.sh android:release  build the signed Play bundle (app-release.aab)
+#   scripts/mentalmath.sh android:icons    regenerate launcher icons and splash from assets/
+#   scripts/mentalmath.sh emu:start | emu:stop | emu:install | emu:shots
+#                                     boot the headless emulator, install the debug APK,
+#                                     take the Android screenshots into screenshots/android/
+#
 # Layout: the site is served from $SITE_DIR (a copy of dist/), by scripts/serve.mjs, on $PORT,
 # as the systemd --user unit $UNIT. Override PORT, SITE_DIR or HOST in the environment.
 set -euo pipefail
@@ -91,7 +100,36 @@ cmd_health() {
   [ "$code" = 200 ]
 }
 
+android_env() { . "$REPO/scripts/android-env.sh"; }
+cmd_android_sync() { android_env; cd "$REPO"; npm run build; npx cap sync android; }
+cmd_android_debug() { cmd_android_sync; cd "$REPO/android" && ./gradlew -q assembleDebug && ls -la app/build/outputs/apk/debug/app-debug.apk; }
+cmd_android_release() {
+  [ -f "$HOME/.mentalmath/keystore.properties" ] || { echo "missing ~/.mentalmath/keystore.properties (upload keystore)" >&2; exit 1; }
+  cmd_android_sync; cd "$REPO/android" && ./gradlew -q bundleRelease && ls -la app/build/outputs/bundle/release/app-release.aab
+}
+cmd_android_icons() { android_env; cd "$REPO"; npx @capacitor/assets generate --android --assetPath assets --iconBackgroundColor '#8b2e2e' --iconBackgroundColorDark '#8b2e2e' --splashBackgroundColor '#f6f1e7' --splashBackgroundColorDark '#0f1720'; }
+cmd_emu_start() {
+  android_env
+  if adb devices | grep -q emulator-5554; then echo "emulator already running"; return; fi
+  mkdir -p "$HOME/.mentalmath"
+  setsid nohup sg kvm -c "emulator -avd mentalmath -no-window -gpu swiftshader_indirect -no-audio -no-boot-anim -no-snapshot -port 5554" > "$HOME/.mentalmath/emulator.log" 2>&1 < /dev/null &
+  adb wait-for-device
+  until [ "$(adb -s emulator-5554 shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = "1" ]; do sleep 3; done
+  echo "emulator booted"
+}
+cmd_emu_stop() { android_env; adb -s emulator-5554 emu kill 2>/dev/null || true; }
+cmd_emu_install() { android_env; adb -s emulator-5554 install -r "$REPO/android/app/build/outputs/apk/debug/app-debug.apk"; }
+cmd_emu_shots() { android_env; cd "$REPO"; node --input-type=module -e "$(cat scripts/android-shots.mjs)"; }
+
 case "${1:-}" in
+  android:sync) cmd_android_sync ;;
+  android:debug) cmd_android_debug ;;
+  android:release) cmd_android_release ;;
+  android:icons) cmd_android_icons ;;
+  emu:start) cmd_emu_start ;;
+  emu:stop) cmd_emu_stop ;;
+  emu:install) cmd_emu_install ;;
+  emu:shots) cmd_emu_shots ;;
   deploy) cmd_deploy ;;
   update) cmd_update ;;
   install) cmd_install ;;
@@ -101,5 +139,5 @@ case "${1:-}" in
   logs) shift; journalctl --user -u "$UNIT" -n 100 "$@" ;;
   health) cmd_health ;;
   url) cmd_url ;;
-  *) sed -n '2,15p' "$0"; exit 2 ;;
+  *) sed -n '2,24p' "$0"; exit 2 ;;
 esac

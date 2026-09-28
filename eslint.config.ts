@@ -12,6 +12,8 @@ export default defineConfigWithVueTs(
       '**/node_modules/**',
       'public/**',
       'src/content/chapters/**',
+      'android/**',
+      'assets/**',
     ],
   },
   pluginVue.configs['flat/essential'],

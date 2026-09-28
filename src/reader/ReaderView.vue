@@ -327,9 +327,9 @@ function selectFromSheet(id: string) {
 .col-outline,
 .col-rail {
   position: sticky;
-  top: 68px;
+  top: calc(68px + env(safe-area-inset-top, 0px));
   align-self: start;
-  max-height: calc(100dvh - 84px);
+  max-height: calc(100dvh - 84px - env(safe-area-inset-top, 0px));
   overflow: auto;
   padding-top: 1.5rem;
 }
