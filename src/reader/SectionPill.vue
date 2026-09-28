@@ -55,6 +55,8 @@ const emit = defineEmits<{ prev: []; next: []; practice: [] }>()
   font-size: 1.1rem;
   line-height: 1;
   padding: 0.2rem 0.3rem;
+  min-height: 36px;
+  min-width: 36px;
 }
 .pill button:disabled {
   opacity: 0.35;
@@ -69,7 +71,7 @@ const emit = defineEmits<{ prev: []; next: []; practice: [] }>()
   color: var(--accent-ink);
   font-size: 0.85rem;
   font-weight: 700;
-  padding: 0.3rem 0.8rem;
+  padding: 0.5rem 0.9rem;
   border-radius: 999px;
 }
 </style>

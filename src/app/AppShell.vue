@@ -5,10 +5,11 @@ import { getChapterMeta } from '@/content/loader'
 import { chapterCompletion } from './completion'
 import { useProgress } from './progress'
 import { useTheme } from './theme'
+import ThemePicker from './ThemePicker.vue'
 
 const route = useRoute()
 const { state } = useProgress()
-const { themes, setTheme, cycleFontScale } = useTheme()
+const { cycleFontScale } = useTheme()
 
 const inReader = computed(() => route.name === 'read')
 const completion = computed(() => {
@@ -40,17 +41,7 @@ function toggleFocus() {
         >
           Focus
         </button>
-        <label class="tgl theme-pick" :title="`Theme: ${state.settings.theme}`">
-          <span class="sr">Theme</span>
-          <select
-            data-testid="theme-toggle"
-            aria-label="Theme"
-            :value="state.settings.theme"
-            @change="setTheme(($event.target as HTMLSelectElement).value)"
-          >
-            <option v-for="t in themes" :key="t.value" :value="t.value">{{ t.label }}</option>
-          </select>
-        </label>
+        <ThemePicker />
         <button type="button" class="tgl" title="Text size" @click="cycleFontScale">Aa</button>
         <span
           v-if="completion"
@@ -133,26 +124,6 @@ function toggleFocus() {
   border-radius: 4px;
   padding: 0.2rem 0.55rem;
 }
-.theme-pick {
-  padding: 0;
-  display: inline-flex;
-}
-.theme-pick select {
-  font: inherit;
-  font-size: 0.85rem;
-  color: var(--muted);
-  background: transparent;
-  border: 0;
-  padding: 0.2rem 0.4rem;
-  cursor: pointer;
-}
-.sr {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  overflow: hidden;
-  clip: rect(0 0 0 0);
-}
 .tgl[aria-pressed='true'] {
   border-color: var(--accent);
   color: var(--accent);
@@ -183,6 +154,10 @@ function toggleFocus() {
 .navlink {
   color: var(--accent);
   font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  min-height: 32px;
+  padding: 0 0.3rem;
 }
 .navlink.router-link-active {
   text-decoration: underline;
@@ -195,6 +170,10 @@ function toggleFocus() {
 @media (max-width: 719px) {
   .about,
   .focus-toggle {
+    display: none;
+  }
+  /* The chapter select has no room beside the controls; the pill and the outline navigate instead. */
+  .center {
     display: none;
   }
   .top {

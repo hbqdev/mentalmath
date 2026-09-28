@@ -58,3 +58,10 @@ export const sampleProgress = {
 export async function lockUntilRead(page: Page) {
   await seedProgress(page, { settings: { lockUntilRead: true } })
 }
+
+/** Pick a theme through the icon picker; on phones the row sits behind the current-theme button. */
+export async function selectTheme(page: Page, theme: 'system' | 'light' | 'bright' | 'dark') {
+  const opt = page.getByTestId(`theme-${theme}`)
+  if (!(await opt.isVisible())) await page.getByTestId('theme-toggle').click()
+  await opt.click()
+}
