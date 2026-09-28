@@ -59,15 +59,20 @@ Every worked example in the book (397 figures across chapters 0 to 9) is transcr
 
 The site runs as a systemd user service (`mentalmath.service`, enabled at boot with linger) that serves a copy of `dist/` from `~/srv/mentalmath` on port 8547 through `scripts/serve.mjs`, a dependency-free static server with the SPA fallback and the cache headers the service worker needs. `scripts/mentalmath.sh` manages it: `deploy` (build and publish), `update` (pull, install if the lockfile changed, deploy), `start`, `stop`, `restart`, `status`, `logs`, `health`, `url`, `install`, `uninstall`. Override `PORT`, `HOST` or `SITE_DIR` in the environment.
 
+## On a phone
+
+Under 720 px the app switches to a phone shell: bottom tabs (Read, Practice, Progress, Settings), a compact header with the page title, one section per page in the reader (swipe or arrows; `Settings → Reading` restores scrolling), a full-screen drill with an on-screen keypad for generated sets, and the worksheet for book sets. A drill interrupted by a call or an app switch resumes where it stopped (`src/practice/resume.ts`, sessionStorage). Settings collects theme, text size and font, the reading lock, the clock, haptics (native only) and backup / restore / reset of the local data; Progress shows streak, totals, per-chapter reading and practice history. `e2e/mobile.spec.ts` guards the phone layout (no sideways scroll, thumb-sized controls, tab bar, keypad, resume).
+
 ## Android app
 
 `android/` is a Capacitor 7 project that bundles the built site (offline, no server). Toolchain on this host: OpenJDK 21, the Android SDK in `~/Android/Sdk` (platform 35, build-tools, emulator with a Pixel 6 AVD named `mentalmath`), and `scripts/android-env.sh` puts them on `PATH`. Commands through `scripts/mentalmath.sh`:
 
-- `android:debug` builds `android/app/build/outputs/apk/debug/app-debug.apk`; `android:release` builds the signed Play bundle `app-release.aab` (the upload keystore and its passwords live in `~/.mentalmath/`, never in the repo: back that folder up, a lost key means a new store listing).
+- `android:debug` builds `android/app/build/outputs/apk/debug/app-debug.apk`; `android:release` builds the signed Play bundle into `store/` with `versionName` from `package.json` and `versionCode` derived from it (`bump [patch|minor|major]` raises both). The upload keystore and its passwords live in `~/.mentalmath/`, never in the repo: back that folder up, a lost key means a new store listing.
+- Inside the app, Android Back walks the app's own history, the status and navigation bars follow the theme, a drill keeps the screen awake and taps on check.
 - `android:icons` regenerates launcher icons and splash screens from `assets/` with `@capacitor/assets`.
 - `emu:start`, `emu:install`, `emu:shots`: boot the headless emulator (KVM), install the debug APK and drive the app through the WebView's DevTools socket (`scripts/android-shots.mjs`) to capture `screenshots/android/*.png`, the Android counterpart of the web screenshot set.
 
-Store assets are under `store/` (512 px icon, 1024×500 feature graphic); the phone screenshots come from `screenshots/android/`. App id `dev.hbq.mentalmath`, version in `android/app/build.gradle`.
+Store assets are under `store/` (512 px icon, 1024×500 feature graphic, `listing.md` with the descriptions and release notes); the phone screenshots come from `screenshots/android/`. App id `dev.hbq.mentalmath`, version in `android/app/build.gradle`.
 
 ## Status
 
