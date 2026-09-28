@@ -92,4 +92,28 @@ test.describe('reader', () => {
     await expect(page.locator('.col-outline')).toBeVisible()
     await expect(page.getByTestId('practice-rail')).toBeVisible()
   })
+
+  test('text size slider and font choice change the reading text', async ({ page }) => {
+    await page.goto('/read/1/left-to-right-addition')
+    const size = () =>
+      page
+        .locator('.prose p')
+        .first()
+        .evaluate((el) => parseFloat(getComputedStyle(el).fontSize))
+    const before = await size()
+    await page.getByTestId('text-toggle').click()
+    await page.getByTestId('font-size').fill('23')
+    await expect(page.getByTestId('font-size-value')).toHaveText('23 px')
+    expect(await size()).toBeGreaterThan(before)
+    await page.getByTestId('font-mono').click()
+    await expect(page.locator('html')).toHaveAttribute('data-font', 'mono')
+    const family = await page
+      .locator('.prose p')
+      .first()
+      .evaluate((el) => getComputedStyle(el).fontFamily)
+    expect(family).toMatch(/JetBrains Mono|monospace/)
+    await page.reload()
+    await expect(page.locator('html')).toHaveAttribute('data-font', 'mono')
+    expect(await size()).toBeCloseTo(23, 0)
+  })
 })

@@ -2,6 +2,18 @@ import { usePreferredDark } from '@vueuse/core'
 import { computed, watchEffect } from 'vue'
 import { useProgress } from './progress'
 
+export const MIN_SIZE = 14
+export const MAX_SIZE = 24
+const clampSize = (px: number) =>
+  Math.min(MAX_SIZE, Math.max(MIN_SIZE, Math.round(Number(px) || 18)))
+const FONTS: Array<{ value: 'serif' | 'sans' | 'system' | 'mono'; label: string; sample: string }> =
+  [
+    { value: 'serif', label: 'Serif', sample: 'Source Serif' },
+    { value: 'sans', label: 'Sans', sample: 'Alegreya Sans' },
+    { value: 'system', label: 'System', sample: 'Your device font' },
+    { value: 'mono', label: 'Mono', sample: 'JetBrains Mono' },
+  ]
+
 export function useTheme() {
   const { state } = useProgress()
   const prefersDark = usePreferredDark()
@@ -14,7 +26,8 @@ export function useTheme() {
   watchEffect(() => {
     const root = document.documentElement
     root.dataset.theme = resolved.value
-    root.dataset.fontScale = String(state.value.settings.fontScale)
+    root.style.setProperty('--body-size', `${clampSize(state.value.settings.fontSize)}px`)
+    root.dataset.font = state.value.settings.font
   })
 
   const THEMES: Array<{ value: 'system' | 'light' | 'bright' | 'dark'; label: string }> = [
@@ -32,10 +45,23 @@ export function useTheme() {
     state.value.settings.theme = THEMES[(i + 1) % THEMES.length]!.value
   }
 
-  function cycleFontScale() {
-    const next = ((state.value.settings.fontScale + 1) % 3) as 0 | 1 | 2
-    state.value.settings.fontScale = next
+  function setFontSize(px: number) {
+    state.value.settings.fontSize = clampSize(px)
+  }
+  function setFont(f: string) {
+    if (FONTS.some((x) => x.value === f))
+      state.value.settings.font = f as (typeof FONTS)[number]['value']
   }
 
-  return { resolved, themes: THEMES, setTheme, cycleTheme, cycleFontScale }
+  return {
+    resolved,
+    themes: THEMES,
+    setTheme,
+    cycleTheme,
+    fonts: FONTS,
+    setFontSize,
+    setFont,
+    MIN_SIZE,
+    MAX_SIZE,
+  }
 }

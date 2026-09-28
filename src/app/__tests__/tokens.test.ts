@@ -13,9 +13,8 @@ describe('design tokens', () => {
     expect(css).toMatch(/\[data-theme=['"]?dark['"]?\]\s*{[^}]*--paper:\s*#0f1720/i)
     expect(css).toMatch(/\[data-theme=['"]?dark['"]?\]\s*{[^}]*--accent:\s*#f5a524/i)
   })
-  it('defines three font scale steps', () => {
-    for (const step of ['0', '1', '2']) {
-      expect(css).toContain(`[data-font-scale='${step}']`)
-    }
+  it('defines a reading face per font setting', () => {
+    for (const f of ['sans', 'system', 'mono']) expect(css).toContain(`[data-font='${f}']`)
+    expect(css).toMatch(/--font-body:\s*var\(--font-serif\)/)
   })
 })

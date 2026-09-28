@@ -4,14 +4,13 @@ import { RouterLink, RouterView, useRoute } from 'vue-router'
 import { getChapterMeta } from '@/content/loader'
 import { chapterCompletion } from './completion'
 import { useProgress } from './progress'
-import { useTheme } from './theme'
 import { useNativeBars } from './native'
 import ThemePicker from './ThemePicker.vue'
+import TextSettings from './TextSettings.vue'
 import AppLogo from './AppLogo.vue'
 
 const route = useRoute()
 const { state } = useProgress()
-const { cycleFontScale } = useTheme()
 useNativeBars()
 
 const inReader = computed(() => route.name === 'read')
@@ -47,7 +46,7 @@ function toggleFocus() {
           Focus
         </button>
         <ThemePicker />
-        <button type="button" class="tgl" title="Text size" @click="cycleFontScale">Aa</button>
+        <TextSettings />
         <span
           v-if="completion"
           class="ring"

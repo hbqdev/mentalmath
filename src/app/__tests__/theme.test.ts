@@ -7,7 +7,8 @@ beforeEach(() => {
   localStorage.clear()
   disposeProgressStore()
   document.documentElement.removeAttribute('data-theme')
-  document.documentElement.removeAttribute('data-font-scale')
+  document.documentElement.removeAttribute('data-font')
+  document.documentElement.style.removeProperty('--body-size')
 })
 
 describe('useTheme', () => {
@@ -17,11 +18,13 @@ describe('useTheme', () => {
       const p = useProgress()
       useTheme()
       p.state.value.settings.theme = 'dark'
-      p.state.value.settings.fontScale = 2
+      p.state.value.settings.fontSize = 21
+      p.state.value.settings.font = 'sans'
     })
     await nextTick()
     expect(document.documentElement.dataset.theme).toBe('dark')
-    expect(document.documentElement.dataset.fontScale).toBe('2')
+    expect(document.documentElement.style.getPropertyValue('--body-size')).toBe('21px')
+    expect(document.documentElement.dataset.font).toBe('sans')
     scope.stop()
   })
 
@@ -47,6 +50,25 @@ describe('useTheme', () => {
     api.setTheme('nonsense')
     await nextTick()
     expect(document.documentElement.dataset.theme).toBe('bright')
+    scope.stop()
+  })
+
+  it('clamps the text size and ignores unknown fonts', async () => {
+    const scope = effectScope()
+    let api!: ReturnType<typeof useTheme>
+    scope.run(() => {
+      api = useTheme()
+    })
+    api.setFontSize(40)
+    await nextTick()
+    expect(document.documentElement.style.getPropertyValue('--body-size')).toBe('24px')
+    api.setFontSize(3)
+    await nextTick()
+    expect(document.documentElement.style.getPropertyValue('--body-size')).toBe('14px')
+    api.setFont('mono')
+    api.setFont('comic')
+    await nextTick()
+    expect(document.documentElement.dataset.font).toBe('mono')
     scope.stop()
   })
 })

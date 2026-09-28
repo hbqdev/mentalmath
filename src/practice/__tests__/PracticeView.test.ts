@@ -163,4 +163,22 @@ describe('book sessions', () => {
     await flushPromises()
     expect(b.w.find('[data-testid="worksheet"]').exists()).toBe(true)
   })
+
+  it("links back to the set's section when opened directly, and back in history when it came from the chapter", async () => {
+    useProgress().state.value.settings.lockUntilRead = false
+    const direct = await mountAt('/practice/1/gen1-two-digit-addition?mode=generated&seed=1')
+    const link = direct.w.find('[data-testid="practice-back"]')
+    expect(link.attributes('href')).toBe('/read/1/left-to-right-addition')
+    expect(link.text()).toContain('Chapter 1')
+    // arriving from the chapter page
+    const router = createAppRouter(createMemoryHistory())
+    await router.push('/read/1/left-to-right-addition')
+    await router.push('/practice/1/gen1-two-digit-addition?mode=generated&seed=1')
+    await router.isReady()
+    window.history.replaceState({ back: '/read/1/left-to-right-addition' }, '')
+    const w = mount(PracticeView, { global: { plugins: [router], stubs: { Teleport: true } } })
+    await flushPromises()
+    expect(w.find('button[data-testid="practice-back"]').text()).toContain('Back to Chapter 1')
+    window.history.replaceState({}, '')
+  })
 })
