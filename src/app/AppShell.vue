@@ -6,6 +6,7 @@ import { chapterCompletion } from './completion'
 import { useProgress } from './progress'
 import { useTheme } from './theme'
 import ThemePicker from './ThemePicker.vue'
+import Logo from './Logo.vue'
 
 const route = useRoute()
 const { state } = useProgress()
@@ -28,7 +29,7 @@ function toggleFocus() {
 <template>
   <div class="shell" :class="{ focus: state.settings.focus && inReader }">
     <header class="top">
-      <RouterLink to="/" class="wordmark">Mental<span>Math</span></RouterLink>
+      <RouterLink to="/" class="wordmark"><Logo /><span class="wm">Mental<em>Math</em></span></RouterLink>
       <div id="shell-center" class="center" />
       <nav class="controls" aria-label="Display">
         <button
@@ -91,12 +92,16 @@ function toggleFocus() {
   font-family: var(--font-sans);
 }
 .wordmark {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
   font-weight: 700;
   font-size: 1.15rem;
   color: var(--ink);
   letter-spacing: 0.01em;
 }
-.wordmark span {
+.wordmark em {
+  font-style: normal;
   color: var(--accent);
 }
 .wordmark:hover {
