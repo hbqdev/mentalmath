@@ -13,7 +13,13 @@ import router from './router'
 createApp(App).use(router).mount('#app')
 
 // Installable and readable offline after the first visit; updates apply on the next load.
-registerSW({ immediate: true })
+registerSW({
+  immediate: true,
+  // Check for a new build every minute while the tab is open, so a deploy lands without a hard refresh.
+  onRegisteredSW(_url, registration) {
+    if (registration) setInterval(() => registration.update(), 60_000)
+  },
+})
 
 // After a deploy, a page that still runs the old bundle may ask for a chunk that no longer
 // exists; reloading once picks up the new build instead of leaving a blank view.
