@@ -4,6 +4,8 @@ import type { Exercise } from './types'
 export interface SessionOptions {
   timed?: boolean
   now?: () => number
+  /** Continue a run: answers already given, in order, and the time spent so far. */
+  resume?: { inputs: string[]; elapsedMs: number }
 }
 
 export interface SessionState {
@@ -41,7 +43,7 @@ export function createSession(exercises: Exercise[], opts: SessionOptions = {}):
   }
   if (st.phase === 'done') st.finishedAt = startedAt
 
-  return {
+  const api: Session = {
     state: () => st,
     submit(input) {
       if (st.phase === 'feedback' && st.lastResult) return st.lastResult
@@ -79,4 +81,14 @@ export function createSession(exercises: Exercise[], opts: SessionOptions = {}):
       return (st.finishedAt ?? now()) - st.startedAt
     },
   }
+  // Replay the answers of an interrupted run so the learner continues where they left off.
+  if (opts.resume) {
+    for (const input of opts.resume.inputs) {
+      api.submit(input)
+      api.next()
+    }
+    st.startedAt = now() - opts.resume.elapsedMs
+    questionStartedAt = now()
+  }
+  return api
 }

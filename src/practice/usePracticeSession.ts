@@ -1,5 +1,10 @@
 import { computed, onBeforeUnmount, ref, shallowRef } from 'vue'
-import { createSession, type Session, type SessionState } from '@/exercises/session'
+import {
+  createSession,
+  type Session,
+  type SessionOptions,
+  type SessionState,
+} from '@/exercises/session'
 import type { Exercise } from '@/exercises/types'
 
 /** Reactive wrapper around the pure session: refs update after each action, a ticker drives the clock. */
@@ -20,9 +25,9 @@ export function usePracticeSession() {
     timer = null
   }
 
-  function start(exercises: Exercise[]) {
+  function start(exercises: Exercise[], resume?: SessionOptions['resume']) {
     stopTicker()
-    session.value = createSession(exercises)
+    session.value = createSession(exercises, { resume })
     sync()
     timer = setInterval(() => {
       if (session.value?.state().phase === 'done') stopTicker()

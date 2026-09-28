@@ -15,11 +15,18 @@ import SetLockedView from './SetLockedView.vue'
 import SolutionSteps from './SolutionSteps.vue'
 import WorksheetView from './WorksheetView.vue'
 import { usePracticeSession } from './usePracticeSession'
+import DrillScreen from './DrillScreen.vue'
+import { useIsPhone } from '@/app/useIsPhone'
+import { hapticResult, keepAwake } from '@/app/native'
+import { clearRun, loadRun, runKey, saveRun } from './resume'
+import { onBeforeUnmount, watchEffect } from 'vue'
 
 const route = useRoute()
 const router = useRouter()
 const { state: progress, isUnlocked, recordAttempt, bestScore } = useProgress()
 const { state, seconds, start, submit, next } = usePracticeSession()
+const isPhone = useIsPhone()
+const showTimer = computed(() => timed.value || progress.value.settings.showTimer)
 
 const chapterId = computed(() => String(route.params.chapter ?? ''))
 const setId = computed(() => String(route.params.set ?? ''))
@@ -115,8 +122,28 @@ function begin() {
     sheetExercises.value = exercises
     return
   }
-  start(exercises)
+  const saved = loadRun(runKey(setId.value, route.query))
+  start(exercises, saved ? { inputs: saved.inputs, elapsedMs: saved.elapsedMs } : undefined)
   nextTick(() => answerBox.value?.focus())
+}
+
+// Persist the run after every answer so an app switch or a call does not lose the set.
+watchEffect(() => {
+  if (!state.value || status.value !== 'running' || view.value !== 'one') return
+  const key = runKey(setId.value, route.query)
+  saveRun(key, state.value, seconds.value * 1000)
+})
+// Keep the screen on while a drill is in progress (native only).
+watchEffect(() => {
+  void keepAwake(
+    status.value === 'running' && view.value === 'one' && state.value?.phase !== 'done',
+  )
+})
+onBeforeUnmount(() => void keepAwake(false))
+
+function exitDrill() {
+  clearRun(runKey(setId.value, route.query))
+  goBack()
 }
 
 watch(
@@ -149,7 +176,8 @@ watch(
 )
 
 function onSubmit(input: string) {
-  submit(input)
+  const r = submit(input)
+  if (r) void hapticResult(r.correct, progress.value.settings.haptics)
 }
 
 function onNext() {
@@ -175,6 +203,7 @@ function setDifficulty(e: Event) {
 }
 
 function again() {
+  clearRun(runKey(setId.value, route.query))
   const fresh = createRng().seed
   router.replace({
     query: { ...route.query, seed: mode.value === 'generated' ? String(fresh) : undefined },
@@ -226,7 +255,13 @@ const focusMode = computed(() => progress.value.settings.focus)
     />
 
     <template v-else>
-      <nav class="crumb" aria-label="Back">
+      <nav
+        v-if="
+          !(isPhone && view === 'one' && status === 'running' && state && state.phase !== 'done')
+        "
+        class="crumb"
+        aria-label="Back"
+      >
         <button
           v-if="origin !== 'none'"
           type="button"
@@ -249,7 +284,12 @@ const focusMode = computed(() => progress.value.settings.focus)
           >‹ {{ meta?.kicker }} · {{ sectionTitle }}</RouterLink
         >
       </nav>
-      <header class="head">
+      <header
+        v-if="
+          !(isPhone && view === 'one' && status === 'running' && state && state.phase !== 'done')
+        "
+        class="head"
+      >
         <div>
           <p class="kicker">{{ kicker }}</p>
           <h1>{{ title }}</h1>
@@ -264,7 +304,12 @@ const focusMode = computed(() => progress.value.settings.focus)
           >
         </div>
       </header>
-      <div v-if="status === 'running'" class="tools">
+      <div
+        v-if="
+          status === 'running' && !(isPhone && view === 'one' && state && state.phase !== 'done')
+        "
+        class="tools"
+      >
         <span class="seg" role="group" aria-label="Layout">
           <button
             type="button"
@@ -345,6 +390,17 @@ const focusMode = computed(() => progress.value.settings.focus)
       </section>
 
       <WorksheetView v-else-if="view === 'sheet'" :exercises="sheetExercises" @done="onSheetDone" />
+
+      <DrillScreen
+        v-else-if="isPhone && state && state.phase !== 'done' && state.current"
+        :state="state"
+        :seconds="seconds"
+        :show-timer="showTimer"
+        :title="title"
+        @submit="onSubmit"
+        @next="onNext"
+        @exit="exitDrill"
+      />
 
       <section v-else-if="state && state.phase !== 'done' && state.current" class="card">
         <PromptRenderer :prompt="state.current.prompt" />
