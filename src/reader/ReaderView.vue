@@ -56,6 +56,10 @@ function clearObservers() {
   timers.clear()
 }
 
+/** How long a section stays on screen before it counts as read. */
+const DWELL_MS = 700
+const HEADER_PX = 52
+
 function observeSections() {
   clearObservers()
   if (typeof IntersectionObserver === 'undefined') return
@@ -72,13 +76,14 @@ function observeSections() {
           ) {
             activeId.value = id
           }
+          // On screen for a moment counts as read.
           if (!isVisited(cid, id) && !timers.has(id)) {
             timers.set(
               id,
               setTimeout(() => {
                 markVisited(cid, id)
                 timers.delete(id)
-              }, 2000),
+              }, DWELL_MS),
             )
           }
         } else {
@@ -87,6 +92,9 @@ function observeSections() {
             clearTimeout(t)
             timers.delete(id)
           }
+          // Scrolled past the top: a short section that never dwelled long enough still counts as read.
+          if (!isVisited(cid, id) && entry.boundingClientRect.bottom < HEADER_PX)
+            markVisited(cid, id)
         }
       },
       { threshold: [0, 0.15, 0.5], rootMargin: '-52px 0px -40% 0px' },

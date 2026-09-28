@@ -8,7 +8,14 @@ import { generateMany } from '../src/exercises/generators/shared'
 import { createRng } from '../src/exercises/rng'
 import { bookExercises } from '../src/exercises/bookSets'
 import '../src/content/book-exercises'
-import { freezeClock, lockUntilRead, sampleProgress, seedProgress, unlockAll } from './helpers'
+import {
+  freezeClock,
+  lockUntilRead,
+  sampleProgress,
+  seedProgress,
+  selectTheme,
+  unlockAll,
+} from './helpers'
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', 'screenshots')
 
@@ -62,10 +69,10 @@ test.describe('screenshots', () => {
     await expect(page.locator('#instant-multiplication')).toBeVisible()
     await shot(page, info, 'reader', 'chapter-0-focus')
     await page.getByTestId('focus-toggle').click()
-    await page.getByTestId('theme-toggle').selectOption('dark')
+    await selectTheme(page, 'dark')
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
     await shot(page, info, 'reader', 'chapter-0-dark')
-    await page.getByTestId('theme-toggle').selectOption('bright')
+    await selectTheme(page, 'bright')
     await expect(page.locator('html')).toHaveAttribute('data-theme', 'bright')
     await shot(page, info, 'reader', 'chapter-0-bright')
   })

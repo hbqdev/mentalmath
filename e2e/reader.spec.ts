@@ -1,4 +1,4 @@
-import { lockUntilRead } from './helpers'
+import { lockUntilRead, selectTheme } from './helpers'
 import { expect, test } from '@playwright/test'
 
 test.describe('reader', () => {
@@ -22,7 +22,7 @@ test.describe('reader', () => {
     await expect(page.locator('#left-to-right-subtraction h2')).toBeInViewport()
   })
 
-  test('reading a section unlocks its exercise callout after two seconds', async ({ page }) => {
+  test('reading a section unlocks its exercise callout after a moment', async ({ page }) => {
     await lockUntilRead(page)
     await page.goto('/read/1/left-to-right-addition')
     const callout = page.getByTestId('exercise-callout').first()
@@ -48,7 +48,7 @@ test.describe('reader', () => {
 
     const html = page.locator('html')
     const before = await html.getAttribute('data-theme')
-    await page.getByTestId('theme-toggle').selectOption('dark')
+    await selectTheme(page, 'dark')
     await expect(html).toHaveAttribute('data-theme', 'dark')
     expect(before).not.toBeNull()
     await page.reload()
