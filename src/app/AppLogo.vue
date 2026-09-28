@@ -12,9 +12,34 @@ defineProps<{ size?: number }>()
       stroke="var(--accent-ink)"
       stroke-width="3"
     />
-    <path d="M26 46h12M27.5 51h9" stroke="var(--accent-ink)" stroke-width="3" stroke-linecap="round" />
-    <text x="29.5" y="31.5" text-anchor="middle" font-family="var(--font-serif)" font-weight="700" font-size="17" fill="var(--warm)">M</text>
-    <text x="39.5" y="22" text-anchor="middle" font-family="var(--font-serif)" font-weight="700" font-size="8.5" fill="var(--accent-ink)">2</text>
+    <path
+      d="M26 46h12M27.5 51h9"
+      stroke="var(--accent-ink)"
+      stroke-width="3"
+      stroke-linecap="round"
+    />
+    <text
+      x="29.5"
+      y="31.5"
+      text-anchor="middle"
+      font-family="var(--font-serif)"
+      font-weight="700"
+      font-size="17"
+      fill="var(--warm)"
+    >
+      M
+    </text>
+    <text
+      x="39.5"
+      y="22"
+      text-anchor="middle"
+      font-family="var(--font-serif)"
+      font-weight="700"
+      font-size="8.5"
+      fill="var(--accent-ink)"
+    >
+      2
+    </text>
   </svg>
 </template>
 
