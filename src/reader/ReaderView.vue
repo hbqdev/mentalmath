@@ -390,4 +390,10 @@ function selectFromSheet(id: string) {
   border-top: 1px solid var(--rule);
   font-family: var(--font-sans);
 }
+@media (max-width: 899px) {
+  .col-text {
+    /* the floating pill must not cover the last lines of the chapter */
+    padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
+  }
+}
 </style>
