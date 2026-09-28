@@ -33,7 +33,7 @@ const emit = defineEmits<{ prev: []; next: []; practice: [] }>()
 .pill {
   position: fixed;
   left: 50%;
-  bottom: calc(0.75rem + env(safe-area-inset-bottom, 0px));
+  bottom: calc(0.75rem + var(--tabbar-h, 0px) + env(safe-area-inset-bottom, 0px));
   transform: translateX(-50%);
   z-index: 30;
   display: flex;

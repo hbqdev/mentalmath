@@ -29,6 +29,9 @@ export function createAppRouter(
         redirect: (to) => ({ name: 'read', params: { chapter: String(to.params.chapterId) } }),
       },
       { path: '/about', name: 'about', component: () => import('@/views/AboutView.vue') },
+      { path: '/settings', name: 'settings', component: () => import('@/views/SettingsView.vue') },
+      { path: '/progress', name: 'progress', component: () => import('@/views/ProgressView.vue') },
+      { path: '/privacy', name: 'privacy', component: () => import('@/views/PrivacyView.vue') },
       {
         path: '/chapters/:id',
         redirect: (to) => ({ name: 'read', params: { chapter: String(to.params.id) } }),

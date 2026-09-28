@@ -23,6 +23,9 @@
     "shots": "npm run build && playwright test -c e2e/playwright.config.ts e2e/screenshots.spec.ts"
   },
   "dependencies": {
+    "@capacitor-community/keep-awake": "^7.1.0",
+    "@capacitor/app": "^7.1.2",
+    "@capacitor/haptics": "^7.0.5",
     "@capacitor/status-bar": "^7.0.6",
     "@capawesome/capacitor-android-edge-to-edge-support": "^7.2.3",
     "@fontsource-variable/jetbrains-mono": "^5.3.0",

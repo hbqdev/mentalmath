@@ -5,6 +5,7 @@ import { useTheme } from './theme'
 
 const { state } = useProgress()
 const { themes, setTheme } = useTheme()
+const props = defineProps<{ inline?: boolean }>()
 const open = ref(false)
 const root = ref<HTMLElement | null>(null)
 
@@ -29,7 +30,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div ref="root" class="picker" data-testid="theme-picker">
+  <div ref="root" class="picker" :class="{ inline: props.inline }" data-testid="theme-picker">
     <!-- Desktop: the four icons side by side. Phone: the current icon opens the same row. -->
     <button
       type="button"
@@ -168,10 +169,10 @@ onBeforeUnmount(() => {
   display: none;
 }
 @media (max-width: 899px) {
-  .current {
+  .picker:not(.inline) .current {
     display: inline-flex;
   }
-  .group {
+  .picker:not(.inline) .group {
     display: none;
     position: absolute;
     top: calc(100% + 6px);
@@ -185,15 +186,26 @@ onBeforeUnmount(() => {
     border-radius: var(--radius);
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.18);
   }
-  .group.open {
+  .picker:not(.inline) .group.open {
     display: flex;
   }
-  .group .opt {
+  .picker:not(.inline) .group .opt {
     min-height: 44px;
     padding: 0.5rem 0.75rem;
   }
-  .group .opt .name {
+  .picker:not(.inline) .group .opt .name {
     display: inline;
   }
+}
+.picker.inline .group {
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+.picker.inline .opt {
+  min-height: 40px;
+  padding: 0.45rem 0.7rem;
+}
+.picker.inline .opt .name {
+  display: inline;
 }
 </style>
