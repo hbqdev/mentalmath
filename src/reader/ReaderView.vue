@@ -204,6 +204,15 @@ function selectFromSheet(id: string) {
       </aside>
 
       <article class="col-text">
+        <button
+          v-if="focus"
+          type="button"
+          class="exit-focus"
+          data-testid="exit-focus"
+          @click="state.settings.focus = false"
+        >
+          Exit focus · show outline and practice
+        </button>
         <header class="chapter-head">
           <p class="kicker">{{ doc.kicker }}</p>
           <h1>{{ doc.title }}</h1>
@@ -340,6 +349,20 @@ function selectFromSheet(id: string) {
   font-size: 0.8rem;
 }
 
+.exit-focus {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  color: var(--muted);
+  background: var(--card);
+  border: 1px solid var(--card-rule);
+  border-radius: 999px;
+  padding: 0.3rem 0.8rem;
+  margin: 1.5rem 0 -0.5rem;
+}
+.exit-focus:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
 .col-text {
   max-width: var(--measure);
   padding-top: 1.5rem;

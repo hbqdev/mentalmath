@@ -1,4 +1,4 @@
-import { lockUntilRead, selectTheme } from './helpers'
+import { lockUntilRead, sampleProgress, seedProgress, selectTheme } from './helpers'
 import { expect, test } from '@playwright/test'
 
 test.describe('reader', () => {
@@ -78,5 +78,18 @@ test.describe('reader', () => {
     await expect(page).toHaveURL(/\/read\/3$/)
     await page.goto('/exercises/1/left-to-right-addition')
     await expect(page).toHaveURL(/\/read\/1$/)
+  })
+
+  test('focus mode can always be left from inside the reader', async ({ page }, info) => {
+    test.skip(info.project.name !== 'desktop')
+    await seedProgress(page, {
+      ...sampleProgress,
+      settings: { ...sampleProgress.settings, focus: true },
+    })
+    await page.goto('/read/3/cubing')
+    await expect(page.locator('.col-outline')).toHaveCount(0)
+    await page.getByTestId('exit-focus').click()
+    await expect(page.locator('.col-outline')).toBeVisible()
+    await expect(page.getByTestId('practice-rail')).toBeVisible()
   })
 })
