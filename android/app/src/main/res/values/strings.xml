@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Mental Math</string>
+    <string name="title_activity_main">Mental Math</string>
+    <string name="package_name">dev.hbq.mentalmath</string>
+    <string name="custom_url_scheme">dev.hbq.mentalmath</string>
+</resources>

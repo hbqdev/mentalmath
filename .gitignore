@@ -40,3 +40,7 @@ coverage
 e2e/.results/
 test-results/
 playwright-report/
+
+# rasterised only as sources for @capacitor/assets
+public/icons/icon-1024.png
+public/icons/icon-1024-maskable.png
