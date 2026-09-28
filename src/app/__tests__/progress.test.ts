@@ -16,7 +16,8 @@ describe('useProgress', () => {
     localStorage.setItem(STORAGE_KEY, JSON.stringify({ settings: { theme: 'dark' } }))
     const p = useProgress()
     expect(p.state.value.settings.theme).toBe('dark')
-    expect(p.state.value.settings.fontScale).toBe(1)
+    expect(p.state.value.settings.fontSize).toBe(18)
+    expect(p.state.value.settings.font).toBe('serif')
     expect(p.state.value.reading).toEqual({})
   })
 

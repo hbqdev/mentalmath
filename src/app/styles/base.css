@@ -13,10 +13,11 @@ html {
   -webkit-text-size-adjust: 100%;
   background: var(--paper);
   color: var(--ink);
-  font-size: var(--body-size);
+  /* The chrome keeps a fixed scale; the reading text follows --body-size (see .col-text). */
+  font-size: 18px;
 }
 body {
-  font-family: var(--font-serif);
+  font-family: var(--font-body);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
   min-height: 100dvh;

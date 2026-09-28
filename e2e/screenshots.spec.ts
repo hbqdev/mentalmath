@@ -77,6 +77,16 @@ test.describe('screenshots', () => {
     await shot(page, info, 'reader', 'chapter-0-bright')
   })
 
+  test('reader text settings open', async ({ page }, info) => {
+    await seedProgress(page, sampleProgress)
+    await page.goto('/read/1/left-to-right-addition')
+    await page.getByTestId('text-toggle').click()
+    await page.getByTestId('font-size').fill('21')
+    await page.getByTestId('font-sans').click()
+    await expect(page.getByTestId('text-panel')).toBeVisible()
+    await shot(page, info, 'reader', 'text-settings')
+  })
+
   test('reader sheet open', async ({ page }, info) => {
     test.skip(info.project.name !== 'phone')
     await seedProgress(page, sampleProgress)
@@ -221,7 +231,7 @@ test.describe('screenshots', () => {
       )
       await page.evaluate(() => {
         const raw = JSON.parse(localStorage.getItem('mentalmath.v1') ?? '{}')
-        raw.settings = { ...raw.settings, theme: 'light', fontScale: 2 }
+        raw.settings = { ...raw.settings, theme: 'light', fontSize: 22 }
         localStorage.setItem('mentalmath.v1', JSON.stringify(raw))
       })
       await figureShot(

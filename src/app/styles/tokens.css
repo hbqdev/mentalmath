@@ -56,24 +56,16 @@
   --card-rule: #2a3846;
 }
 
-[data-font-scale='0'] {
-  --body-size: 16px;
+:root {
+  /* the reading face; the header and controls keep their own */
+  --font-body: var(--font-serif);
 }
-[data-font-scale='1'] {
-  --body-size: 18px;
+[data-font='sans'] {
+  --font-body: var(--font-sans);
 }
-[data-font-scale='2'] {
-  --body-size: 21px;
+[data-font='system'] {
+  --font-body: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
 }
-
-@media (max-width: 719px) {
-  [data-font-scale='0'] {
-    --body-size: 15px;
-  }
-  [data-font-scale='1'] {
-    --body-size: 17px;
-  }
-  [data-font-scale='2'] {
-    --body-size: 19px;
-  }
+[data-font='mono'] {
+  --font-body: var(--font-mono);
 }

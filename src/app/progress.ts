@@ -17,7 +17,10 @@ export interface ProgressState {
     /** 'light' is the warm paper theme; 'bright' the white one. */
     theme: 'system' | 'light' | 'bright' | 'dark'
     focus: boolean
-    fontScale: 0 | 1 | 2
+    /** Reading size in CSS pixels (14–24). */
+    fontSize: number
+    /** Reading face: the warm serif, the sans, the system face or the monospace. */
+    font: 'serif' | 'sans' | 'system' | 'mono'
     /** Off by default: every set is open. On, a set opens once its section has been read. */
     lockUntilRead: boolean
   }
@@ -30,7 +33,7 @@ export function defaultProgress(): ProgressState {
     reading: {},
     practice: {},
     streak: { current: 0, lastActiveDay: '' },
-    settings: { theme: 'system', focus: false, fontScale: 1, lockUntilRead: false },
+    settings: { theme: 'system', focus: false, fontSize: 18, font: 'serif', lockUntilRead: false },
   }
 }
 
