@@ -246,4 +246,11 @@ function generateTo(t: Technique, difficulty: Difficulty | 'mixed' = 'mixed') {
   border-color: var(--accent);
   text-decoration: none;
 }
+@media (max-width: 719px) {
+  .chapter h2 {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.2rem;
+  }
+}
 </style>
