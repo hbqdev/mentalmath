@@ -65,3 +65,27 @@ export async function selectTheme(page: Page, theme: 'system' | 'light' | 'brigh
   if (!(await opt.isVisible())) await page.getByTestId('theme-toggle').click()
   await opt.click()
 }
+
+/**
+ * Enter an answer the way the current layout expects it: the keypad on phones (one-at-a-time
+ * drills), the text box elsewhere. Letters and symbols the keypad lacks go through the text box.
+ */
+export async function typeAnswer(page: Page, text: string) {
+  const keypad = page.getByTestId('keypad')
+  if (await keypad.isVisible().catch(() => false)) {
+    for (const ch of text.replace(/,/g, '')) {
+      const key = ch === ' ' ? 'extra-1' : ch
+      const btn = page.getByTestId(`key-${key}`)
+      if (await btn.count()) await btn.click()
+      else if (ch === '/') await page.getByTestId('key-extra-0').click()
+      else if (ch === '-' || ch === '.')
+        await page.getByTestId(`key-extra-${ch === '.' ? 0 : 1}`).click()
+      else if (ch === 'r') await page.getByTestId('key-extra-0').click()
+      else throw new Error(`keypad cannot type ${JSON.stringify(ch)}`)
+    }
+    await page.getByTestId('key-check').click()
+    return
+  }
+  await page.getByTestId('answer-input').fill(text)
+  await page.getByTestId('answer-input').press('Enter')
+}

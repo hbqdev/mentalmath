@@ -2,7 +2,7 @@ import { expect, test, type Page } from '@playwright/test'
 import { formatAnswer } from '../src/exercises/checker'
 import { bookExercises } from '../src/exercises/bookSets'
 import '../src/content/book-exercises'
-import { unlockAll } from './helpers'
+import { typeAnswer, unlockAll } from './helpers'
 
 // One book set per chapter that has them; answers come from the committed data.
 const SETS: Array<[string, string]> = [
@@ -22,8 +22,7 @@ async function answer(page: Page, spec: ReturnType<typeof bookExercises>[number]
     return
   }
   const text = spec.kind === 'text' ? spec.accept[0]! : formatAnswer(spec).replace(/^≈ /, '')
-  await page.getByTestId('answer-input').fill(text)
-  await page.getByTestId('answer-input').press('Enter')
+  await typeAnswer(page, text)
 }
 
 for (const [chapter, setId] of SETS) {
@@ -38,7 +37,11 @@ for (const [chapter, setId] of SETS) {
       )
       await answer(page, problems[i]!.answer)
       await expect(page.getByTestId('feedback')).toContainText('Correct')
-      if (i === 0) await expect(page.getByTestId('solution-steps')).toBeVisible()
+      if (i === 0) {
+        const toggle = page.getByTestId('drill-steps-toggle')
+        if (await toggle.count()) await toggle.click()
+        await expect(page.getByTestId('solution-steps')).toBeVisible()
+      }
       await page.getByTestId('next-button').click()
     }
     await expect(page.getByTestId('results-score')).toHaveText(
