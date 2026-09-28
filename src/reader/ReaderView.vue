@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useBreakpoints, useIntersectionObserver } from '@vueuse/core'
+import { useBreakpoints, useIntersectionObserver, usePointerSwipe } from '@vueuse/core'
 import { computed, nextTick, onBeforeUnmount, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useProgress } from '@/app/progress'
@@ -24,6 +24,10 @@ const sheetOpen = ref(false)
 
 const bp = useBreakpoints({ tablet: 720, desktop: 1024 })
 const isPhone = bp.smaller('tablet')
+/** Phones read one section per page (Settings → Reading); everything else scrolls the whole chapter. */
+const paged = computed(() => isPhone.value && state.value.settings.pagedReader)
+const pageEl = ref<HTMLElement | null>(null)
+const pageTurn = ref<'next' | 'prev' | ''>('')
 const isDesktop = bp.greaterOrEqual('desktop')
 const focus = computed(() => state.value.settings.focus)
 
@@ -37,6 +41,12 @@ const activeIndex = computed(() =>
   ),
 )
 const practiceSets = computed(() => allSetsFor(chapterId.value))
+const sectionSets = computed(() =>
+  practiceSets.value.filter(
+    (x) => (x.kind === 'book' ? x.ref.sectionId : x.def.sectionId) === activeId.value,
+  ),
+)
+const currentSection = computed(() => sections.value[activeIndex.value] ?? null)
 const nav = computed(() => neighbours(chapterId.value))
 const allChapters = readableChapters()
 
@@ -129,8 +139,11 @@ async function load() {
     activeId.value = target
     await nextTick()
     if (my !== loadSeq) return
-    observeSections()
-    if (target && target !== d.sections[0]?.id) scrollToSection(target, 'auto', false)
+    if (paged.value) scrollToSection(target, 'auto', false)
+    else {
+      observeSections()
+      if (target && target !== d.sections[0]?.id) scrollToSection(target, 'auto', false)
+    }
     if (wanted && !known) router.replace({ name: 'read', params: { chapter: d.id } })
   } catch {
     if (my === loadSeq) status.value = 'missing'
@@ -140,6 +153,21 @@ async function load() {
 watch(chapterId, load, { immediate: true })
 
 function scrollToSection(id: string, behavior: ScrollBehavior = 'smooth', updateUrl = true) {
+  if (paged.value) {
+    const i = sections.value.findIndex((x) => x.id === id)
+    if (i < 0) return
+    pageTurn.value = i > activeIndex.value ? 'next' : i < activeIndex.value ? 'prev' : ''
+    activeId.value = id
+    window.scrollTo({ top: 0, behavior: 'auto' })
+    // a page shown counts as read once it has been looked at
+    if (!isVisited(chapterId.value, id)) {
+      const t = setTimeout(() => markVisited(chapterId.value, id), DWELL_MS)
+      timers.set(id, t)
+    }
+    if (updateUrl)
+      router.replace({ name: 'read', params: { chapter: chapterId.value, section: id } })
+    return
+  }
   const el = sectionEls.value[id]
   if (!el) return
   activeId.value = id
@@ -151,6 +179,25 @@ function step(delta: number) {
   const s = sections.value[activeIndex.value + delta]
   if (s) scrollToSection(s.id)
 }
+
+// Swipe left/right turns the page on phones (pointer events, so it works for touch and mouse).
+usePointerSwipe(pageEl, {
+  threshold: 60,
+  onSwipeEnd(_e, direction) {
+    if (!paged.value) return
+    if (direction === 'left') step(1)
+    else if (direction === 'right') step(-1)
+  },
+})
+
+// Paged mode marks the first page read too, and re-observes when the mode flips.
+watch(paged, async () => {
+  await nextTick()
+  if (paged.value) {
+    clearObservers()
+    if (activeId.value) scrollToSection(activeId.value, 'auto', false)
+  } else observeSections()
+})
 
 function goChapter(e: Event) {
   const id = (e.target as HTMLSelectElement).value
@@ -203,7 +250,76 @@ function selectFromSheet(id: string) {
         </div>
       </aside>
 
-      <article class="col-text">
+      <article
+        v-if="paged && currentSection"
+        ref="pageEl"
+        class="col-text page"
+        :class="pageTurn"
+        :key="currentSection.id"
+        data-testid="section-page"
+      >
+        <header class="chapter-head compact">
+          <p class="kicker">{{ doc.kicker }} · {{ activeIndex + 1 }} / {{ sections.length }}</p>
+          <h1 v-if="activeIndex === 0">{{ doc.title }}</h1>
+        </header>
+        <section :id="currentSection.id" class="book-section">
+          <h2 v-if="currentSection.id !== 'overview'">{{ currentSection.title }}</h2>
+          <ContentBlocks
+            :blocks="currentSection.blocks"
+            :chapter-id="doc.id"
+            :section-id="currentSection.id"
+          />
+        </section>
+        <footer class="page-foot">
+          <div v-if="sectionSets.length" class="practice-this" data-testid="practice-this">
+            <p class="label">Practice this section</p>
+            <RouterLink
+              v-for="x in sectionSets"
+              :key="x.kind === 'book' ? x.ref.id : x.def.id"
+              class="ps"
+              :to="{
+                name: 'practice',
+                params: { chapter: doc.id, set: x.kind === 'book' ? x.ref.id : x.def.id },
+                query: x.kind === 'generated' ? { mode: 'generated' } : undefined,
+              }"
+            >
+              <span
+                >{{ x.kind === 'book' ? '📖 ' : ''
+                }}{{ x.kind === 'book' ? x.ref.title : x.def.title }}</span
+              >
+              <strong>{{ x.kind === 'book' ? 'Book set ›' : 'Generate ›' }}</strong>
+            </RouterLink>
+          </div>
+          <div class="page-nav">
+            <button
+              type="button"
+              class="pn"
+              :disabled="activeIndex <= 0"
+              data-testid="page-prev"
+              @click="step(-1)"
+            >
+              ‹ Previous
+            </button>
+            <button
+              v-if="activeIndex < sections.length - 1"
+              type="button"
+              class="pn primary"
+              data-testid="page-next"
+              @click="step(1)"
+            >
+              Next section ›
+            </button>
+            <RouterLink
+              v-else-if="nav.next"
+              class="pn primary"
+              :to="{ name: 'read', params: { chapter: nav.next.id } }"
+              >Next: {{ nav.next.kicker }} ›</RouterLink
+            >
+          </div>
+        </footer>
+      </article>
+
+      <article v-else class="col-text">
         <button
           v-if="focus"
           type="button"
@@ -349,6 +465,100 @@ function selectFromSheet(id: string) {
   font-size: 0.8rem;
 }
 
+.page {
+  padding-bottom: 1rem;
+  animation: page-in 0.22s ease-out;
+}
+.page.prev {
+  animation-name: page-in-prev;
+}
+@keyframes page-in {
+  from {
+    opacity: 0;
+    transform: translateX(24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes page-in-prev {
+  from {
+    opacity: 0;
+    transform: translateX(-24px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+.chapter-head.compact {
+  padding-top: 0.5rem;
+}
+.page-foot {
+  margin-top: 2rem;
+  display: grid;
+  gap: 1rem;
+  font-family: var(--font-sans);
+}
+.practice-this {
+  background: var(--card);
+  border: 1px solid var(--card-rule);
+  border-radius: var(--radius);
+  padding: 0.75rem 0.9rem;
+  display: grid;
+  gap: 0.4rem;
+}
+.practice-this .label {
+  margin: 0 0 0.2rem;
+}
+.ps {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.55rem 0.7rem;
+  border-radius: var(--radius);
+  background: var(--surface);
+  border: 1px solid var(--rule);
+  color: var(--ink);
+  min-height: 44px;
+}
+.ps:hover {
+  text-decoration: none;
+}
+.ps strong {
+  color: var(--accent);
+  white-space: nowrap;
+}
+.page-nav {
+  display: flex;
+  gap: 0.6rem;
+}
+.pn {
+  flex: 1;
+  min-height: 48px;
+  border-radius: var(--radius);
+  border: 1px solid var(--rule);
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.pn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--accent-ink);
+}
+.pn:disabled {
+  opacity: 0.4;
+}
+.pn:hover {
+  text-decoration: none;
+}
 .exit-focus {
   font-family: var(--font-sans);
   font-size: 0.8rem;

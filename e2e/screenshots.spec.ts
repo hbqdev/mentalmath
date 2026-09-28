@@ -89,6 +89,16 @@ test.describe('screenshots', () => {
     await shot(page, info, 'reader', 'text-settings')
   })
 
+  test('reader paged section on a phone', async ({ page }, info) => {
+    test.skip(info.project.name !== 'phone')
+    await seedProgress(page, sampleProgress)
+    await page.goto('/read/1/left-to-right-addition')
+    await expect(page.getByTestId('section-page')).toBeVisible()
+    await shot(page, info, 'reader', 'chapter-1-paged')
+    await page.getByTestId('practice-this').scrollIntoViewIfNeeded()
+    await shot(page, info, 'reader', 'chapter-1-paged-footer')
+  })
+
   test('reader sheet open', async ({ page }, info) => {
     test.skip(info.project.name !== 'phone')
     await seedProgress(page, sampleProgress)
