@@ -23,6 +23,8 @@
     "shots": "npm run build && playwright test -c e2e/playwright.config.ts e2e/screenshots.spec.ts"
   },
   "dependencies": {
+    "@capacitor/status-bar": "^7.0.6",
+    "@capawesome/capacitor-android-edge-to-edge-support": "^7.2.3",
     "@fontsource-variable/jetbrains-mono": "^5.3.0",
     "@fontsource-variable/source-serif-4": "^5.3.0",
     "@fontsource/alegreya-sans": "^5.3.0",
@@ -31,6 +33,9 @@
     "vue-router": "^4.6.4"
   },
   "devDependencies": {
+    "@capacitor/android": "^7.6.9",
+    "@capacitor/cli": "^7.6.9",
+    "@capacitor/core": "^7.6.9",
     "@playwright/test": "^1.63.0",
     "@tsconfig/node20": "^20.1.10",
     "@types/node": "^20.19.0",

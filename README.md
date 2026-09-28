@@ -59,9 +59,19 @@ Every worked example in the book (397 figures across chapters 0 to 9) is transcr
 
 The site runs as a systemd user service (`mentalmath.service`, enabled at boot with linger) that serves a copy of `dist/` from `~/srv/mentalmath` on port 8547 through `scripts/serve.mjs`, a dependency-free static server with the SPA fallback and the cache headers the service worker needs. `scripts/mentalmath.sh` manages it: `deploy` (build and publish), `update` (pull, install if the lockfile changed, deploy), `start`, `stop`, `restart`, `status`, `logs`, `health`, `url`, `install`, `uninstall`. Override `PORT`, `HOST` or `SITE_DIR` in the environment.
 
+## Android app
+
+`android/` is a Capacitor 7 project that bundles the built site (offline, no server). Toolchain on this host: OpenJDK 21, the Android SDK in `~/Android/Sdk` (platform 35, build-tools, emulator with a Pixel 6 AVD named `mentalmath`), and `scripts/android-env.sh` puts them on `PATH`. Commands through `scripts/mentalmath.sh`:
+
+- `android:debug` builds `android/app/build/outputs/apk/debug/app-debug.apk`; `android:release` builds the signed Play bundle `app-release.aab` (the upload keystore and its passwords live in `~/.mentalmath/`, never in the repo: back that folder up, a lost key means a new store listing).
+- `android:icons` regenerates launcher icons and splash screens from `assets/` with `@capacitor/assets`.
+- `emu:start`, `emu:install`, `emu:shots`: boot the headless emulator (KVM), install the debug APK and drive the app through the WebView's DevTools socket (`scripts/android-shots.mjs`) to capture `screenshots/android/*.png`, the Android counterpart of the web screenshot set.
+
+Store assets are under `store/` (512 px icon, 1024×500 feature graphic); the phone screenshots come from `screenshots/android/`. App id `dev.hbq.mentalmath`, version in `android/app/build.gradle`.
+
 ## Status
 
-Complete: reader with every figure typeset, generated drills for chapters 0 to 9, all 40 book problem sets with solution steps in the book's methods, offline support, unit and end-to-end suites. Deployed on the LAN host as a user service on port 8547. Deferred: visual-regression comparison of the screenshots.
+Complete: reader with every figure typeset, generated drills for chapters 0 to 9, all 40 book problem sets with solution steps in the book's methods, offline support, unit and end-to-end suites. Deployed on the LAN host as a user service on port 8547; Android app builds as a signed bundle and is exercised on the emulator. Deferred: visual-regression comparison of the screenshots.
 
 ## Book exercise data
 
