@@ -42,8 +42,10 @@ test('primary controls are thumb-sized on a phone', async ({ page }, info) => {
     'new-set',
     'view-sheet',
     'view-one',
-    'theme-toggle',
-    'nav-practice',
+    'tab-read',
+    'tab-practice',
+    'tab-progress',
+    'tab-settings',
   ]) {
     const box = await page.getByTestId(id).boundingBox()
     expect(box, id).not.toBeNull()
@@ -61,7 +63,7 @@ test('primary controls are thumb-sized on a phone', async ({ page }, info) => {
   expect(gen!.height).toBeGreaterThanOrEqual(40)
 })
 
-test('numeric answers open the numeric keyboard and the theme picker opens as a menu', async ({
+test('numeric answers open the numeric keyboard; theme and text live in Settings on phones', async ({
   page,
 }, info) => {
   test.skip(info.project.name !== 'phone')
@@ -70,10 +72,11 @@ test('numeric answers open the numeric keyboard and the theme picker opens as a 
   await expect(page.getByTestId('answer-input')).toHaveAttribute('inputmode', 'decimal')
   await page.goto('/practice/1/ch1-two-digit-addition')
   await expect(page.getByTestId('sheet-input-1')).toHaveAttribute('inputmode', 'decimal')
-  await expect(page.getByTestId('theme-dark')).toBeHidden()
-  await page.getByTestId('theme-toggle').click()
-  await expect(page.getByTestId('theme-dark')).toBeVisible()
+  await expect(page.getByTestId('theme-picker')).toHaveCount(0)
+  await page.getByTestId('tab-settings').click()
+  await expect(page).toHaveURL(/\/settings$/)
   await page.getByTestId('theme-dark').click()
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
-  await expect(page.getByTestId('theme-dark')).toBeHidden()
+  await page.getByTestId('font-size').fill('20')
+  await expect(page.getByTestId('font-size-value')).toHaveText('20 px')
 })

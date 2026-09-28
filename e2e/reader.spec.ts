@@ -93,7 +93,8 @@ test.describe('reader', () => {
     await expect(page.getByTestId('practice-rail')).toBeVisible()
   })
 
-  test('text size slider and font choice change the reading text', async ({ page }) => {
+  test('text size slider and font choice change the reading text', async ({ page }, info) => {
+    const phone = info.project.name === 'phone'
     await page.goto('/read/1/left-to-right-addition')
     const size = () =>
       page
@@ -101,12 +102,14 @@ test.describe('reader', () => {
         .first()
         .evaluate((el) => parseFloat(getComputedStyle(el).fontSize))
     const before = await size()
-    await page.getByTestId('text-toggle').click()
+    if (phone) await page.goto('/settings')
+    else await page.getByTestId('text-toggle').click()
     await page.getByTestId('font-size').fill('23')
     await expect(page.getByTestId('font-size-value')).toHaveText('23 px')
-    expect(await size()).toBeGreaterThan(before)
     await page.getByTestId('font-mono').click()
     await expect(page.locator('html')).toHaveAttribute('data-font', 'mono')
+    if (phone) await page.goto('/read/1/left-to-right-addition')
+    expect(await size()).toBeGreaterThan(before)
     const family = await page
       .locator('.prose p')
       .first()
