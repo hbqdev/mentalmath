@@ -7,7 +7,11 @@ import WebSocket from 'ws'
 
 const serial = 'emulator-5554'
 const pkg = 'dev.hbq.mentalmath'
-const adb = (...args) => execFileSync('adb', ['-s', serial, ...args], { stdio: ['ignore', 'pipe', 'inherit'], maxBuffer: 64 << 20 })
+const adb = (...args) =>
+  execFileSync('adb', ['-s', serial, ...args], {
+    stdio: ['ignore', 'pipe', 'inherit'],
+    maxBuffer: 64 << 20,
+  })
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
 const out = 'screenshots/android'
 mkdirSync(out, { recursive: true })
@@ -34,10 +38,18 @@ ws.on('message', (raw) => {
     else res(msg.result)
   }
 })
-const send = (method, params = {}) => new Promise((res, rej) => { const id = ++seq; pending.set(id, { res, rej }); ws.send(JSON.stringify({ id, method, params })) })
+const send = (method, params = {}) =>
+  new Promise((res, rej) => {
+    const id = ++seq
+    pending.set(id, { res, rej })
+    ws.send(JSON.stringify({ id, method, params }))
+  })
 async function js(expression) {
   const r = await send('Runtime.evaluate', { expression, awaitPromise: true, returnByValue: true })
-  if (r.exceptionDetails) throw new Error(r.exceptionDetails.text + ' ' + (r.exceptionDetails.exception?.description ?? ''))
+  if (r.exceptionDetails)
+    throw new Error(
+      r.exceptionDetails.text + ' ' + (r.exceptionDetails.exception?.description ?? ''),
+    )
   return r.result.value
 }
 const q = (sel) => `document.querySelector(${JSON.stringify(sel)})`
@@ -50,9 +62,14 @@ async function waitFor(sel, ms = 8000) {
   throw new Error(`timeout waiting for ${sel}`)
 }
 const click = (sel) => js(`${q(sel)}.click(); true`)
-const fill = (sel, value) => js(`(() => { const el = ${q(sel)}; const set = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set; set.call(el, ${JSON.stringify(value)}); el.dispatchEvent(new Event('input', { bubbles: true })); return true })()`)
+const fill = (sel, value) =>
+  js(
+    `(() => { const el = ${q(sel)}; const set = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value').set; set.call(el, ${JSON.stringify(value)}); el.dispatchEvent(new Event('input', { bubbles: true })); return true })()`,
+  )
 async function go(path) {
-  await js(`window.history.pushState({}, '', ${JSON.stringify(path)}); window.dispatchEvent(new PopStateEvent('popstate')); true`)
+  await js(
+    `window.history.pushState({}, '', ${JSON.stringify(path)}); window.dispatchEvent(new PopStateEvent('popstate')); true`,
+  )
   await sleep(700)
 }
 async function shot(name) {
@@ -61,8 +78,26 @@ async function shot(name) {
   writeFileSync(`${out}/${name}.png`, adb('exec-out', 'screencap', '-p'))
   console.log(`wrote ${out}/${name}.png`)
 }
+const seed = {
+  reading: {
+    1: {
+      lastSection: 'left-to-right-addition',
+      visited: ['overview', 'left-to-right-addition'],
+      updatedAt: '2026-09-27T09:00:00.000Z',
+    },
+  },
+  practice: {
+    'gen1-two-digit-addition': {
+      attempts: [
+        { at: '2026-09-27T09:30:00.000Z', correct: 8, total: 10, seconds: 95, mode: 'generated' },
+      ],
+      best: 8,
+    },
+  },
+  streak: { current: 2, lastActiveDay: new Date().toISOString().slice(0, 10) },
+}
 
-await js('localStorage.clear(); true')
+await js(`localStorage.setItem('mentalmath.v1', ${JSON.stringify(JSON.stringify(seed))}); true`)
 await send('Page.reload')
 await sleep(2500)
 await waitFor('h1')
@@ -71,26 +106,39 @@ await go('/practice')
 await waitFor('[data-testid="technique-gen1-two-digit-addition"]')
 await shot('practice-hub')
 await go('/read/1/left-to-right-addition')
-await waitFor('#left-to-right-addition')
-await shot('reader-chapter-1')
+await waitFor('[data-testid="section-page"]')
+await shot('reader-page')
+await js(`${q('[data-testid="practice-this"]')}.scrollIntoView({ block: 'center' }); true`)
+await shot('reader-page-footer')
 await click('[data-testid="pill-practice"]')
 await waitFor('[data-testid="sheet"].open')
 await shot('reader-sheet-open')
 await click('[data-testid="sheet-close"]')
+await go('/practice/1/gen1-two-digit-addition?mode=generated&seed=3')
+await waitFor('[data-testid="keypad"]')
+await click('[data-testid="key-7"]')
+await click('[data-testid="key-9"]')
+await shot('drill')
+await click('[data-testid="key-check"]')
+await waitFor('[data-testid="feedback"]')
+await click('[data-testid="drill-steps-toggle"]')
+await sleep(200)
+await shot('drill-feedback')
 await go('/practice/1/ch1-two-digit-addition')
 await waitFor('[data-testid="worksheet"]')
-await fill('[data-testid="sheet-input-1"]', '0')
+await fill('[data-testid="sheet-input-1"]', '39')
 await click('[data-testid="sheet-check-1"]')
 await waitFor('[data-testid="sheet-verdict-1"]')
 await shot('worksheet')
-await go('/practice/1/gen1-two-digit-addition?mode=generated&seed=3')
-await waitFor('[data-testid="answer-input"]')
-await js(`${q('[data-testid="answer-input"]')}.focus(); true`)
-adb('shell', 'input', 'tap', '540', '1500')
-await sleep(900)
-await shot('session-keyboard')
-await click('[data-testid="theme-toggle"]')
+await go('/progress')
+await waitFor('[data-testid="progress-totals"]')
+await shot('progress')
+await go('/settings')
+await waitFor('[data-testid="setting-paged"]')
+await shot('settings')
 await click('[data-testid="theme-dark"]')
-await sleep(400)
-await shot('session-dark')
+await sleep(300)
+await go('/practice/1/gen1-two-digit-addition?mode=generated&seed=8')
+await waitFor('[data-testid="keypad"]')
+await shot('drill-dark')
 ws.close()

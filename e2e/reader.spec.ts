@@ -119,4 +119,33 @@ test.describe('reader', () => {
     await expect(page.locator('html')).toHaveAttribute('data-font', 'mono')
     expect(await size()).toBeCloseTo(23, 0)
   })
+
+  test('phones read one section per page with arrows, swipe and a practice footer', async ({
+    page,
+  }, info) => {
+    test.skip(info.project.name !== 'phone')
+    await page.goto('/read/1')
+    const pageEl = page.getByTestId('section-page')
+    await expect(pageEl).toBeVisible()
+    await expect(page.locator('.book-section')).toHaveCount(1)
+    await expect(page.getByTestId('page-prev')).toBeDisabled()
+    await page.getByTestId('page-next').click()
+    await expect(page).toHaveURL(/\/read\/1\/left-to-right-addition$/)
+    await expect(page.getByTestId('practice-this')).toContainText('Two-Digit Addition')
+    await expect(page.getByTestId('practice-this')).toContainText('Generate')
+    // swipe left → next section
+    const box = (await pageEl.boundingBox())!
+    await page.mouse.move(box.x + box.width - 20, box.y + 200)
+    await page.mouse.down()
+    await page.mouse.move(box.x + box.width / 2, box.y + 200, { steps: 8 })
+    await page.mouse.move(box.x + 20, box.y + 200, { steps: 8 })
+    await page.mouse.up()
+    await expect(page).toHaveURL(/\/read\/1\/left-to-right-subtraction$/)
+    // the pill still counts pages, and a viewed page is marked read
+    await expect(page.locator('text=Section 3 / 3')).toBeVisible()
+    await page.goto('/settings')
+    await page.getByTestId('setting-paged').uncheck()
+    await page.goto('/read/1')
+    await expect(page.locator('.book-section')).toHaveCount(3)
+  })
 })

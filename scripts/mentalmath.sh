@@ -12,7 +12,8 @@
 # Android (needs the toolchain from scripts/android-env.sh; keystore in ~/.mentalmath):
 #   scripts/mentalmath.sh android:sync     build the web app and copy it into android/
 #   scripts/mentalmath.sh android:debug    build android/app/build/outputs/apk/debug/app-debug.apk
-#   scripts/mentalmath.sh android:release  build the signed Play bundle (app-release.aab)
+#   scripts/mentalmath.sh android:release  build the signed Play bundle into store/ (version from package.json)
+#   scripts/mentalmath.sh bump [patch|minor|major]  raise the version in package.json and android/
 #   scripts/mentalmath.sh android:icons    regenerate launcher icons and splash from assets/
 #   scripts/mentalmath.sh emu:start | emu:stop | emu:install | emu:shots
 #                                     boot the headless emulator, install the debug APK,
@@ -103,9 +104,21 @@ cmd_health() {
 android_env() { . "$REPO/scripts/android-env.sh"; }
 cmd_android_sync() { android_env; cd "$REPO"; npm run build; npx cap sync android; }
 cmd_android_debug() { cmd_android_sync; cd "$REPO/android" && ./gradlew -q assembleDebug && ls -la app/build/outputs/apk/debug/app-debug.apk; }
+# versionName is package.json's version; versionCode = major*10000 + minor*100 + patch (must rise every upload).
+sync_version() {
+  local v code
+  v=$(node -p "require('$REPO/package.json').version")
+  code=$(node -p "const [a,b,c]='$v'.split('.').map(Number); a*10000+b*100+c")
+  sed -i -E "s/versionCode [0-9]+/versionCode $code/; s/versionName \"[^\"]*\"/versionName \"$v\"/" "$REPO/android/app/build.gradle"
+  echo "android version $v ($code)"
+}
 cmd_android_release() {
   [ -f "$HOME/.mentalmath/keystore.properties" ] || { echo "missing ~/.mentalmath/keystore.properties (upload keystore)" >&2; exit 1; }
-  cmd_android_sync; cd "$REPO/android" && ./gradlew -q bundleRelease && ls -la app/build/outputs/bundle/release/app-release.aab
+  sync_version
+  cmd_android_sync; cd "$REPO/android" && ./gradlew -q bundleRelease && mkdir -p "$REPO/store" && cp app/build/outputs/bundle/release/app-release.aab "$REPO/store/mentalmath-$(node -p "require('$REPO/package.json').version")-release.aab" && ls -la "$REPO"/store/*.aab
+}
+cmd_bump() {
+  cd "$REPO"; npm version --no-git-tag-version "${2:-patch}" >/dev/null; sync_version; echo "now $(node -p "require('./package.json').version")"
 }
 cmd_android_icons() { android_env; cd "$REPO"; npx @capacitor/assets generate --android --assetPath assets --iconBackgroundColor '#8b2e2e' --iconBackgroundColorDark '#8b2e2e' --splashBackgroundColor '#f6f1e7' --splashBackgroundColorDark '#0f1720'; }
 cmd_emu_start() {
@@ -125,6 +138,7 @@ case "${1:-}" in
   android:sync) cmd_android_sync ;;
   android:debug) cmd_android_debug ;;
   android:release) cmd_android_release ;;
+  bump) cmd_bump "$@" ;;
   android:icons) cmd_android_icons ;;
   emu:start) cmd_emu_start ;;
   emu:stop) cmd_emu_stop ;;
