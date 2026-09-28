@@ -38,10 +38,10 @@ test('primary controls are thumb-sized on a phone', async ({ page }, info) => {
   await unlockAll(page)
   await page.goto('/practice/1/gen1-two-digit-addition?mode=generated&seed=3')
   for (const id of [
-    'answer-submit',
-    'new-set',
-    'view-sheet',
-    'view-one',
+    'key-check',
+    'key-5',
+    'key-backspace',
+    'drill-exit',
     'tab-read',
     'tab-practice',
     'tab-progress',
@@ -69,7 +69,7 @@ test('numeric answers open the numeric keyboard; theme and text live in Settings
   test.skip(info.project.name !== 'phone')
   await unlockAll(page)
   await page.goto('/practice/1/gen1-two-digit-addition?mode=generated&seed=3')
-  await expect(page.getByTestId('answer-input')).toHaveAttribute('inputmode', 'decimal')
+  await expect(page.getByTestId('keypad')).toBeVisible() // phones drill with the on-screen keypad
   await page.goto('/practice/1/ch1-two-digit-addition')
   await expect(page.getByTestId('sheet-input-1')).toHaveAttribute('inputmode', 'decimal')
   await expect(page.getByTestId('theme-picker')).toHaveCount(0)
@@ -79,4 +79,22 @@ test('numeric answers open the numeric keyboard; theme and text live in Settings
   await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark')
   await page.getByTestId('font-size').fill('20')
   await expect(page.getByTestId('font-size-value')).toHaveText('20 px')
+})
+
+test('a phone drill survives an app switch and can be left', async ({ page }, info) => {
+  test.skip(info.project.name !== 'phone')
+  await unlockAll(page)
+  await page.goto('/practice/1/gen1-two-digit-addition?mode=generated&seed=5')
+  await expect(page.getByTestId('practice-progress')).toContainText('1 / 10')
+  await page.getByTestId('key-1').click()
+  await page.getByTestId('key-check').click()
+  await expect(page.getByTestId('feedback')).toBeVisible()
+  await page.getByTestId('next-button').click()
+  await expect(page.getByTestId('practice-progress')).toContainText('2 / 10')
+  await page.reload() // the app coming back after a call or a switch
+  await expect(page.getByTestId('practice-progress')).toContainText('2 / 10')
+  await page.getByTestId('drill-exit').click()
+  await expect(page).toHaveURL(/\/read\/1\/left-to-right-addition/)
+  await page.goto('/practice/1/gen1-two-digit-addition?mode=generated&seed=5')
+  await expect(page.getByTestId('practice-progress')).toContainText('1 / 10') // leaving discards the run
 })

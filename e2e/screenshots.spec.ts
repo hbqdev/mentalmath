@@ -14,6 +14,7 @@ import {
   sampleProgress,
   seedProgress,
   selectTheme,
+  typeAnswer,
   unlockAll,
 } from './helpers'
 
@@ -105,14 +106,13 @@ test.describe('screenshots', () => {
     await page.goto('/practice/1/gen1-two-digit-addition?mode=generated&seed=42')
     await expect(page.getByTestId('practice-prompt')).toBeVisible()
     await shot(page, info, 'practice', 'session-prompt')
-    await page.getByTestId('answer-input').fill('0')
-    await page.getByTestId('answer-input').press('Enter')
+    await typeAnswer(page, '0')
+    if (info.project.name !== 'desktop') await page.getByTestId('drill-steps-toggle').click()
     await expect(page.getByTestId('solution-steps')).toBeVisible()
     await shot(page, info, 'practice', 'session-wrong-answer')
     await page.getByTestId('next-button').click()
     for (let i = 1; i < answers.length; i++) {
-      await page.getByTestId('answer-input').fill(answers[i]!)
-      await page.getByTestId('answer-input').press('Enter')
+      await typeAnswer(page, answers[i]!)
       await page.getByTestId('next-button').click()
     }
     await expect(page.getByTestId('results')).toBeVisible()
@@ -141,14 +141,13 @@ test.describe('screenshots', () => {
     await page.goto('/practice/1/ch1-three-digit-subtraction?view=one')
     await expect(page.getByTestId('practice-prompt')).toBeVisible()
     await shot(page, info, 'practice', 'book-session-prompt')
-    await page.getByTestId('answer-input').fill('0')
-    await page.getByTestId('answer-input').press('Enter')
+    await typeAnswer(page, '0')
+    if (info.project.name !== 'desktop') await page.getByTestId('drill-steps-toggle').click()
     await expect(page.getByTestId('solution-steps')).toBeVisible()
     await shot(page, info, 'practice', 'book-session-steps')
     await page.getByTestId('next-button').click()
     for (let i = 1; i < problems.length; i++) {
-      await page.getByTestId('answer-input').fill(formatAnswer(problems[i]!.answer))
-      await page.getByTestId('answer-input').press('Enter')
+      await typeAnswer(page, formatAnswer(problems[i]!.answer))
       await page.getByTestId('next-button').click()
     }
     await expect(page.getByTestId('results')).toBeVisible()
