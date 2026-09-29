@@ -13,7 +13,7 @@ export default defineConfig({
   timeout: 30_000,
   expect: { timeout: 8_000 },
   fullyParallel: false,
-  workers: 2,
+  workers: process.env.PHONE_SERIAL ? 1 : 2,
   retries: process.env.CI ? 1 : 0,
   reporter: [['list']],
   use: {
@@ -27,6 +27,18 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 900 } },
     },
     { name: 'phone', use: { ...devices['Pixel 5'] } },
+    // The installed app on a paired device: `PHONE_SERIAL=ip:port npx playwright test --project=android`.
+    // Screenshot scenes and the service-worker offline proof belong to the web build.
+    ...(process.env.PHONE_SERIAL
+      ? [
+          {
+            name: 'android',
+            timeout: 120_000,
+            testIgnore: ['**/screenshots.spec.ts', '**/offline.spec.ts'],
+            use: { baseURL: 'http://localhost' },
+          },
+        ]
+      : []),
   ],
   webServer: {
     command: `npx vite preview --host 127.0.0.1 --port ${PORT} --strictPort`,

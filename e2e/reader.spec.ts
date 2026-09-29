@@ -1,11 +1,14 @@
 import { lockUntilRead, sampleProgress, seedProgress, selectTheme } from './helpers'
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures'
 
 test.describe('reader', () => {
-  test('renders chapter 1 with its title and sections', async ({ page }) => {
+  test('renders chapter 1 with its title and sections', async ({ page }, info) => {
     await page.goto('/read/1')
     await expect(page.getByRole('heading', { level: 1 })).toContainText('A Little Give and Take')
-    await expect(page.locator('section.book-section')).toHaveCount(3)
+    // phones page one section at a time; wider screens scroll the whole chapter
+    await expect(page.locator('section.book-section')).toHaveCount(
+      info.project.name === 'desktop' ? 3 : 1,
+    )
     await expect(page.locator('.prose').first()).toContainText(
       'add and subtract numbers from left to right',
     )
@@ -56,7 +59,7 @@ test.describe('reader', () => {
   })
 
   test('phone: the pill opens the practice sheet with the outline', async ({ page }, testInfo) => {
-    test.skip(testInfo.project.name !== 'phone', 'phone layout only')
+    test.skip(testInfo.project.name === 'desktop', 'phone layout only')
     await page.goto('/read/1')
     await expect(page.locator('.col-rail')).toHaveCount(0)
     await expect(page.getByTestId('sheet')).not.toBeVisible()
@@ -94,7 +97,7 @@ test.describe('reader', () => {
   })
 
   test('text size slider and font choice change the reading text', async ({ page }, info) => {
-    const phone = info.project.name === 'phone'
+    const phone = info.project.name !== 'desktop'
     await page.goto('/read/1/left-to-right-addition')
     const size = () =>
       page
@@ -123,7 +126,7 @@ test.describe('reader', () => {
   test('phones read one section per page with arrows, swipe and a practice footer', async ({
     page,
   }, info) => {
-    test.skip(info.project.name !== 'phone')
+    test.skip(info.project.name === 'desktop')
     await page.goto('/read/1')
     const pageEl = page.getByTestId('section-page')
     await expect(pageEl).toBeVisible()

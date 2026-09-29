@@ -4,6 +4,18 @@ export const STORAGE_KEY = 'mentalmath.v1'
 
 /** Seed localStorage before the app boots. Missing fields are filled by the app's defaults merge. */
 export async function seedProgress(page: Page, partial: Record<string, unknown>) {
+  // Inside the installed app the page already sits on the app's origin: seed its storage directly,
+  // so the next goto boots with it, whether or not init scripts reach the WebView.
+  if ((page as Page & { __android?: boolean }).__android) {
+    await page.evaluate(
+      ([key, value]) => {
+        if (window.localStorage.getItem(key as string) === null) {
+          window.localStorage.setItem(key as string, JSON.stringify(value))
+        }
+      },
+      [STORAGE_KEY, partial] as const,
+    )
+  }
   await page.addInitScript(
     ([key, value]) => {
       // Init scripts run on every document load; only seed a fresh profile so the app's own writes survive reloads.

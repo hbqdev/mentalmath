@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures'
 import { seedProgress, sampleProgress } from './helpers'
 
 // After one online visit the service worker has precached the app shell, chapter data and

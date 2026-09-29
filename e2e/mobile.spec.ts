@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test'
+import { expect, test, type Page } from './fixtures'
 import { sampleProgress, seedProgress, unlockAll } from './helpers'
 
 // Phone-specific guarantees: no sideways scrolling, a header that fits in one row, tap targets
@@ -34,7 +34,7 @@ for (const path of PAGES) {
 }
 
 test('primary controls are thumb-sized on a phone', async ({ page }, info) => {
-  test.skip(info.project.name !== 'phone')
+  test.skip(info.project.name === 'desktop')
   await unlockAll(page)
   await page.goto('/practice/1/gen1-two-digit-addition?mode=generated&seed=3')
   for (const id of [
@@ -66,7 +66,7 @@ test('primary controls are thumb-sized on a phone', async ({ page }, info) => {
 test('numeric answers open the numeric keyboard; theme and text live in Settings on phones', async ({
   page,
 }, info) => {
-  test.skip(info.project.name !== 'phone')
+  test.skip(info.project.name === 'desktop')
   await unlockAll(page)
   await page.goto('/practice/1/gen1-two-digit-addition?mode=generated&seed=3')
   await expect(page.getByTestId('keypad')).toBeVisible() // phones drill with the on-screen keypad
@@ -82,7 +82,7 @@ test('numeric answers open the numeric keyboard; theme and text live in Settings
 })
 
 test('a phone drill survives an app switch and can be left', async ({ page }, info) => {
-  test.skip(info.project.name !== 'phone')
+  test.skip(info.project.name === 'desktop')
   await unlockAll(page)
   await page.goto('/practice/1/gen1-two-digit-addition?mode=generated&seed=5')
   await expect(page.getByTestId('practice-progress')).toContainText('1 / 10')

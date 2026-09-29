@@ -3,7 +3,7 @@
 **App name:** Mental Math Trainer
 **Package:** dev.hbq.mentalmath
 **Category:** Education · **Content rating:** Everyone
-**Privacy policy:** the app's `/privacy` page (needs a public URL; text below)
+**Privacy policy:** https://hbqdev.github.io/mentalmath/privacy.html (docs/privacy.html, GitHub Pages from /docs on dev)
 
 ## Short description (80 chars max)
 

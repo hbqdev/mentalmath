@@ -124,4 +124,32 @@ describe('useProgress with malformed stored entries', () => {
     expect(p.state.value.practice['s']?.attempts).toEqual([])
     expect(p.bestScore('s')).toBe(3)
   })
+
+  it('exports a backup and restores it, rejecting foreign files', () => {
+    const p = useProgress()
+    p.markVisited('1', 'overview')
+    p.recordAttempt('gen1-two-digit-addition', {
+      at: '2026-09-27T09:30:00.000Z',
+      correct: 8,
+      total: 10,
+      seconds: 95,
+      mode: 'generated',
+    })
+    p.state.value.settings.fontSize = 22
+    const text = p.exportJson()
+    expect(JSON.parse(text)).toMatchObject({
+      app: 'mentalmath',
+      version: 1,
+      progress: { settings: { fontSize: 22 } },
+    })
+    p.reset()
+    expect(p.state.value.settings.fontSize).toBe(18)
+    expect(p.importJson(text)).toBe(true)
+    expect(p.state.value.settings.fontSize).toBe(22)
+    expect(p.state.value.practice['gen1-two-digit-addition']?.best).toBe(8)
+    expect(p.isVisited('1', 'overview')).toBe(true)
+    expect(p.importJson('{"app":"other"}')).toBe(false)
+    expect(p.importJson('not json')).toBe(false)
+    expect(p.state.value.settings.fontSize).toBe(22)
+  })
 })
