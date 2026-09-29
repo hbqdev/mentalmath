@@ -6,7 +6,8 @@ import { zipSync, strToU8 } from 'fflate'
 import { describe, expect, it } from 'vitest'
 import { extract } from '../extract-book'
 
-const fx = (name: string) => readFileSync(new URL(`../__fixtures__/${name}`, import.meta.url), 'utf8')
+const fx = (name: string) =>
+  readFileSync(new URL(`../__fixtures__/${name}`, import.meta.url), 'utf8')
 // A real 32x70 figure copied out of the EPUB
 const JPEG = new Uint8Array(readFileSync(new URL('../__fixtures__/fig.jpeg', import.meta.url)))
 
@@ -17,12 +18,20 @@ function miniEpub() {
     'META-INF/container.xml': strToU8(container),
     'content.opf': strToU8(fx('mini.opf')),
     'toc.ncx': strToU8(fx('mini.ncx')),
-    'text/part0005.html': strToU8('<html><body><h1 class="preface">Foreword</h1><p class="nonindent">Hi.</p></body></html>'),
-    'text/part0008.html': strToU8('<html><body><h1 class="itr">Introduction</h1><p class="nonindent">Numbers.</p></body></html>'),
+    'text/part0005.html': strToU8(
+      '<html><body><h1 class="preface">Foreword</h1><p class="nonindent">Hi.</p></body></html>',
+    ),
+    'text/part0008.html': strToU8(
+      '<html><body><h1 class="itr">Introduction</h1><p class="nonindent">Numbers.</p></body></html>',
+    ),
     'text/part0009_split_000.html': strToU8(fx('chapter-sample.html')),
     'text/part0009_split_001.html': strToU8(fx('chapter-sample-2.html')),
-    'text/part0019.html': strToU8('<html><body><h1 class="chapter">Chapter ∞</h1><h1 class="subchapter">Epilogue</h1><p class="nonindent">End.</p></body></html>'),
-    'text/part0020.html': strToU8('<html><body><h2 class="section">CHAPTER 1: X</h2></body></html>'),
+    'text/part0019.html': strToU8(
+      '<html><body><h1 class="chapter">Chapter ∞</h1><h1 class="subchapter">Epilogue</h1><p class="nonindent">End.</p></body></html>',
+    ),
+    'text/part0020.html': strToU8(
+      '<html><body><h2 class="section">CHAPTER 1: X</h2></body></html>',
+    ),
     'text/part0022.html': strToU8('<html><body><p>about</p></body></html>'),
     'images/00008.jpeg': JPEG,
     'images/00009.jpeg': JPEG,
@@ -40,7 +49,11 @@ describe('extract()', () => {
       publicPrefix: '/book/figures',
       exerciseSets: { 'ch0-f002': 'ch0-sample-set' },
     })
-    expect(readdirSync(path.join(out, 'content', 'chapters')).sort()).toEqual(['0.json', 'epilogue.json', 'intro.json'])
+    expect(readdirSync(path.join(out, 'content', 'chapters')).sort()).toEqual([
+      '0.json',
+      'epilogue.json',
+      'intro.json',
+    ])
     const ch0 = JSON.parse(readFileSync(path.join(out, 'content', 'chapters', '0.json'), 'utf8'))
     expect(ch0.title).toBe('Quick Tricks: Easy (and Impressive) Calculations')
     const fig = ch0.sections[1].blocks[1]
@@ -51,9 +64,17 @@ describe('extract()', () => {
     expect(index).toContain(`'intro': () => import('./chapters/intro.json')`)
     const meta = JSON.parse(readFileSync(path.join(out, 'content', 'chapters', '0.json'), 'utf8'))
     expect(meta.id).toBe('0')
-    const indexJson = index.slice(index.indexOf('= [') + 2, index.indexOf('\n\nexport const chapterLoaders'))
-    const metas = JSON.parse(indexJson) as Array<{ id: string; sets: Array<{ id: string; sectionId: string }> }>
-    expect(metas.find((m) => m.id === '0')?.sets).toEqual([{ id: 'ch0-sample-set', sectionId: 'instant-multiplication' }])
+    const indexJson = index.slice(
+      index.indexOf('= [') + 2,
+      index.indexOf('\n\nexport const chapterLoaders'),
+    )
+    const metas = JSON.parse(indexJson) as Array<{
+      id: string
+      sets: Array<{ id: string; sectionId: string }>
+    }>
+    expect(metas.find((m) => m.id === '0')?.sets).toEqual([
+      { id: 'ch0-sample-set', sectionId: 'instant-multiplication' },
+    ])
     expect(metas.find((m) => m.id === 'intro')?.sets).toEqual([])
     expect(result.candidates).toEqual([])
     expect(result.units.map((u) => u.id)).toEqual(['intro', '0', 'epilogue'])

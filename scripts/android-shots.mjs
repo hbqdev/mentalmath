@@ -5,7 +5,7 @@ import { execFileSync } from 'node:child_process'
 import { mkdirSync, writeFileSync } from 'node:fs'
 import WebSocket from 'ws'
 
-const serial = 'emulator-5554'
+const serial = process.env.ANDROID_SERIAL ?? 'emulator-5554'
 const pkg = 'dev.hbq.mentalmath'
 const adb = (...args) =>
   execFileSync('adb', ['-s', serial, ...args], {
@@ -13,7 +13,7 @@ const adb = (...args) =>
     maxBuffer: 64 << 20,
   })
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms))
-const out = 'screenshots/android'
+const out = process.env.SHOTS_DIR ?? 'screenshots/android'
 mkdirSync(out, { recursive: true })
 
 adb('shell', 'am', 'force-stop', pkg)

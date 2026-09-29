@@ -4,7 +4,8 @@ import { zipSync, strToU8 } from 'fflate'
 import { describe, expect, it } from 'vitest'
 import { openEpub, planUnits, readSpine, readText, readToc } from '../lib/epub'
 
-const fx = (name: string) => readFileSync(new URL(`../__fixtures__/${name}`, import.meta.url), 'utf8')
+const fx = (name: string) =>
+  readFileSync(new URL(`../__fixtures__/${name}`, import.meta.url), 'utf8')
 
 function miniEpub() {
   const container = `<?xml version="1.0"?><container version="1.0" xmlns="urn:oasis:names:tc:opendocument:xmlns:container"><rootfiles><rootfile full-path="content.opf" media-type="application/oebps-package+xml"/></rootfiles></container>`
@@ -64,7 +65,11 @@ describe('planUnits', () => {
       kicker: 'Chapter 0',
       files: [{ path: 'text/part0009_split_000.html' }, { path: 'text/part0009_split_001.html' }],
     })
-    expect(units[2]).toEqual({ id: 'epilogue', kicker: 'Chapter ∞', files: [{ path: 'text/part0019.html' }] })
+    expect(units[2]).toEqual({
+      id: 'epilogue',
+      kicker: 'Chapter ∞',
+      files: [{ path: 'text/part0019.html' }],
+    })
     expect(units[3]?.files).toEqual([{ path: 'text/part0020.html' }])
   })
 })

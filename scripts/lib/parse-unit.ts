@@ -289,7 +289,8 @@ function wrappedChildren(
       }
     } else if (tag === 'div' && classesOf(c).includes('dis_img')) {
       flushRun()
-      for (const img of $(c).find('img').toArray()) b.addFigure(imagePath(fileDir, img.attribs.src ?? ''))
+      for (const img of $(c).find('img').toArray())
+        b.addFigure(imagePath(fileDir, img.attribs.src ?? ''))
     } else {
       console.warn(`parse-unit: unhandled <${tag}> inside wrapper, dropped`)
     }

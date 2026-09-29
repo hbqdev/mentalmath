@@ -52,6 +52,7 @@
     "eslint": "^9.39.5",
     "eslint-plugin-vue": "^10.11.1",
     "fflate": "^0.8.3",
+    "googleapis": "^178.0.0",
     "happy-dom": "^20.14.5",
     "image-size": "^2.0.4",
     "jiti": "^2.4.2",
