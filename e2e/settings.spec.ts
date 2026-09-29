@@ -1,8 +1,12 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures'
 import { sampleProgress, seedProgress } from './helpers'
 
 test.describe('settings and progress', () => {
-  test('backup, restore and reset round-trip the local data', async ({ page }) => {
+  test('backup, restore and reset round-trip the local data', async ({ page }, info) => {
+    test.skip(
+      info.project.name === 'android',
+      'the app hands the backup to the share sheet; file dialogs are outside the WebView',
+    )
     await seedProgress(page, sampleProgress)
     await page.goto('/settings')
     const download = page.waitForEvent('download')

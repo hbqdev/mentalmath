@@ -1,7 +1,7 @@
 import { mkdirSync } from 'node:fs'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { expect, test, type Page, type TestInfo } from '@playwright/test'
+import { expect, test, type Page, type TestInfo } from './fixtures'
 import { formatAnswer } from '../src/exercises/checker'
 import { findGenerated } from '../src/exercises/generators'
 import { generateMany } from '../src/exercises/generators/shared'
@@ -90,7 +90,7 @@ test.describe('screenshots', () => {
   })
 
   test('reader paged section on a phone', async ({ page }, info) => {
-    test.skip(info.project.name !== 'phone')
+    test.skip(info.project.name === 'desktop')
     await seedProgress(page, sampleProgress)
     await page.goto('/read/1/left-to-right-addition')
     await expect(page.getByTestId('section-page')).toBeVisible()
@@ -100,7 +100,7 @@ test.describe('screenshots', () => {
   })
 
   test('reader sheet open', async ({ page }, info) => {
-    test.skip(info.project.name !== 'phone')
+    test.skip(info.project.name === 'desktop')
     await seedProgress(page, sampleProgress)
     await page.goto('/read/1')
     await page.getByTestId('pill-practice').click()
