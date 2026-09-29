@@ -107,7 +107,10 @@ function resetAll() {
 
     <section>
       <h2>Your data</h2>
-      <p class="note">Everything is stored only on this device. Nothing is sent anywhere.</p>
+      <p class="note">
+        Nothing is collected or sent anywhere. What the app remembers (your place in the book,
+        scores, settings) lives only on this device.
+      </p>
       <div class="actions">
         <button type="button" class="btn" data-testid="export-progress" @click="download">
           Save a backup

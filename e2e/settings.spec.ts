@@ -42,6 +42,6 @@ test.describe('settings and progress', () => {
     await expect(page.getByTestId('setting-timer')).toBeChecked()
     await expect(page.getByTestId('setting-lock')).toBeChecked()
     await page.goto('/privacy')
-    await expect(page.getByRole('heading', { level: 1 })).toContainText('stays on your device')
+    await expect(page.getByRole('heading', { level: 1 })).toContainText('We collect nothing')
   })
 })
