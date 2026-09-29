@@ -139,7 +139,8 @@ if (cmd === 'check') {
       'settings',
     ]
     for (const name of shots) {
-      const file = path.join(root, 'screenshots', 'android', `${name}.png`)
+      const dir = existsSync(path.join(root, 'screenshots', 'phone', 'home.png')) ? 'phone' : 'android'
+      const file = path.join(root, 'screenshots', dir, `${name}.png`)
       if (existsSync(file)) await upload('phoneScreenshots', file)
     }
     console.log(`images uploaded: icon, feature graphic, ${shots.length} screenshots`)
