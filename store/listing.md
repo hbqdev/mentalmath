@@ -3,7 +3,7 @@
 **App name:** Mental Math Trainer
 **Package:** dev.hbq.mentalmath
 **Category:** Education · **Content rating:** Everyone
-**Privacy policy:** https://hbqdev.github.io/mentalmath/privacy.html (docs/privacy.html, GitHub Pages from /docs on dev)
+**Privacy policy:** https://mentalmath.hbqnexus.win/privacy-policy.html (public/privacy-policy.html, served by the app; same text as the in-app /privacy page)
 
 ## Short description (80 chars max)
 
@@ -27,7 +27,7 @@ PRACTICE
 PROGRESS
 • Streaks, accuracy, time practised and per-chapter reading progress
 • Techniques worth another go, surfaced automatically
-• Everything stays on your device: no account, no tracking, no ads, works offline
+• Collects nothing: no account, no tracking, no ads; your place and scores stay on your device; works offline
 • Back up and restore your progress as a file
 
 Not affiliated with the authors or publisher of *Secrets of Mental Math*.
@@ -44,4 +44,4 @@ First release: the full book, 40 book exercise sets, generated drills for every 
 
 ## Privacy policy text
 
-See the app's Privacy page (`src/views/PrivacyView.vue`): all data stays on the device; no accounts, analytics or advertising; export/erase from Settings; contact hbq.dev@gmail.com.
+See the app's Privacy page (`src/views/PrivacyView.vue`) and public/privacy-policy.html: nothing is collected or transmitted; the app keeps your place and scores on the device only; export/erase from Settings; contact hbq.dev@gmail.com.
