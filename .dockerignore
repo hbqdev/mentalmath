@@ -1,0 +1,11 @@
+node_modules
+dist
+android
+screenshots
+store/*.aab
+e2e/.results
+docs
+.git
+*.log
+.vscode
+.idea
