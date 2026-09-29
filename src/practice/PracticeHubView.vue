@@ -6,8 +6,31 @@ import { bookExercises } from '@/exercises/bookSets'
 import { bookSetsFor, generatedSetsFor } from '@/exercises/registry'
 import { createRng } from '@/exercises/rng'
 import type { Difficulty } from '@/exercises/types'
+import DueToday from './DueToday.vue'
+import TimedSheet from './TimedSheet.vue'
+import { describeBest, timedQuery, type BestKey, type TimedOptions } from './timing'
+import { useRouter } from 'vue-router'
+import { ref } from 'vue'
 
-const { bestScore, state } = useProgress()
+const { bestScore, state, bests } = useProgress()
+const router = useRouter()
+const timedFor = ref<Technique | null>(null)
+function startTimed(opts: TimedOptions) {
+  const t = timedFor.value
+  timedFor.value = null
+  if (!t?.generated) return
+  router.push({
+    name: 'practice',
+    params: { chapter: t.chapterId, set: t.generated },
+    query: { mode: 'generated', seed: String(createRng().seed), ...timedQuery(opts) },
+  })
+}
+/** "0:42 clean ten · 17 in 2 min" */
+function bestLine(id: string) {
+  return (Object.entries(bests(id)) as Array<[BestKey, number]>)
+    .map(([k, v]) => describeBest(k, v))
+    .join(' · ')
+}
 const lastAttempt = (id: string) => state.value.practice[id]?.attempts.at(-1)
 
 interface Technique {
@@ -74,9 +97,11 @@ function generateTo(t: Technique, difficulty: Difficulty | 'mixed' = 'mixed') {
       <p class="sub">
         Pick any technique and go: <strong>Generate</strong> draws ten fresh problems that follow
         the chapter's method, with worked steps after each answer; <strong>Book set</strong> replays
-        the authors' own problems.
+        the authors' own problems. <strong>⏱</strong> runs a sprint or a shot clock.
       </p>
     </header>
+
+    <DueToday />
 
     <section
       v-for="c in chapters"
@@ -102,12 +127,25 @@ function generateTo(t: Technique, difficulty: Difficulty | 'mixed' = 'mixed') {
                 {{ lastAttempt(t.generated ?? t.book!.id)!.total }}</template
               >
             </p>
+            <p v-if="t.generated && bestLine(t.generated)" class="meta" data-testid="best-line">
+              ★ {{ bestLine(t.generated) }}
+            </p>
           </div>
           <div class="actions">
             <template v-if="t.generated">
               <RouterLink class="btn primary" data-testid="generate" :to="generateTo(t)"
                 >Generate</RouterLink
               >
+              <button
+                type="button"
+                class="btn ghost timed"
+                data-testid="timed"
+                :aria-label="`Timed drill: ${t.title}`"
+                title="Sprint or shot clock"
+                @click="timedFor = t"
+              >
+                ⏱
+              </button>
               <span class="levels" aria-label="Difficulty">
                 <RouterLink
                   v-for="d in DIFFICULTIES.slice(1)"
@@ -133,6 +171,12 @@ function generateTo(t: Technique, difficulty: Difficulty | 'mixed' = 'mixed') {
         </li>
       </ul>
     </section>
+    <TimedSheet
+      v-if="timedFor"
+      :title="timedFor.title"
+      @start="startTimed"
+      @close="timedFor = null"
+    />
   </div>
 </template>
 
@@ -227,6 +271,12 @@ function generateTo(t: Technique, difficulty: Difficulty | 'mixed' = 'mixed') {
 .btn.ghost {
   color: var(--accent);
   background: transparent;
+}
+.btn.timed {
+  font: inherit;
+  font-size: 1.05rem;
+  padding: 0 0.7rem;
+  cursor: pointer;
 }
 .btn:hover {
   text-decoration: none;

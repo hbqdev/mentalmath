@@ -10,6 +10,10 @@ const props = defineProps<{
   seconds: number
   showTimer: boolean
   title: string
+  /** Sprint seconds left; shown instead of the stopwatch. */
+  timeLeft?: number
+  /** Shot clock, 1 → 0; draws a bar under the prompt. */
+  shotFraction?: number
 }>()
 const emit = defineEmits<{ submit: [value: string]; next: []; exit: [] }>()
 
@@ -53,17 +57,39 @@ const clock = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2,
         ✕
       </button>
       <span class="title">{{ title }}</span>
-      <span class="count" data-testid="practice-progress"
+      <span v-if="state.sprint" class="count" data-testid="practice-progress"
+        >{{ state.history.length }} answered</span
+      >
+      <span v-else class="count" data-testid="practice-progress"
         >{{ Math.min(state.index + 1, state.total) }} / {{ state.total }}</span
       >
-      <span v-if="showTimer" class="clock" data-testid="drill-clock">{{ clock(seconds) }}</span>
+      <span
+        v-if="timeLeft !== undefined"
+        class="clock"
+        :class="{ low: timeLeft <= 10 }"
+        data-testid="drill-clock"
+        >{{ clock(timeLeft) }}</span
+      >
+      <span v-else-if="showTimer" class="clock" data-testid="drill-clock">{{
+        clock(seconds)
+      }}</span>
     </header>
-    <div class="track" aria-hidden="true">
+    <div v-if="!state.sprint" class="track" aria-hidden="true">
       <i :style="{ width: `${(state.index / state.total) * 100}%` }" />
     </div>
 
     <div class="stage">
       <PromptRenderer v-if="state.current" :prompt="state.current.prompt" />
+      <div
+        v-if="shotFraction !== undefined"
+        class="shot"
+        data-testid="shot-clock"
+        role="progressbar"
+        aria-label="Time for this problem"
+        :aria-valuenow="Math.round(shotFraction * 100)"
+      >
+        <i :class="{ low: shotFraction < 0.25 }" :style="{ width: `${shotFraction * 100}%` }" />
+      </div>
       <div
         v-if="!choice"
         class="answer"
@@ -98,6 +124,9 @@ const clock = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2,
     >
       <p class="verdict">
         <template v-if="state.lastResult!.correct">Correct</template>
+        <template v-else-if="state.lastResult!.timedOut"
+          >Time's up. The answer is <strong>{{ state.lastResult!.shown }}</strong></template
+        >
         <template v-else
           >The answer is <strong>{{ state.lastResult!.shown }}</strong></template
         >
@@ -116,7 +145,7 @@ const clock = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2,
         :steps="state.current.solution.steps"
       />
       <button type="button" class="next" data-testid="next-button" @click="next">
-        {{ state.index < state.total - 1 ? 'Next ›' : 'See results ›' }}
+        {{ state.sprint || state.index < state.total - 1 ? 'Next ›' : 'See results ›' }}
       </button>
     </div>
 
@@ -202,6 +231,26 @@ const clock = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2,
   height: 100%;
   background: var(--accent);
   transition: width 0.2s;
+}
+.clock.low {
+  color: var(--accent);
+  font-weight: 700;
+}
+.shot {
+  width: min(100%, 22rem);
+  height: 4px;
+  background: var(--rule);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.shot i {
+  display: block;
+  height: 100%;
+  background: var(--warm);
+  transition: width 0.25s linear;
+}
+.shot i.low {
+  background: var(--accent);
 }
 .stage {
   flex: 1;

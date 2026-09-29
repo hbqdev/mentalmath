@@ -153,3 +153,23 @@ describe('useProgress with malformed stored entries', () => {
     expect(p.state.value.settings.fontSize).toBe(22)
   })
 })
+
+describe('personal bests', () => {
+  it('keeps a best per key and survives a reload', async () => {
+    const p = useProgress()
+    p.recordAttempt('gen1-two-digit-addition', {
+      at: '2026-09-28T10:00:00.000Z',
+      correct: 10,
+      total: 10,
+      seconds: 42,
+      mode: 'timed',
+    })
+    p.recordBest('gen1-two-digit-addition', 'clean10', 42)
+    p.recordBest('gen1-two-digit-addition', 'sprint60', 9)
+    expect(p.bests('gen1-two-digit-addition')).toEqual({ clean10: 42, sprint60: 9 })
+    await Promise.resolve()
+    disposeProgressStore()
+    expect(useProgress().bests('gen1-two-digit-addition')).toEqual({ clean10: 42, sprint60: 9 })
+    expect(useProgress().bests('nothing')).toEqual({})
+  })
+})

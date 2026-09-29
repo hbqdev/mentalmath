@@ -20,11 +20,22 @@ import { useIsPhone } from '@/app/useIsPhone'
 import { hapticResult, keepAwake } from '@/app/native'
 import { clearRun, loadRun, runKey, saveRun } from './resume'
 import { onBeforeUnmount, watchEffect } from 'vue'
+import TimedSheet from './TimedSheet.vue'
+import {
+  bestKey,
+  clock,
+  describeBest,
+  describeTimed,
+  improves,
+  parseTimed,
+  timedQuery,
+  type TimedOptions,
+} from './timing'
 
 const route = useRoute()
 const router = useRouter()
-const { state: progress, isUnlocked, recordAttempt, bestScore } = useProgress()
-const { state, seconds, start, submit, next } = usePracticeSession()
+const { state: progress, isUnlocked, recordAttempt, bestScore, bests, recordBest } = useProgress()
+const { state, seconds, timeLeft, shotFraction, start, submit, next } = usePracticeSession()
 const isPhone = useIsPhone()
 const showTimer = computed(() => timed.value || progress.value.settings.showTimer)
 
@@ -49,7 +60,22 @@ const twin = computed(() =>
   set.value?.kind === 'book' ? generatedTwin(set.value.ref.id) : undefined,
 )
 
-const timed = computed(() => route.query.timed === '1')
+/** Timed options from the query; null for an ordinary run. */
+const timedOpts = computed<TimedOptions | null>(() => parseTimed(route.query))
+const timed = computed(() => timedOpts.value !== null)
+const sprint = computed(() => !!timedOpts.value?.sprint)
+const showTimedSheet = ref(false)
+const newBest = ref<string | undefined>(undefined)
+function startTimed(opts: TimedOptions) {
+  showTimedSheet.value = false
+  clearRun(runKey(setId.value, route.query))
+  const rest = Object.fromEntries(
+    Object.entries(route.query).filter(([k]) => !['len', 'shot', 'timed'].includes(k)),
+  )
+  router.replace({
+    query: { ...rest, mode: 'generated', seed: String(createRng().seed), ...timedQuery(opts) },
+  })
+}
 const difficulty = computed<Difficulty | 'mixed'>(() => {
   const d = String(route.query.difficulty ?? 'mixed')
   return d === 'easy' || d === 'medium' || d === 'hard' ? d : 'mixed'
@@ -92,9 +118,16 @@ function buildExercises(): Exercise[] {
   seed.value = rng.seed
   return generateMany(def, 10, difficulty.value, rng)
 }
+/** Sprints draw more problems from the same technique and stream as the run goes on. */
+function moreExercises(): Exercise[] {
+  const s = set.value
+  const def = s?.kind === 'generated' ? s.def : s ? generatedTwin(s.ref.id) : undefined
+  return def ? generateMany(def, 10, difficulty.value, createRng()) : []
+}
 
 function begin() {
   recorded = false
+  newBest.value = undefined
   seed.value = undefined
   if (!set.value || locked.value) {
     status.value = 'idle'
@@ -122,14 +155,24 @@ function begin() {
     sheetExercises.value = exercises
     return
   }
-  const saved = loadRun(runKey(setId.value, route.query))
-  start(exercises, saved ? { inputs: saved.inputs, elapsedMs: saved.elapsedMs } : undefined)
+  const t = timedOpts.value
+  if (t) {
+    // Clocks cannot pause, so a timed run is never resumed.
+    start(exercises, {
+      sprintMs: t.sprint ? t.sprint * 1000 : undefined,
+      more: t.sprint ? moreExercises : undefined,
+      shotMs: t.shot ? t.shot * 1000 : undefined,
+    })
+  } else {
+    const saved = loadRun(runKey(setId.value, route.query))
+    start(exercises, saved ? { resume: { inputs: saved.inputs, elapsedMs: saved.elapsedMs } } : {})
+  }
   nextTick(() => answerBox.value?.focus())
 }
 
 // Persist the run after every answer so an app switch or a call does not lose the set.
 watchEffect(() => {
-  if (!state.value || status.value !== 'running' || view.value !== 'one') return
+  if (!state.value || status.value !== 'running' || view.value !== 'one' || timed.value) return
   const key = runKey(setId.value, route.query)
   saveRun(key, state.value, seconds.value * 1000)
 })
@@ -154,6 +197,8 @@ watch(
     route.query.seed,
     route.query.difficulty,
     route.query.timed,
+    route.query.len,
+    route.query.shot,
     locked.value,
   ],
   begin,
@@ -165,13 +210,28 @@ watch(
   (phase) => {
     if (phase !== 'done' || recorded || !state.value || !set.value) return
     recorded = true
-    recordAttempt(setId.value, {
-      at: new Date().toISOString(),
+    const result = {
       correct: state.value.correct,
       total: state.value.total,
       seconds: seconds.value,
-      mode: timed.value ? 'timed' : mode.value,
+    }
+    const t = timedOpts.value
+    recordAttempt(setId.value, {
+      at: new Date().toISOString(),
+      ...result,
+      mode: t ? 'timed' : mode.value,
+      ...(t?.sprint ? { sprint: t.sprint } : {}),
+      ...(t?.shot ? { shot: t.shot } : {}),
     })
+    // Personal bests: generated runs only, so the numbers are always fresh.
+    if (mode.value === 'generated' && (!t || !t.shot || t.sprint)) {
+      const key = bestKey(t ?? { sprint: undefined, shot: 0 })
+      const better = improves(key, bests(setId.value)[key], result)
+      if (better !== undefined) {
+        recordBest(setId.value, key, better)
+        newBest.value = describeBest(key, better)
+      }
+    }
   },
 )
 
@@ -296,12 +356,22 @@ const focusMode = computed(() => progress.value.settings.focus)
           <p class="desc">{{ description }}</p>
         </div>
         <div v-if="status === 'running' && view === 'one' && state" class="hud">
-          <span data-testid="practice-progress"
+          <span v-if="state.sprint && state.phase !== 'done'" data-testid="practice-progress"
+            >{{ state.history.length }} answered</span
+          >
+          <span v-else data-testid="practice-progress"
             >{{ Math.min(state.index + 1, state.total) }} / {{ state.total }}</span
           >
-          <span v-if="timed || state.phase === 'done'" class="clock"
-            >{{ Math.floor(seconds / 60) }}:{{ String(seconds % 60).padStart(2, '0') }}</span
+          <span
+            v-if="timeLeft !== undefined && state.phase !== 'done'"
+            class="clock"
+            :class="{ low: timeLeft <= 10 }"
+            data-testid="time-left"
+            >{{ clock(timeLeft) }}</span
           >
+          <span v-else-if="timed || state.phase === 'done'" class="clock">{{
+            clock(seconds)
+          }}</span>
         </div>
       </header>
       <div
@@ -341,6 +411,16 @@ const focusMode = computed(() => progress.value.settings.focus)
             @click="newSet"
           >
             Generate new set
+          </button>
+          <button
+            type="button"
+            class="tool"
+            :class="{ on: timed }"
+            data-testid="timed-open"
+            :title="timedOpts ? describeTimed(timedOpts) : 'Sprint or shot clock'"
+            @click="showTimedSheet = true"
+          >
+            ⏱ {{ timedOpts ? describeTimed(timedOpts) : 'Timed' }}
           </button>
           <label class="tool-label"
             >Difficulty
@@ -397,6 +477,8 @@ const focusMode = computed(() => progress.value.settings.focus)
         :seconds="seconds"
         :show-timer="showTimer"
         :title="title"
+        :time-left="timeLeft"
+        :shot-fraction="shotFraction"
         @submit="onSubmit"
         @next="onNext"
         @exit="exitDrill"
@@ -404,6 +486,16 @@ const focusMode = computed(() => progress.value.settings.focus)
 
       <section v-else-if="state && state.phase !== 'done' && state.current" class="card">
         <PromptRenderer :prompt="state.current.prompt" />
+        <div
+          v-if="shotFraction !== undefined"
+          class="shot"
+          data-testid="shot-clock"
+          role="progressbar"
+          aria-label="Time for this problem"
+          :aria-valuenow="Math.round(shotFraction * 100)"
+        >
+          <i :class="{ low: shotFraction < 0.25 }" :style="{ width: `${shotFraction * 100}%` }" />
+        </div>
         <AnswerInput
           ref="answerBox"
           :spec="state.current.answer"
@@ -420,6 +512,10 @@ const focusMode = computed(() => progress.value.settings.focus)
         >
           <p class="verdict">
             <template v-if="state.lastResult.correct">Correct.</template>
+            <template v-else-if="state.lastResult.timedOut"
+              >Time's up. The answer is <strong>{{ state.lastResult.shown }}</strong
+              >.</template
+            >
             <template v-else
               >Not quite. The answer is <strong>{{ state.lastResult.shown }}</strong
               >.</template
@@ -430,7 +526,7 @@ const focusMode = computed(() => progress.value.settings.focus)
             :steps="state.current.solution.steps"
           />
           <button type="button" class="btn next" data-testid="next-button" @click="onNext">
-            {{ state.index < state.total - 1 ? 'Next ›' : 'See results ›' }}
+            {{ state.sprint || state.index < state.total - 1 ? 'Next ›' : 'See results ›' }}
           </button>
         </div>
       </section>
@@ -442,7 +538,9 @@ const focusMode = computed(() => progress.value.settings.focus)
         :seconds="seconds"
         :seed="mode === 'generated' ? seed : undefined"
         :mode="timed ? 'timed' : mode"
-        :best="bestScore(setId)"
+        :best="sprint ? undefined : bestScore(setId)"
+        :timed-label="timedOpts ? describeTimed(timedOpts) : undefined"
+        :new-best="newBest"
         :twin="
           set?.kind === 'book' && twin
             ? { chapterId, setId: twin.id, title: twin.title }
@@ -452,6 +550,13 @@ const focusMode = computed(() => progress.value.settings.focus)
         @back="back"
       />
     </template>
+    <TimedSheet
+      v-if="showTimedSheet"
+      :title="title"
+      :initial="timedOpts ?? undefined"
+      @start="startTimed"
+      @close="showTimedSheet = false"
+    />
   </div>
 </template>
 
@@ -525,6 +630,30 @@ const focusMode = computed(() => progress.value.settings.focus)
 .tool.primary {
   background: var(--accent);
   color: var(--accent-ink);
+}
+.tool.on {
+  background: var(--card);
+}
+.clock.low {
+  color: var(--accent);
+  font-weight: 700;
+}
+.shot {
+  width: min(100%, 22rem);
+  height: 4px;
+  margin: 0 auto 0.75rem;
+  background: var(--rule);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.shot i {
+  display: block;
+  height: 100%;
+  background: var(--warm);
+  transition: width 0.25s linear;
+}
+.shot i.low {
+  background: var(--accent);
 }
 .tool:hover {
   text-decoration: none;

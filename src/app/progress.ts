@@ -7,11 +7,18 @@ export interface Attempt {
   total: number
   seconds: number
   mode: 'book' | 'generated' | 'timed'
+  /** Sprint length in seconds and shot clock in seconds, for timed runs. */
+  sprint?: number
+  shot?: number
 }
+
+export type BestKey = 'clean10' | 'sprint60' | 'sprint120' | 'sprint300'
+/** Personal bests: seconds for a clean ten, problems right for each sprint length. */
+export type Bests = Partial<Record<BestKey, number>>
 
 export interface ProgressState {
   reading: Record<string, { lastSection: string; visited: string[]; updatedAt: string }>
-  practice: Record<string, { attempts: Attempt[]; best: number }>
+  practice: Record<string, { attempts: Attempt[]; best: number; bests?: Bests }>
   streak: { current: number; lastActiveDay: string }
   settings: {
     /** 'light' is the warm paper theme; 'bright' the white one. */
@@ -108,6 +115,7 @@ export function normalizeProgress(p: ProgressState): ProgressState {
     practice[k] = {
       attempts: Array.isArray(v.attempts) ? (v.attempts as Attempt[]) : [],
       best: typeof v.best === 'number' ? v.best : 0,
+      ...(isPlainObject(v.bests) ? { bests: v.bests as Bests } : {}),
     }
   }
   return { ...p, reading, practice }
@@ -176,6 +184,15 @@ export function useProgress() {
     return state.value.practice[setId]?.best
   }
 
+  function bests(setId: string): Bests {
+    return state.value.practice[setId]?.bests ?? {}
+  }
+  function recordBest(setId: string, key: BestKey, value: number) {
+    const entry = state.value.practice[setId] ?? { attempts: [], best: 0 }
+    entry.bests = { ...entry.bests, [key]: value }
+    state.value.practice = { ...state.value.practice, [setId]: entry }
+  }
+
   function isUnlocked(chapterId: string, sectionId: string) {
     return !state.value.settings.lockUntilRead || isVisited(chapterId, sectionId)
   }
@@ -216,6 +233,8 @@ export function useProgress() {
     chapterCompletion,
     recordAttempt,
     bestScore,
+    bests,
+    recordBest,
     isUnlocked,
     touchStreak,
     localDay,

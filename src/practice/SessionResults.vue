@@ -6,6 +6,10 @@ defineProps<{
   seed?: number
   mode: string
   best?: number
+  /** "2 min sprint · 10 s per problem" for a timed run. */
+  timedLabel?: string
+  /** A personal best set by this run, in words. */
+  newBest?: string
   /** Generated drill for the same technique, offered after a book set. */
   twin?: { chapterId: string; setId: string; title: string }
 }>()
@@ -21,6 +25,8 @@ const clock = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2,
       {{ Math.round((correct / Math.max(1, total)) * 100) }}% · {{ clock(seconds) }}
       <template v-if="best !== undefined"> · best {{ best }}</template>
     </p>
+    <p v-if="timedLabel" class="meta" data-testid="results-timed">{{ timedLabel }}</p>
+    <p v-if="newBest" class="best" data-testid="results-best">★ New best: {{ newBest }}</p>
     <p v-if="seed !== undefined" class="meta seed">Seed {{ seed }} · {{ mode }}</p>
     <div class="btns">
       <button type="button" class="btn primary" data-testid="practice-again" @click="emit('again')">
@@ -55,6 +61,12 @@ const clock = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2,
   font-size: clamp(2.5rem, 8vw, 4rem);
   font-weight: 700;
   margin: 0.25rem 0;
+}
+.best {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  color: var(--warm);
+  margin: 0.4rem 0;
 }
 .meta {
   color: var(--muted);

@@ -66,3 +66,32 @@ describe('DrillScreen', () => {
     expect(c.emitted('submit')?.[0]).toEqual(['No'])
   })
 })
+
+describe('DrillScreen timed', () => {
+  it('shows the sprint clock, the answered count and the shot bar, and a timed-out verdict', async () => {
+    let t = 0
+    const s = createSession([ex, { ...ex, id: 'c' }], {
+      now: () => t,
+      sprintMs: 60_000,
+      shotMs: 10_000,
+    })
+    const w = mount(DrillScreen, {
+      props: {
+        state: { ...s.state() },
+        seconds: 0,
+        showTimer: true,
+        title: 'Two-digit addition',
+        timeLeft: 60,
+        shotFraction: 1,
+      },
+    })
+    expect(w.find('[data-testid="drill-clock"]').text()).toBe('1:00')
+    expect(w.find('[data-testid="practice-progress"]').text()).toBe('0 answered')
+    expect(w.find('[data-testid="shot-clock"]').exists()).toBe(true)
+    t = 10_000
+    s.tick()
+    await w.setProps({ state: { ...s.state() }, timeLeft: 50, shotFraction: 0 })
+    expect(w.find('[data-testid="feedback"]').text()).toMatch(/Time's up.*79/)
+    expect(w.find('[data-testid="next-button"]').text()).toBe('Next ›')
+  })
+})

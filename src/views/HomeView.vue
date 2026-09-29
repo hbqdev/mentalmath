@@ -4,6 +4,7 @@ import { useProgress } from '@/app/progress'
 import { readableChapters } from '@/content/loader'
 import { findGenerated } from '@/exercises/generators'
 import { setTitle } from '@/exercises/registry'
+import DueToday from '@/practice/DueToday.vue'
 
 const chapters = readableChapters()
 const { state, chapterCompletion, lastSection } = useProgress()
@@ -72,6 +73,8 @@ function pct(id: string, total: number) {
         data-testid="book-cover"
       />
     </section>
+
+    <DueToday />
 
     <section v-if="recent.length" class="recent" data-testid="recent-sessions">
       <h2 class="label">Recent practice</h2>
