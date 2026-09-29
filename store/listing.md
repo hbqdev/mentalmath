@@ -23,18 +23,19 @@ PRACTICE
 • Endless generated problems that follow each chapter's method, in three difficulties
 • A distraction-free drill screen with an on-screen keypad and instant feedback
 • Worksheet mode: a whole page of problems, answered in any order
+• Timed drills: 1, 2 or 5 minute sprints and a per-problem shot clock, with personal bests
 
 PROGRESS
 • Streaks, accuracy, time practised and per-chapter reading progress
-• Techniques worth another go, surfaced automatically
+• Spaced review: a Due today list brings each technique back on the right day
 • Collects nothing: no account, no tracking, no ads; your place and scores stay on your device; works offline
 • Back up and restore your progress as a file
 
 Not affiliated with the authors or publisher of *Secrets of Mental Math*.
 
-## Release notes (1.0.0)
+## Release notes (1.0.2)
 
-First release: the full book, 40 book exercise sets, generated drills for every technique, phone drill screen, progress and settings, offline.
+Timed drills (sprints and a shot clock, with personal bests), a Due today spaced-review list on Home and Practice, clearer privacy wording, and a fix so updates never show stale screens.
 
 ## Assets
 
