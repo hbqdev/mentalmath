@@ -15,7 +15,11 @@
 #   scripts/mentalmath.sh android:release  build the signed Play bundle into store/ (version from package.json)
 #   scripts/mentalmath.sh bump [patch|minor|major]  raise the version in package.json and android/
 #   scripts/mentalmath.sh android:icons    regenerate launcher icons and splash from assets/
+#   scripts/mentalmath.sh play:check | play:upload [track] | play:listing
+#                                     Google Play via the service account in ~/.mentalmath
+#   scripts/mentalmath.sh release [track]  bump patch, build the signed bundle, upload (default: internal)
 #   scripts/mentalmath.sh emu:start | emu:stop | emu:install | emu:shots
+#   PHONE_SERIAL=ip:port scripts/mentalmath.sh phone:install | phone:shots   (a paired phone)
 #                                     boot the headless emulator, install the debug APK,
 #                                     take the Android screenshots into screenshots/android/
 #
@@ -132,9 +136,19 @@ cmd_emu_start() {
 }
 cmd_emu_stop() { android_env; adb -s emulator-5554 emu kill 2>/dev/null || true; }
 cmd_emu_install() { android_env; adb -s emulator-5554 install -r "$REPO/android/app/build/outputs/apk/debug/app-debug.apk"; }
-cmd_emu_shots() { android_env; cd "$REPO"; node --input-type=module -e "$(cat scripts/android-shots.mjs)"; }
+cmd_emu_shots() { android_env; cd "$REPO"; node scripts/android-shots.mjs; }
+# A paired phone (adb pair <ip:port> <code>, then adb connect <ip:port>): install and drive it like the emulator.
+cmd_phone_install() { android_env; adb -s "${PHONE_SERIAL:?set PHONE_SERIAL=ip:port}" install -r "$REPO/android/app/build/outputs/apk/debug/app-debug.apk"; }
+cmd_phone_shots() { android_env; cd "$REPO"; ANDROID_SERIAL="${PHONE_SERIAL:?set PHONE_SERIAL=ip:port}" SHOTS_DIR=screenshots/phone node scripts/android-shots.mjs; }
+
+cmd_play() { cd "$REPO"; node scripts/play.mjs "$@"; }
+cmd_release() { cmd_bump patch; cmd_android_release; cmd_play upload "${2:-internal}"; }
 
 case "${1:-}" in
+  play:check) cmd_play check ;;
+  play:upload) cmd_play upload "${2:-internal}" ;;
+  play:listing) cmd_play listing ;;
+  release) cmd_release "$@" ;;
   android:sync) cmd_android_sync ;;
   android:debug) cmd_android_debug ;;
   android:release) cmd_android_release ;;
@@ -144,6 +158,8 @@ case "${1:-}" in
   emu:stop) cmd_emu_stop ;;
   emu:install) cmd_emu_install ;;
   emu:shots) cmd_emu_shots ;;
+  phone:install) cmd_phone_install ;;
+  phone:shots) cmd_phone_shots ;;
   deploy) cmd_deploy ;;
   update) cmd_update ;;
   install) cmd_install ;;
@@ -153,5 +169,5 @@ case "${1:-}" in
   logs) shift; journalctl --user -u "$UNIT" -n 100 "$@" ;;
   health) cmd_health ;;
   url) cmd_url ;;
-  *) sed -n '2,24p' "$0"; exit 2 ;;
+  *) sed -n '2,28p' "$0"; exit 2 ;;
 esac

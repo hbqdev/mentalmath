@@ -109,7 +109,8 @@ if (invokedDirectly) {
     exerciseSets: map.exerciseSets,
     exerciseAfter: map.exerciseAfter ?? {},
   })
-  for (const u of result.units) console.log(`unit ${u.id}: ${u.sections} sections, ${u.figures} figures`)
+  for (const u of result.units)
+    console.log(`unit ${u.id}: ${u.sections} sections, ${u.figures} figures`)
   if (result.candidates.length) {
     console.log('\nExercise-set candidates (add confirmed ones to scripts/book-map.json):')
     for (const c of result.candidates) console.log(`  ${c.figureId}  …${c.after.slice(-110)}`)

@@ -2,13 +2,41 @@ import * as cheerio from 'cheerio'
 import type { AnyNode, Element } from 'domhandler'
 
 export const ALLOWED_TAGS: ReadonlySet<string> = new Set([
-  'p', 'h3', 'strong', 'em', 'u', 'sup', 'sub', 'br', 'span', 'aside', 'div', 'blockquote',
-  'table', 'thead', 'tbody', 'tr', 'td', 'th', 'img', 'ol', 'ul', 'li',
+  'p',
+  'h3',
+  'strong',
+  'em',
+  'u',
+  'sup',
+  'sub',
+  'br',
+  'span',
+  'aside',
+  'div',
+  'blockquote',
+  'table',
+  'thead',
+  'tbody',
+  'tr',
+  'td',
+  'th',
+  'img',
+  'ol',
+  'ul',
+  'li',
 ])
 
 export const ALLOWED_CLASSES: ReadonlySet<string> = new Set([
-  'center', 'right', 'extract', 'hanging', 'list-line', 'footnote', 'aside-title', 'block',
-  'boxed', 'inline',
+  'center',
+  'right',
+  'extract',
+  'hanging',
+  'list-line',
+  'footnote',
+  'aside-title',
+  'block',
+  'boxed',
+  'inline',
 ])
 
 const ALLOWED_ATTRS: Record<string, ReadonlySet<string>> = {
@@ -17,7 +45,17 @@ const ALLOWED_ATTRS: Record<string, ReadonlySet<string>> = {
   th: new Set(['colspan', 'rowspan', 'class']),
 }
 const DEFAULT_ATTRS: ReadonlySet<string> = new Set(['class'])
-const DROP_WITH_CONTENT = new Set(['script', 'style', 'iframe', 'object', 'embed', 'link', 'meta', 'title', 'head'])
+const DROP_WITH_CONTENT = new Set([
+  'script',
+  'style',
+  'iframe',
+  'object',
+  'embed',
+  'link',
+  'meta',
+  'title',
+  'head',
+])
 
 function clean(el: Element): void {
   const tag = el.tagName.toLowerCase()

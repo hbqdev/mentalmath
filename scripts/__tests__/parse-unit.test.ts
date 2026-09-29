@@ -3,7 +3,8 @@ import { readFileSync } from 'node:fs'
 import { describe, expect, it } from 'vitest'
 import { parseUnit, type ParseOptions } from '../lib/parse-unit'
 
-const fx = (name: string) => readFileSync(new URL(`../__fixtures__/${name}`, import.meta.url), 'utf8')
+const fx = (name: string) =>
+  readFileSync(new URL(`../__fixtures__/${name}`, import.meta.url), 'utf8')
 
 const opts: ParseOptions = {
   exerciseSets: { 'ch0-f002': 'ch0-sample-set' },
@@ -178,9 +179,14 @@ describe('parseUnit exercise mapping extras', () => {
   it('collapses several figures mapped to the same set into one exercise block per section', () => {
     const { doc, figures } = parseUnit(
       { id: '2', kicker: 'Chapter 2', files: [{ path: 'text/x.html', html: two }] },
-      { ...opts, exerciseSets: { 'ch2-f001': 'ch2-two-digit-squares', 'ch2-f002': 'ch2-two-digit-squares' } },
+      {
+        ...opts,
+        exerciseSets: { 'ch2-f001': 'ch2-two-digit-squares', 'ch2-f002': 'ch2-two-digit-squares' },
+      },
     )
-    const types = doc.sections[0]!.blocks.map((b) => (b.type === 'exercise' ? `exercise:${b.setId}` : b.type))
+    const types = doc.sections[0]!.blocks.map((b) =>
+      b.type === 'exercise' ? `exercise:${b.setId}` : b.type,
+    )
     expect(types).toEqual(['html', 'exercise:ch2-two-digit-squares', 'html', 'figure', 'html'])
     expect(figures.map((f) => f.id)).toEqual(['ch2-f003'])
   })
@@ -190,8 +196,18 @@ describe('parseUnit exercise mapping extras', () => {
       { id: '3', kicker: 'Chapter 3', files: [{ path: 'text/x.html', html: two }] },
       { ...opts, exerciseSets: {}, exerciseAfter: { 'ch3-f003': 'ch3-three-digit-squares' } },
     )
-    const types = doc.sections[0]!.blocks.map((b) => (b.type === 'exercise' ? `exercise:${b.setId}` : b.type))
-    expect(types).toEqual(['html', 'figure', 'figure', 'html', 'figure', 'exercise:ch3-three-digit-squares', 'html'])
+    const types = doc.sections[0]!.blocks.map((b) =>
+      b.type === 'exercise' ? `exercise:${b.setId}` : b.type,
+    )
+    expect(types).toEqual([
+      'html',
+      'figure',
+      'figure',
+      'html',
+      'figure',
+      'exercise:ch3-three-digit-squares',
+      'html',
+    ])
     expect(figures.map((f) => f.id)).toEqual(['ch3-f001', 'ch3-f002', 'ch3-f003'])
   })
 })
@@ -214,9 +230,13 @@ describe('parseUnit figures nested in block divs', () => {
     )
     const blocks = doc.sections[0]!.blocks
     expect(blocks.map((b) => b.type)).toEqual(['html', 'figure', 'html', 'figure'])
-    expect((blocks[0] as { html: string }).html).toBe('<p>Lead.</p><div class="block"><p class="hanging">First line</p></div>')
+    expect((blocks[0] as { html: string }).html).toBe(
+      '<p>Lead.</p><div class="block"><p class="hanging">First line</p></div>',
+    )
     expect(blocks[1]).toMatchObject({ id: 'ch1-f001' })
-    expect((blocks[2] as { html: string }).html).toBe('<div class="block"><p class="hanging">Second line</p></div>')
+    expect((blocks[2] as { html: string }).html).toBe(
+      '<div class="block"><p class="hanging">Second line</p></div>',
+    )
     expect(blocks[3]).toMatchObject({ id: 'ch1-f002' })
     expect(figures.map((f) => f.sourcePath)).toEqual(['images/a.jpeg', 'images/b.jpeg'])
   })
@@ -225,7 +245,10 @@ describe('parseUnit figures nested in block divs', () => {
 describe('parseUnit heading text', () => {
   it('turns a line break inside a section heading into a space', () => {
     const html = `<html><body><h2 class="section"><strong>MATCHING WITS WITH A CALCULATOR:<br class="calibre3"/>LEARNING DECIMALIZATION</strong></h2><p class="indent">x</p></body></html>`
-    const { doc } = parseUnit({ id: '4', kicker: 'Chapter 4', files: [{ path: 'text/x.html', html }] }, { ...opts, exerciseSets: {} })
+    const { doc } = parseUnit(
+      { id: '4', kicker: 'Chapter 4', files: [{ path: 'text/x.html', html }] },
+      { ...opts, exerciseSets: {} },
+    )
     expect(doc.sections[0]?.title).toBe('Matching Wits with a Calculator: Learning Decimalization')
     expect(doc.sections[0]?.id).toBe('matching-wits-with-a-calculator-learning-decimalization')
   })
