@@ -5,7 +5,7 @@
 //   node scripts/play.mjs upload <track> [<aab>]     upload a bundle and release it on a track
 //                                                     (internal | alpha | beta | production)
 //   node scripts/play.mjs listing                    push store/listing.md, icon, feature graphic and screenshots
-import { createReadStream, readFileSync, readdirSync, existsSync } from 'node:fs'
+import { createReadStream, existsSync, readFileSync } from 'node:fs'
 import { homedir } from 'node:os'
 import path from 'node:path'
 import { google } from 'googleapis'
