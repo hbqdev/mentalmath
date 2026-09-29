@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test'
+import { expect, test } from './fixtures'
 import { formatAnswer } from '../src/exercises/checker'
 import { findGenerated } from '../src/exercises/generators'
 import { generateMany } from '../src/exercises/generators/shared'

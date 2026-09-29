@@ -213,6 +213,9 @@ function generateTo(t: Technique, difficulty: Difficulty | 'mixed' = 'mixed') {
 .btn {
   font-weight: 700;
   padding: 0.45rem 0.9rem;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
   border-radius: var(--radius);
   border: 1px solid var(--accent);
   font-size: 0.9rem;

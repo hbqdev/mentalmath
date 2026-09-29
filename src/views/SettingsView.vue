@@ -10,11 +10,28 @@ const native = Capacitor.isNativePlatform()
 const notice = ref('')
 const fileInput = ref<HTMLInputElement | null>(null)
 
-function download() {
+async function download() {
+  const name = `mentalmath-progress-${new Date().toISOString().slice(0, 10)}.json`
+  if (native) {
+    // A WebView cannot download a blob; write the file and hand it to the share sheet (Files, Drive, mail…).
+    const [{ Filesystem, Directory, Encoding }, { Share }] = await Promise.all([
+      import('@capacitor/filesystem'),
+      import('@capacitor/share'),
+    ])
+    const { uri } = await Filesystem.writeFile({
+      path: name,
+      data: exportJson(),
+      directory: Directory.Cache,
+      encoding: Encoding.UTF8,
+    })
+    await Share.share({ title: 'Mental Math backup', files: [uri] }).catch(() => {})
+    notice.value = 'Backup ready to save or send.'
+    return
+  }
   const blob = new Blob([exportJson()], { type: 'application/json' })
   const a = document.createElement('a')
   a.href = URL.createObjectURL(blob)
-  a.download = `mentalmath-progress-${new Date().toISOString().slice(0, 10)}.json`
+  a.download = name
   a.click()
   URL.revokeObjectURL(a.href)
   notice.value = 'Backup saved.'
