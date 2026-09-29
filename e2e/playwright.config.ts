@@ -27,6 +27,8 @@ export default defineConfig({
       use: { ...devices['Desktop Chrome'], viewport: { width: 1280, height: 900 } },
     },
     { name: 'phone', use: { ...devices['Pixel 5'] } },
+    // Safari engine on a phone viewport; needs `npx playwright install webkit` (+ install-deps on Linux).
+    { name: 'phone-webkit', use: { ...devices['iPhone 13'] } },
     // The installed app on a paired device: `PHONE_SERIAL=ip:port npx playwright test --project=android`.
     // Screenshot scenes and the service-worker offline proof belong to the web build.
     ...(process.env.PHONE_SERIAL
