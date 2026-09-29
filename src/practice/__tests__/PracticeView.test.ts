@@ -1,5 +1,5 @@
 import { flushPromises, mount } from '@vue/test-utils'
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createMemoryHistory } from 'vue-router'
 import { disposeProgressStore, useProgress } from '@/app/progress'
 import { formatAnswer } from '@/exercises/checker'
@@ -180,5 +180,62 @@ describe('book sessions', () => {
     await flushPromises()
     expect(w.find('button[data-testid="practice-back"]').text()).toContain('Back to Chapter 1')
     window.history.replaceState({}, '')
+  })
+})
+
+describe('PracticeView timed', () => {
+  it('runs a sprint against the clock, records the attempt and a personal best', async () => {
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval', 'Date'] })
+    try {
+      useProgress().state.value.settings.lockUntilRead = false
+      const { w } = await mountAt(
+        '/practice/1/gen1-two-digit-addition?mode=generated&len=1m&seed=42',
+      )
+      expect(w.find('[data-testid="time-left"]').text()).toBe('1:00')
+      expect(w.find('[data-testid="practice-progress"]').text()).toBe('0 answered')
+      const expected = generateMany(
+        findGenerated('gen1-two-digit-addition')!,
+        10,
+        'mixed',
+        createRng(42),
+      )
+      const input = w.find('input[data-testid="answer-input"]')
+      await input.setValue(formatAnswer(expected[0]!.answer))
+      await input.trigger('keyup.enter')
+      await flushPromises()
+      await w.find('[data-testid="next-button"]').trigger('click')
+      await flushPromises()
+      expect(w.find('[data-testid="practice-progress"]').text()).toBe('1 answered')
+      vi.advanceTimersByTime(61_000)
+      await flushPromises()
+      expect(w.find('[data-testid="results-score"]').text()).toBe('1 / 1')
+      expect(w.find('[data-testid="results-best"]').text()).toMatch(/New best/)
+      const entry = useProgress().state.value.practice['gen1-two-digit-addition']!
+      expect(entry.attempts.at(-1)).toMatchObject({
+        mode: 'timed',
+        sprint: 60,
+        correct: 1,
+        total: 1,
+      })
+      expect(entry.bests).toEqual({ sprint60: 1 })
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('a shot clock times a problem out', async () => {
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval', 'Date'] })
+    try {
+      useProgress().state.value.settings.lockUntilRead = false
+      const { w } = await mountAt(
+        '/practice/1/gen1-two-digit-addition?mode=generated&shot=10&seed=42',
+      )
+      expect(w.find('[data-testid="shot-clock"]').exists()).toBe(true)
+      vi.advanceTimersByTime(10_500)
+      await flushPromises()
+      expect(w.find('[data-testid="feedback"]').text()).toMatch(/Time's up/)
+    } finally {
+      vi.useRealTimers()
+    }
   })
 })
