@@ -14,6 +14,11 @@
 #   scripts/mentalmath.sh android:debug    build android/app/build/outputs/apk/debug/app-debug.apk
 #   scripts/mentalmath.sh android:release  build the signed Play bundle into store/ (version from package.json)
 #   scripts/mentalmath.sh bump [patch|minor|major]  raise the version in package.json and android/
+#
+# Container (Dockerfile + docker-compose.yml; the systemd service above is unaffected):
+#   scripts/mentalmath.sh docker:build   build the image, tagged mentalmath:<version> and mentalmath:latest
+#   scripts/mentalmath.sh docker:run     docker compose up -d on $PORT (default 8547)
+#   scripts/mentalmath.sh docker:stop    docker compose down
 #   scripts/mentalmath.sh android:icons    regenerate launcher icons and splash from assets/
 #   scripts/mentalmath.sh play:check | play:upload [track] | play:listing
 #                                     Google Play via the service account in ~/.mentalmath
@@ -142,6 +147,15 @@ cmd_phone_install() { android_env; adb -s "${PHONE_SERIAL:?set PHONE_SERIAL=ip:p
 cmd_phone_shots() { android_env; cd "$REPO"; ANDROID_SERIAL="${PHONE_SERIAL:?set PHONE_SERIAL=ip:port}" SHOTS_DIR=screenshots/phone node scripts/android-shots.mjs; }
 
 cmd_play() { cd "$REPO"; node scripts/play.mjs "$@"; }
+cmd_docker_build() {
+  cd "$REPO"
+  local v; v=$(node -p "require('./package.json').version")
+  docker build -t "mentalmath:$v" -t mentalmath:latest .
+  echo "built mentalmath:$v (also :latest)"
+}
+cmd_docker_run() { cd "$REPO"; PORT="$PORT" docker compose up -d; echo "container on http://localhost:$PORT/"; }
+cmd_docker_stop() { cd "$REPO"; docker compose down; }
+
 cmd_release() { cmd_bump patch; cmd_android_release; cmd_play upload "${2:-internal}"; }
 
 case "${1:-}" in
@@ -149,6 +163,9 @@ case "${1:-}" in
   play:upload) cmd_play upload "${2:-internal}" ;;
   play:listing) cmd_play listing ;;
   release) cmd_release "$@" ;;
+  docker:build) cmd_docker_build ;;
+  docker:run) cmd_docker_run ;;
+  docker:stop) cmd_docker_stop ;;
   android:sync) cmd_android_sync ;;
   android:debug) cmd_android_debug ;;
   android:release) cmd_android_release ;;
