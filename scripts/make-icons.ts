@@ -11,20 +11,28 @@ import { chromium } from '@playwright/test'
 const root = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..')
 const out = path.join(root, 'public', 'icons')
 const svg = readFileSync(path.join(root, 'public', 'favicon.svg'), 'utf8')
-const font = path.join(root, 'node_modules/@fontsource-variable/source-serif-4/files/source-serif-4-latin-wght-normal.woff2')
+const font = path.join(
+  root,
+  'node_modules/@fontsource-variable/source-serif-4/files/source-serif-4-latin-wght-normal.woff2',
+)
 
 async function render(name: string, size: number, maskable: boolean) {
   const b = await chromium.launch()
   const page = await b.newPage({ viewport: { width: size, height: size }, deviceScaleFactor: 1 })
   // Maskable and Apple icons must fill the square; the platform rounds the corners itself.
-  const body = maskable ? svg.replace('rx="14"', 'rx="0"').replace('viewBox="0 0 64 64"', 'viewBox="6 6 52 52"') : svg
+  const body = maskable
+    ? svg.replace('rx="14"', 'rx="0"').replace('viewBox="0 0 64 64"', 'viewBox="6 6 52 52"')
+    : svg
   await page.setContent(`<!doctype html><style>
     @font-face { font-family: 'Source Serif 4'; src: url('file://${font}') format('woff2'); font-weight: 200 900; }
     html, body { margin: 0; background: transparent; }
     svg { display: block; width: ${size}px; height: ${size}px; }
   </style>${body}`)
   await page.evaluate('document.fonts.ready')
-  const png = await page.screenshot({ omitBackground: true, clip: { x: 0, y: 0, width: size, height: size } })
+  const png = await page.screenshot({
+    omitBackground: true,
+    clip: { x: 0, y: 0, width: size, height: size },
+  })
   await b.close()
   writeFileSync(path.join(out, name), png)
   console.log(`wrote public/icons/${name}`)
