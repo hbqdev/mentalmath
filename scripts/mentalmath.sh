@@ -15,6 +15,12 @@
 #   scripts/mentalmath.sh android:release  build the signed Play bundle into store/ (version from package.json)
 #   scripts/mentalmath.sh bump [patch|minor|major]  raise the version in package.json and android/
 #
+# iOS (built on a Mac over SSH: MAC_HOST, default tintran@192.168.50.31; project copied to ~/dev/MentalMath there):
+#   scripts/mentalmath.sh ios:sync    build the web app, sync ios/, copy the project to the Mac
+#   scripts/mentalmath.sh ios:sim     ios:sync, then build, install and launch in the simulator ($IOS_SIM)
+#   scripts/mentalmath.sh ios:shot [name]  screenshot the simulator into screenshots/ios/
+#   scripts/mentalmath.sh ios:icons   regenerate the iOS icon and splash from assets/
+#
 # Container (Dockerfile + docker-compose.yml; the systemd service above is unaffected):
 #   scripts/mentalmath.sh docker:build   build the image, tagged mentalmath:<version> and mentalmath:latest
 #   scripts/mentalmath.sh docker:run     docker compose up -d on $PORT (default 8547)
@@ -120,7 +126,39 @@ sync_version() {
   code=$(node -p "const [a,b,c]='$v'.split('.').map(Number); a*10000+b*100+c")
   sed -i -E "s/versionCode [0-9]+/versionCode $code/; s/versionName \"[^\"]*\"/versionName \"$v\"/" "$REPO/android/app/build.gradle"
   echo "android version $v ($code)"
+  if [ -f "$REPO/ios/App/App.xcodeproj/project.pbxproj" ]; then
+    sed -i -E "s/MARKETING_VERSION = [^;]+;/MARKETING_VERSION = $v;/; s/CURRENT_PROJECT_VERSION = [^;]+;/CURRENT_PROJECT_VERSION = $code;/" "$REPO/ios/App/App.xcodeproj/project.pbxproj"
+    echo "ios version $v ($code)"
+  fi
 }
+
+# iOS builds run on a Mac over SSH (Xcode only; packages resolve through Swift Package Manager).
+MAC_HOST=${MAC_HOST:-tintran@192.168.50.31}
+MAC_DIR=${MAC_DIR:-dev/MentalMath}
+IOS_SIM=${IOS_SIM:-iPhone 18 Pro}
+mac() { ssh -o BatchMode=yes "$MAC_HOST" "$@"; }
+cmd_ios_sync() {
+  cd "$REPO"; sync_version; npm run build && npx cap sync ios
+  mac "mkdir -p ~/$MAC_DIR"
+  rsync -a --delete --exclude 'ios/App/build' -R ios node_modules/@capacitor node_modules/@capacitor-community package.json capacitor.config.ts "$MAC_HOST:$MAC_DIR/"
+  echo "synced to $MAC_HOST:~/$MAC_DIR"
+}
+cmd_ios_sim() {
+  cmd_ios_sync
+  mac "set -e; cd ~/$MAC_DIR/ios/App
+    xcodebuild -project App.xcodeproj -scheme App -configuration Debug -sdk iphonesimulator -destination 'platform=iOS Simulator,name=$IOS_SIM' -derivedDataPath build CODE_SIGNING_ALLOWED=NO build 2>&1 | grep -E 'error:|BUILD (SUCCEEDED|FAILED)' | sort -u
+    xcrun simctl boot '$IOS_SIM' 2>/dev/null || true; xcrun simctl bootstatus '$IOS_SIM' -b >/dev/null 2>&1
+    xcrun simctl terminate '$IOS_SIM' dev.hbq.mentalmath 2>/dev/null || true
+    xcrun simctl install '$IOS_SIM' build/Build/Products/Debug-iphonesimulator/App.app
+    xcrun simctl launch '$IOS_SIM' dev.hbq.mentalmath"
+}
+# ios:shot [name]: screenshot the simulator into screenshots/ios/<name>.png
+cmd_ios_shot() {
+  local name=${2:-screen}
+  mac "mkdir -p ~/$MAC_DIR/shots && xcrun simctl io '$IOS_SIM' screenshot ~/$MAC_DIR/shots/$name.png >/dev/null 2>&1"
+  mkdir -p "$REPO/screenshots/ios" && scp -q "$MAC_HOST:$MAC_DIR/shots/$name.png" "$REPO/screenshots/ios/$name.png" && echo "screenshots/ios/$name.png"
+}
+cmd_ios_icons() { cd "$REPO"; npx @capacitor/assets generate --ios --assetPath assets --iconBackgroundColor '#8b2e2e' --iconBackgroundColorDark '#8b2e2e' --splashBackgroundColor '#f6f1e7' --splashBackgroundColorDark '#0f1720'; }
 cmd_android_release() {
   [ -f "$HOME/.mentalmath/keystore.properties" ] || { echo "missing ~/.mentalmath/keystore.properties (upload keystore)" >&2; exit 1; }
   sync_version
@@ -163,6 +201,10 @@ case "${1:-}" in
   play:upload) cmd_play upload "${2:-internal}" ;;
   play:listing) cmd_play listing ;;
   release) cmd_release "$@" ;;
+  ios:sync) cmd_ios_sync ;;
+  ios:sim) cmd_ios_sim ;;
+  ios:shot) cmd_ios_shot "$@" ;;
+  ios:icons) cmd_ios_icons ;;
   docker:build) cmd_docker_build ;;
   docker:run) cmd_docker_run ;;
   docker:stop) cmd_docker_stop ;;
