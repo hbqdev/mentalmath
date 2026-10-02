@@ -1,6 +1,7 @@
 node_modules
 dist
 android
+ios
 screenshots
 store/*.aab
 e2e/.results

@@ -242,7 +242,8 @@ function toggleFocus() {
   }
   .top {
     gap: 0.6rem;
-    padding: 0 0.75rem;
+    /* keep the status bar inset: iOS draws the web view under the notch */
+    padding: env(safe-area-inset-top, 0px) 0.75rem 0;
     grid-template-columns: auto minmax(0, 1fr) auto;
   }
   .controls {

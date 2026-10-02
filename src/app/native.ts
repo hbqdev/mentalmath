@@ -3,8 +3,9 @@ import { watchEffect } from 'vue'
 import { useTheme } from './theme'
 
 /**
- * Inside the Android app, colour the status and navigation bars like the header so the theme
- * runs edge to edge. Does nothing on the web, where the browser owns those bars.
+ * Inside the native app, match the system bars to the theme: on Android colour the status and
+ * navigation bars like the header; on both platforms pick light or dark status bar text.
+ * Does nothing on the web, where the browser owns those bars.
  */
 export function useNativeBars() {
   if (!Capacitor.isNativePlatform()) return
@@ -14,11 +15,12 @@ export function useNativeBars() {
     const surface =
       getComputedStyle(document.documentElement).getPropertyValue('--surface').trim() ||
       (dark ? '#0b1118' : '#fbf8f1')
-    const [{ StatusBar, Style }, { EdgeToEdge }] = await Promise.all([
-      import('@capacitor/status-bar'),
-      import('@capawesome/capacitor-android-edge-to-edge-support'),
-    ])
-    await EdgeToEdge.setBackgroundColor({ color: surface })
+    const { StatusBar, Style } = await import('@capacitor/status-bar')
+    // Only Android has system bars to paint; iOS draws the web view under a transparent status bar.
+    if (Capacitor.getPlatform() === 'android') {
+      const { EdgeToEdge } = await import('@capawesome/capacitor-android-edge-to-edge-support')
+      await EdgeToEdge.setBackgroundColor({ color: surface })
+    }
     await StatusBar.setStyle({ style: dark ? Style.Dark : Style.Light })
   })
 }

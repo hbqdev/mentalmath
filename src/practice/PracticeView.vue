@@ -294,10 +294,19 @@ function goBack() {
   else router.back()
 }
 const focusMode = computed(() => progress.value.settings.focus)
+/** Phones run a set as a full-screen drill; the page padding goes so the keypad fits above the tabs. */
+const drilling = computed(
+  () =>
+    isPhone.value &&
+    view.value === 'one' &&
+    status.value === 'running' &&
+    !!state.value?.current &&
+    state.value.phase !== 'done',
+)
 </script>
 
 <template>
-  <div class="practice" :class="{ focus: focusMode }" @keyup.enter="onEnter">
+  <div class="practice" :class="{ focus: focusMode, drilling }" @keyup.enter="onEnter">
     <section v-if="!set" class="state" data-testid="set-not-found">
       <p class="kicker">Not found</p>
       <h1>No such practice set in this chapter.</h1>
@@ -565,6 +574,9 @@ const focusMode = computed(() => progress.value.settings.focus)
   max-width: 48rem;
   margin: 0 auto;
   padding: 1.5rem var(--gutter) 5rem;
+}
+.practice.drilling {
+  padding: 0;
 }
 .state {
   text-align: center;

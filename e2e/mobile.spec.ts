@@ -98,3 +98,17 @@ test('a phone drill survives an app switch and can be left', async ({ page }, in
   await page.goto('/practice/1/gen1-two-digit-addition?mode=generated&seed=5')
   await expect(page.getByTestId('practice-progress')).toContainText('1 / 10') // leaving discards the run
 })
+
+test('the whole drill keypad sits above the tab bar without scrolling', async ({ page }, info) => {
+  test.skip(info.project.name === 'desktop', 'phones only')
+  await unlockAll(page)
+  await page.goto('/practice/1/gen1-two-digit-addition?mode=generated&seed=42')
+  await expect(page.getByTestId('keypad')).toBeVisible()
+  const { check, tabs, scrollable } = await page.evaluate(() => ({
+    check: document.querySelector('[data-testid="key-check"]')!.getBoundingClientRect().bottom,
+    tabs: document.querySelector('[data-testid="tab-bar"]')!.getBoundingClientRect().top,
+    scrollable: document.documentElement.scrollHeight - window.innerHeight,
+  }))
+  expect(check).toBeLessThanOrEqual(tabs)
+  expect(scrollable).toBeLessThanOrEqual(1)
+})
