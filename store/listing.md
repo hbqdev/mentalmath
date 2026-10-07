@@ -33,9 +33,9 @@ PROGRESS
 
 Not affiliated with the authors or publisher of *Secrets of Mental Math*.
 
-## Release notes (1.0.2)
+## Release notes (1.0.3)
 
-Timed drills (sprints and a shot clock, with personal bests), a Due today spaced-review list on Home and Practice, clearer privacy wording, and a fix so updates never show stale screens.
+The drill keypad now fits fully above the tab bar on every phone, and the header no longer slides under the status bar.
 
 ## Assets
 
