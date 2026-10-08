@@ -46,10 +46,23 @@ export async function hapticResult(correct: boolean, enabled: boolean) {
   await Haptics.notification({ type: correct ? NotificationType.Success : NotificationType.Error })
 }
 
-/** Keep the screen on while a drill is running. */
-export async function keepAwake(on: boolean) {
-  if (!Capacitor.isNativePlatform()) return
-  const { KeepAwake } = await import('@capacitor-community/keep-awake')
-  if (on) await KeepAwake.keepAwake()
-  else await KeepAwake.allowSleep()
+let awakeWanted: boolean | null = null
+let awakeQueue: Promise<void> = Promise.resolve()
+
+/**
+ * Keep the screen on while a drill is running. Requests are sent one after another and repeats are
+ * dropped: opening a drill asks for "allow sleep" then "keep awake" within a few milliseconds, and
+ * sent together the two native calls could land in either order and leave the screen able to sleep.
+ */
+export function keepAwake(on: boolean): Promise<void> {
+  if (!Capacitor.isNativePlatform() || on === awakeWanted) return awakeQueue
+  awakeWanted = on
+  awakeQueue = awakeQueue
+    .then(async () => {
+      const { KeepAwake } = await import('@capacitor-community/keep-awake')
+      if (on) await KeepAwake.keepAwake()
+      else await KeepAwake.allowSleep()
+    })
+    .catch(() => {})
+  return awakeQueue
 }
