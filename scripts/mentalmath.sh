@@ -208,7 +208,7 @@ cmd_ios_wda() {
 cmd_ios_e2e() {
   local want=${2:-iPad}
   cd "$REPO"; npx tsx e2e-ios/make-fixtures.ts >/dev/null
-  if [ "${SKIP_BUILD:-}" = 1 ]; then cmd_ios_sync >/dev/null; else cmd_ios_device ios:device "$want" | grep -E 'FAILED|error:|EXIT [1-9]'; fi
+  if [ "${SKIP_BUILD:-}" = 1 ]; then cmd_ios_sync >/dev/null; else cmd_ios_device ios:device "$want" | grep -E 'FAILED|error:|EXIT [1-9]' || true; fi
   mac "ls ~/$MAC_DIR/build-wda/Build/Products/*.xctestrun >/dev/null 2>&1" || cmd_ios_wda ios:wda "$want"
   cmd_ios_appium ios:appium start >/dev/null || { echo 'appium did not start'; return 1; }
   # Quiet by default: the summary and any failures. VERBOSE=1 shows every test.
