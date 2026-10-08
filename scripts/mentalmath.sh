@@ -22,6 +22,7 @@
 #   scripts/mentalmath.sh ios:device [iPhone|iPad]  signed build, install and launch on a connected device
 #   scripts/mentalmath.sh ios:e2e [iPad|iPhone]     install, then run e2e-ios/ on the device through Appium
 #   scripts/mentalmath.sh ios:appium start|stop     the Appium server those tests use (Mac, 127.0.0.1:4723)
+#   scripts/mentalmath.sh ios:store-shots           App Store screenshots from the simulators into store/ios/
 #   scripts/mentalmath.sh ios:icons   regenerate the iOS icon and splash from assets/
 #
 # Container (Dockerfile + docker-compose.yml; the systemd service above is unaffected):
@@ -215,6 +216,17 @@ cmd_ios_e2e() {
   mac "zsh -lc 'cd ~/$MAC_DIR/e2e-ios && { [ -d node_modules/webdriverio ] || npm install --silent --no-audit --no-fund; } && IOS_DEVICE=$want npm test --silent 2>&1'" \
     | if [ "${VERBOSE:-}" = 1 ]; then cat; else grep -E '^\s*✖|^ℹ (tests|pass|fail|skipped)|Error:|AssertionError' | grep -v '^✖ iOS app' | awk '!seen[$0]++' | head -30; fi
 }
+# ios:store-shots: App Store screenshots (iPhone 6.9" and iPad 13") from the simulators into store/ios/
+cmd_ios_store_shots() {
+  cd "$REPO"; npx tsx e2e-ios/make-fixtures.ts >/dev/null; cmd_ios_sync >/dev/null
+  for pair in "iphone:iPhone 18 Pro Max" "ipad:iPad Pro 13-inch (M5)"; do
+    local dir=${pair%%:*} sim=${pair#*:}
+    mac "rm -rf ~/$MAC_DIR/store-shots/$dir; zsh -lc 'cd ~/$MAC_DIR/e2e-ios && { [ -d node_modules/webdriverio ] || npm install --silent --no-audit --no-fund; } && IOS_SIM=\"$sim\" OUT=~/$MAC_DIR/store-shots/$dir node store-shots.mjs 2>&1 | tail -1'"
+    mkdir -p "store/ios/$dir"; rm -f "store/ios/$dir"/*.png
+    scp -q "$MAC_HOST:$MAC_DIR/store-shots/$dir/*.png" "store/ios/$dir/"
+  done
+  mac "xcrun simctl shutdown all 2>/dev/null"; cmd_ios_sync >/dev/null   # restore the Mac copy
+}
 # ios:shot [name]: screenshot the simulator into screenshots/ios/<name>.png
 cmd_ios_shot() {
   local name=${2:-screen}
@@ -270,6 +282,7 @@ case "${1:-}" in
   ios:device) cmd_ios_device "$@" ;;
   ios:appium) cmd_ios_appium "$@" ;;
   ios:wda) cmd_ios_wda "$@" ;;
+  ios:store-shots) cmd_ios_store_shots ;;
   ios:e2e) cmd_ios_e2e "$@" ;;
   ios:icons) cmd_ios_icons ;;
   docker:build) cmd_docker_build ;;

@@ -12,6 +12,7 @@ const answers = (seed: number) =>
 
 writeFileSync(
   new URL('./fixtures.json', import.meta.url),
-  JSON.stringify({ set: SET, seed42: answers(42), seed7: answers(7) }, null, 2) + '\n',
+  JSON.stringify({ set: SET, seed42: answers(42), seed7: answers(7), seed3: answers(3) }, null, 2) +
+    '\n',
 )
 console.log('wrote e2e-ios/fixtures.json')
