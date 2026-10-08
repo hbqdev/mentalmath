@@ -19,6 +19,7 @@
 #   scripts/mentalmath.sh ios:sync    build the web app, sync ios/, copy the project to the Mac
 #   scripts/mentalmath.sh ios:sim     ios:sync, then build, install and launch in the simulator ($IOS_SIM)
 #   scripts/mentalmath.sh ios:shot [name]  screenshot the simulator into screenshots/ios/
+#   scripts/mentalmath.sh ios:device [iPhone|iPad]  signed build, install and launch on a connected device
 #   scripts/mentalmath.sh ios:icons   regenerate the iOS icon and splash from assets/
 #
 # Container (Dockerfile + docker-compose.yml; the systemd service above is unaffected):
@@ -140,7 +141,7 @@ mac() { ssh -o BatchMode=yes "$MAC_HOST" "$@"; }
 cmd_ios_sync() {
   cd "$REPO"; sync_version; npm run build && npx cap sync ios
   mac "mkdir -p ~/$MAC_DIR"
-  rsync -a --delete --exclude 'ios/App/build' -R ios node_modules/@capacitor node_modules/@capacitor-community package.json capacitor.config.ts "$MAC_HOST:$MAC_DIR/"
+  rsync -a --delete --exclude 'ios/App/build' -R ios node_modules/@capacitor node_modules/@capacitor-community package.json capacitor.config.ts scripts/ios-device.sh "$MAC_HOST:$MAC_DIR/"
   echo "synced to $MAC_HOST:~/$MAC_DIR"
 }
 cmd_ios_sim() {
@@ -151,6 +152,25 @@ cmd_ios_sim() {
     xcrun simctl terminate '$IOS_SIM' dev.hbq.mentalmath 2>/dev/null || true
     xcrun simctl install '$IOS_SIM' build/Build/Products/Debug-iphonesimulator/App.app
     xcrun simctl launch '$IOS_SIM' dev.hbq.mentalmath"
+}
+# ios:device [iPhone|iPad]: signed build, install and launch on a cable-connected device. Signing needs
+# the login keychain, which SSH sessions cannot open, so the build runs as a one-off launchd job in
+# the Mac's logged-in desktop session (removed again afterwards); its log streams back here.
+cmd_ios_device() {
+  local want=${2:-iPhone}
+  cmd_ios_sync >/dev/null
+  mac "U=\$(id -u); L=dev.hbq.mentalmath.device-build; P=/tmp/\$L.plist; LOG=/tmp/\$L.log; rm -f \$LOG
+    cat > \$P <<PL
+<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
+<plist version=\"1.0\"><dict><key>Label</key><string>\$L</string>
+<key>ProgramArguments</key><array><string>/bin/bash</string><string>\$HOME/$MAC_DIR/scripts/ios-device.sh</string><string>$want</string></array>
+<key>StandardOutPath</key><string>\$LOG</string><key>StandardErrorPath</key><string>\$LOG</string>
+<key>RunAtLoad</key><true/></dict></plist>
+PL
+    launchctl bootout gui/\$U/\$L 2>/dev/null; launchctl bootstrap gui/\$U \$P
+    for i in \$(seq 1 600); do grep -q '^EXIT ' \$LOG 2>/dev/null && break; sleep 2; done
+    launchctl bootout gui/\$U/\$L 2>/dev/null; rm -f \$P; cat \$LOG; grep -q '^EXIT 0' \$LOG"
 }
 # ios:shot [name]: screenshot the simulator into screenshots/ios/<name>.png
 cmd_ios_shot() {
@@ -204,6 +224,7 @@ case "${1:-}" in
   ios:sync) cmd_ios_sync ;;
   ios:sim) cmd_ios_sim ;;
   ios:shot) cmd_ios_shot "$@" ;;
+  ios:device) cmd_ios_device "$@" ;;
   ios:icons) cmd_ios_icons ;;
   docker:build) cmd_docker_build ;;
   docker:run) cmd_docker_run ;;
