@@ -20,6 +20,7 @@ async function mountAt(path: string) {
 
 beforeEach(() => {
   localStorage.clear()
+  sessionStorage.clear()
   disposeProgressStore()
 })
 
@@ -235,6 +236,33 @@ describe('PracticeView timed', () => {
       await flushPromises()
       expect(w.find('[data-testid="feedback"]').text()).toMatch(/Time's up/)
     } finally {
+      vi.useRealTimers()
+    }
+  })
+})
+
+describe('PracticeView leaving a phone drill', () => {
+  it('does not save the run again after the learner leaves', async () => {
+    vi.useFakeTimers({ toFake: ['setInterval', 'clearInterval', 'Date'] })
+    const happy = (window as unknown as { happyDOM: { setViewport(v: object): void } }).happyDOM
+    happy.setViewport({ width: 390, height: 844 })
+    try {
+      useProgress().state.value.settings.lockUntilRead = false
+      const { w } = await mountAt('/practice/1/gen1-two-digit-addition?mode=generated&seed=5')
+      expect(w.find('[data-testid="drill"]').exists()).toBe(true)
+      await w.find('[data-testid="key-1"]').trigger('click')
+      await w.find('[data-testid="key-check"]').trigger('click')
+      await w.find('[data-testid="next-button"]').trigger('click')
+      vi.advanceTimersByTime(1500)
+      await flushPromises()
+      const runs = () => Object.keys(sessionStorage).filter((k) => k.startsWith('mentalmath.run:'))
+      expect(runs()).toHaveLength(1)
+      await w.find('[data-testid="drill-exit"]').trigger('click')
+      vi.advanceTimersByTime(1500) // the clock keeps ticking while the navigation completes
+      await flushPromises()
+      expect(runs()).toHaveLength(0)
+    } finally {
+      happy.setViewport({ width: 1024, height: 768 })
       vi.useRealTimers()
     }
   })

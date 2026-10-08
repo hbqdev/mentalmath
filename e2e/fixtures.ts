@@ -23,6 +23,16 @@ async function androidPage(serial: string): Promise<Page> {
   await device.shell(`am start -n ${APP_PKG}/.MainActivity`)
   const webView = await device.webView({ pkg: APP_PKG }, { timeout: 30_000 })
   const page = await webView.page()
+  // Let the app finish its own launch navigation first; a test that navigates while it is still
+  // in flight leaves Playwright waiting on a navigation that never settles.
+  await page.waitForLoadState('load').catch(() => {})
+  await page.waitForFunction(
+    () => (document.querySelector('#app')?.childElementCount ?? 0) > 0,
+    null,
+    {
+      timeout: 30_000,
+    },
+  )
   ;(page as Page & { __android?: boolean }).__android = true
   // relative goto() against the app's own origin, as the web projects do against baseURL
   const goto = page.goto.bind(page)

@@ -13,6 +13,7 @@ export default defineConfigWithVueTs(
       'public/**',
       'src/content/chapters/**',
       'android/**',
+      'ios/**',
       'assets/**',
     ],
   },
