@@ -14,6 +14,7 @@ export default defineConfigWithVueTs(
       'src/content/chapters/**',
       'android/**',
       'ios/**',
+      'e2e-ios/node_modules/**',
       'assets/**',
     ],
   },

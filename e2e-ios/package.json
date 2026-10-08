@@ -1,0 +1,12 @@
+{
+  "name": "mentalmath-e2e-ios",
+  "private": true,
+  "type": "module",
+  "description": "Drives the iOS app on a simulator or device through Appium (XCUITest). Runs on the Mac.",
+  "scripts": {
+    "test": "node --test --test-concurrency=1 --test-timeout=600000 --test-reporter=spec specs/*.spec.mjs"
+  },
+  "dependencies": {
+    "webdriverio": "^9"
+  }
+}
