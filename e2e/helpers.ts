@@ -95,7 +95,9 @@ export async function typeAnswer(page: Page, text: string) {
       else if (ch === 'r') await page.getByTestId('key-extra-0').click()
       else throw new Error(`keypad cannot type ${JSON.stringify(ch)}`)
     }
-    await page.getByTestId('key-check').click()
+    // Inside the Android WebView Playwright sometimes waits forever for a "scheduled navigation"
+    // after a click; the keypad never navigates, and the next assertion would catch it if it did.
+    await page.getByTestId('key-check').click({ noWaitAfter: true })
     return
   }
   await page.getByTestId('answer-input').fill(text)
