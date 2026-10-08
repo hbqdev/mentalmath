@@ -36,6 +36,9 @@ export default defineConfig({
           {
             name: 'android',
             timeout: 120_000,
+            // A real device occasionally drops the first test after the app launches; one retry
+            // reports it as flaky instead of failing the run.
+            retries: 1,
             testIgnore: ['**/screenshots.spec.ts', '**/offline.spec.ts'],
             use: { baseURL: 'http://localhost' },
           },

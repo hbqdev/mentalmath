@@ -33,9 +33,9 @@ PROGRESS
 
 Not affiliated with the authors or publisher of *Secrets of Mental Math*.
 
-## Release notes (1.0.3)
+## Release notes (1.0.4)
 
-The drill keypad now fits fully above the tab bar on every phone, and the header no longer slides under the status bar.
+Leaving a drill now always starts the set fresh next time, and the screen reliably stays on during drills.
 
 ## Assets
 
