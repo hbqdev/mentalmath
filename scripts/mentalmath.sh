@@ -208,10 +208,12 @@ cmd_ios_wda() {
 cmd_ios_e2e() {
   local want=${2:-iPad}
   cd "$REPO"; npx tsx e2e-ios/make-fixtures.ts >/dev/null
-  if [ "${SKIP_BUILD:-}" = 1 ]; then cmd_ios_sync >/dev/null; else cmd_ios_device ios:device "$want" | tail -3; fi
+  if [ "${SKIP_BUILD:-}" = 1 ]; then cmd_ios_sync >/dev/null; else cmd_ios_device ios:device "$want" | grep -E 'FAILED|error:|EXIT [1-9]'; fi
   mac "ls ~/$MAC_DIR/build-wda/Build/Products/*.xctestrun >/dev/null 2>&1" || cmd_ios_wda ios:wda "$want"
-  cmd_ios_appium ios:appium start
-  mac "zsh -lc 'cd ~/$MAC_DIR/e2e-ios && { [ -d node_modules/webdriverio ] || npm install --silent --no-audit --no-fund; } && IOS_DEVICE=$want npm test 2>&1'"
+  cmd_ios_appium ios:appium start >/dev/null || { echo 'appium did not start'; return 1; }
+  # Quiet by default: the summary and any failures. VERBOSE=1 shows every test.
+  mac "zsh -lc 'cd ~/$MAC_DIR/e2e-ios && { [ -d node_modules/webdriverio ] || npm install --silent --no-audit --no-fund; } && IOS_DEVICE=$want npm test --silent 2>&1'" \
+    | if [ "${VERBOSE:-}" = 1 ]; then cat; else grep -E '^\s*✖|^ℹ (tests|pass|fail|skipped)|Error:|AssertionError' | grep -v '^✖ iOS app' | awk '!seen[$0]++' | head -30; fi
 }
 # ios:shot [name]: screenshot the simulator into screenshots/ios/<name>.png
 cmd_ios_shot() {
