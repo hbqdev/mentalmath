@@ -106,6 +106,8 @@ const seed = ref<number | undefined>(undefined)
 const status = ref<'idle' | 'running' | 'empty'>('idle')
 const answerBox = ref<InstanceType<typeof AnswerInput> | null>(null)
 let recorded = false
+/** Set when the learner leaves a drill, so the ticking clock cannot save the run again on the way out. */
+let leaving = false
 
 function buildExercises(): Exercise[] {
   const s = set.value
@@ -127,6 +129,7 @@ function moreExercises(): Exercise[] {
 
 function begin() {
   recorded = false
+  leaving = false
   newBest.value = undefined
   seed.value = undefined
   if (!set.value || locked.value) {
@@ -173,6 +176,7 @@ function begin() {
 // Persist the run after every answer so an app switch or a call does not lose the set.
 watchEffect(() => {
   if (!state.value || status.value !== 'running' || view.value !== 'one' || timed.value) return
+  if (leaving) return
   const key = runKey(setId.value, route.query)
   saveRun(key, state.value, seconds.value * 1000)
 })
@@ -185,6 +189,7 @@ watchEffect(() => {
 onBeforeUnmount(() => void keepAwake(false))
 
 function exitDrill() {
+  leaving = true
   clearRun(runKey(setId.value, route.query))
   goBack()
 }
