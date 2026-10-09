@@ -192,7 +192,9 @@ PL
       launchctl bootout gui/\$U/\$L 2>/dev/null; launchctl bootstrap gui/\$U \$P
       for i in \$(seq 1 60); do curl -s -m 2 http://127.0.0.1:4723/status | grep -q '\"ready\":true' && { echo 'appium ready'; exit 0; }; sleep 1; done
       echo 'appium did not start'; tail -5 /tmp/\$L.log; exit 1" ;;
-    stop) mac "launchctl bootout gui/\$(id -u)/dev.hbq.mentalmath.appium 2>/dev/null; rm -f /tmp/dev.hbq.mentalmath.appium.plist; echo 'appium stopped'" ;;
+    # Also end the xcodebuild that keeps WebDriverAgent running on the device ("Automation Running").
+    stop) mac "launchctl bootout gui/\$(id -u)/dev.hbq.mentalmath.appium 2>/dev/null; rm -f /tmp/dev.hbq.mentalmath.appium.plist
+      for p in \$(pgrep -x xcodebuild); do ps -o args= -p \$p | grep -q test-without-building && kill \$p; done; echo 'appium stopped'" ;;
   esac
 }
 # ios:wda [iPad|iPhone]: build and sign Apple's WebDriverAgent (the helper Appium drives devices
@@ -215,6 +217,7 @@ cmd_ios_e2e() {
   # Quiet by default: the summary and any failures. VERBOSE=1 shows every test.
   mac "zsh -lc 'cd ~/$MAC_DIR/e2e-ios && { [ -d node_modules/webdriverio ] || npm install --silent --no-audit --no-fund; } && IOS_DEVICE=$want npm test --silent 2>&1'" \
     | if [ "${VERBOSE:-}" = 1 ]; then cat; else grep -E '^\s*✖|^ℹ (tests|pass|fail|skipped)|Error:|AssertionError' | grep -v '^✖ iOS app' | awk '!seen[$0]++' | head -30; fi
+  cmd_ios_appium ios:appium stop >/dev/null   # leave nothing running on the Mac or the device
 }
 # ios:store-shots: App Store screenshots (iPhone 6.9" and iPad 13") from the simulators into store/ios/
 cmd_ios_store_shots() {
