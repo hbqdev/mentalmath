@@ -1,7 +1,8 @@
 #!/bin/bash
 # Runs ON the Mac, in the desktop session (via mac-gui-run.sh): archives the App Store build and
-# uploads it to App Store Connect. Signing is automatic through the App Store Connect API key in
-# ~/.appstoreconnect/private_keys/.
+# uploads it to App Store Connect. Signing is automatic through the Apple ID signed in to Xcode (an
+# App Manager API key may not create the distribution certificate); the upload uses the App Store
+# Connect API key in ~/.appstoreconnect/private_keys/. NO_UPLOAD=1 stops after the signed .ipa.
 # usage: ios-release.sh <key-id> <issuer-id> <team-id>
 set -o pipefail
 KEY_ID=$1; ISSUER=$2; TEAM=$3
@@ -9,7 +10,7 @@ KEY=$HOME/.appstoreconnect/private_keys/AuthKey_$KEY_ID.p8
 [ -f "$KEY" ] || { echo "error: no API key at $KEY"; exit 1; }
 cd "$HOME/dev/MentalMath/ios/App" || exit 1
 OUT=build/release; rm -rf "$OUT"; mkdir -p "$OUT"
-AUTH=(-allowProvisioningUpdates -authenticationKeyPath "$KEY" -authenticationKeyID "$KEY_ID" -authenticationKeyIssuerID "$ISSUER")
+AUTH=(-allowProvisioningUpdates)
 
 xcodebuild -project App.xcodeproj -scheme App -configuration Release -destination generic/platform=iOS \
   -archivePath "$OUT/App.xcarchive" DEVELOPMENT_TEAM="$TEAM" "${AUTH[@]}" archive > "$OUT/archive.log" 2>&1
@@ -21,7 +22,7 @@ cat > "$OUT/export.plist" <<PL
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0"><dict>
 <key>method</key><string>app-store-connect</string>
-<key>destination</key><string>upload</string>
+<key>destination</key><string>export</string>
 <key>teamID</key><string>$TEAM</string>
 <key>signingStyle</key><string>automatic</string>
 <key>uploadSymbols</key><true/>
@@ -30,5 +31,9 @@ cat > "$OUT/export.plist" <<PL
 PL
 xcodebuild -exportArchive -archivePath "$OUT/App.xcarchive" -exportOptionsPlist "$OUT/export.plist" \
   -exportPath "$OUT" "${AUTH[@]}" > "$OUT/export.log" 2>&1
-grep -E 'error|EXPORT (SUCCEEDED|FAILED)|[Uu]pload' "$OUT/export.log" | sort -u
-grep -q 'EXPORT SUCCEEDED' "$OUT/export.log"
+grep -E 'error|EXPORT (SUCCEEDED|FAILED)' "$OUT/export.log" | sort -u
+grep -q 'EXPORT SUCCEEDED' "$OUT/export.log" || exit 1
+[ "${NO_UPLOAD:-}" = 1 ] && { ls "$OUT"/*.ipa; exit 0; }
+
+xcrun altool --upload-app -t ios -f "$OUT"/App.ipa --apiKey "$KEY_ID" --apiIssuer "$ISSUER" > "$OUT/upload.log" 2>&1
+st=$?; grep -iE 'error|UPLOAD SUCCEEDED|No errors' "$OUT/upload.log" | head -20; exit $st
