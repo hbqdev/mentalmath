@@ -23,6 +23,7 @@
 #   scripts/mentalmath.sh ios:e2e [iPad|iPhone]     install, then run e2e-ios/ on the device through Appium
 #   scripts/mentalmath.sh ios:appium start|stop     the Appium server those tests use (Mac, 127.0.0.1:4723)
 #   scripts/mentalmath.sh ios:store-shots           App Store screenshots from the simulators into store/ios/
+#   scripts/mentalmath.sh ios:release     signed App Store build, uploaded to App Store Connect (TestFlight)
 #   scripts/mentalmath.sh ios:icons   regenerate the iOS icon and splash from assets/
 #
 # Container (Dockerfile + docker-compose.yml; the systemd service above is unaffected):
@@ -144,7 +145,7 @@ mac() { ssh -o BatchMode=yes "$MAC_HOST" "$@"; }
 cmd_ios_sync() {
   cd "$REPO"; sync_version; npm run build && npx cap sync ios
   mac "mkdir -p ~/$MAC_DIR"
-  rsync -a --delete --exclude 'ios/App/build' --exclude 'e2e-ios/node_modules' -R ios node_modules/@capacitor node_modules/@capacitor-community package.json capacitor.config.ts scripts/ios-device.sh scripts/mac-gui-run.sh e2e-ios "$MAC_HOST:$MAC_DIR/"
+  rsync -a --delete --exclude 'ios/App/build' --exclude 'e2e-ios/node_modules' -R ios node_modules/@capacitor node_modules/@capacitor-community package.json capacitor.config.ts scripts/ios-device.sh scripts/ios-release.sh scripts/mac-gui-run.sh e2e-ios "$MAC_HOST:$MAC_DIR/"
   echo "synced to $MAC_HOST:~/$MAC_DIR"
 }
 cmd_ios_sim() {
@@ -219,6 +220,14 @@ cmd_ios_e2e() {
     | if [ "${VERBOSE:-}" = 1 ]; then cat; else grep -E '^\s*✖|^ℹ (tests|pass|fail|skipped)|Error:|AssertionError' | grep -v '^✖ iOS app' | awk '!seen[$0]++' | head -30; fi
   cmd_ios_appium ios:appium stop >/dev/null   # leave nothing running on the Mac or the device
 }
+# ios:release: archive and upload to App Store Connect with the API key named in ~/.mentalmath/asc.env
+# (the key file itself lives on the Mac in ~/.appstoreconnect/private_keys/).
+cmd_ios_release() {
+  # shellcheck disable=SC1090
+  . "$HOME/.mentalmath/asc.env"
+  cmd_ios_sync >/dev/null
+  mac "~/$MAC_DIR/scripts/mac-gui-run.sh '~/$MAC_DIR/scripts/ios-release.sh $ASC_KEY_ID $ASC_ISSUER_ID $ASC_TEAM_ID' 2400"
+}
 # ios:store-shots: App Store screenshots (iPhone 6.9" and iPad 13") from the simulators into store/ios/
 cmd_ios_store_shots() {
   cd "$REPO"; npx tsx e2e-ios/make-fixtures.ts >/dev/null; cmd_ios_sync >/dev/null
@@ -287,6 +296,7 @@ case "${1:-}" in
   ios:wda) cmd_ios_wda "$@" ;;
   ios:store-shots) cmd_ios_store_shots ;;
   ios:e2e) cmd_ios_e2e "$@" ;;
+  ios:release) cmd_ios_release ;;
   ios:icons) cmd_ios_icons ;;
   docker:build) cmd_docker_build ;;
   docker:run) cmd_docker_run ;;
