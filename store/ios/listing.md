@@ -2,9 +2,9 @@
 
 Fields as App Store Connect asks for them; limits in brackets. Shared text comes from `store/listing.md` (Play).
 
-**Name** [30]: Mental Math Trainer
+**Name** [30]: Mental Math Secrets - Mastery (home-screen name stays "Mental Math Trainer"; that store name is taken)
 **Subtitle** [30]: Learn and drill mental math
-**Bundle ID:** dev.hbq.mentalmath · **SKU:** mentalmath-ios
+**Bundle ID:** dev.hbq.mentalmath · **SKU:** mentalmath · **Apple ID:** 6821235222 · **Price:** Free
 **Primary category:** Education · **Secondary:** Reference
 **Age rating:** 4+ (every questionnaire answer None/No; no web browsing, no user content, no purchases)
 **Copyright:** 2026 HBQDEV
