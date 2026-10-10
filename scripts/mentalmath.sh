@@ -226,7 +226,7 @@ cmd_ios_release() {
   # shellcheck disable=SC1090
   . "$HOME/.mentalmath/asc.env"
   cmd_ios_sync >/dev/null
-  mac "~/$MAC_DIR/scripts/mac-gui-run.sh '~/$MAC_DIR/scripts/ios-release.sh $ASC_KEY_ID $ASC_ISSUER_ID $ASC_TEAM_ID' 2400"
+  mac "~/$MAC_DIR/scripts/mac-gui-run.sh 'NO_UPLOAD=${NO_UPLOAD:-} ~/$MAC_DIR/scripts/ios-release.sh $ASC_KEY_ID $ASC_ISSUER_ID $ASC_TEAM_ID' 2400"
 }
 # ios:store-shots: App Store screenshots (iPhone 6.9" and iPad 13") from the simulators into store/ios/
 cmd_ios_store_shots() {
