@@ -22,6 +22,7 @@
 #   scripts/mentalmath.sh ios:device [iPhone|iPad]  signed build, install and launch on a connected device
 #   scripts/mentalmath.sh ios:e2e [iPad|iPhone]     install, then run e2e-ios/ on the device through Appium
 #   scripts/mentalmath.sh ios:appium start|stop     the Appium server those tests use (Mac, 127.0.0.1:4723)
+#   scripts/mentalmath.sh ios:review-video [iPhone|iPad]  App Review screen recording into store/ios/review.mp4
 #   scripts/mentalmath.sh ios:store-shots           App Store screenshots from the simulators into store/ios/
 #   scripts/mentalmath.sh ios:release     signed App Store build, uploaded to App Store Connect (TestFlight)
 #   scripts/mentalmath.sh ios:icons   regenerate the iOS icon and splash from assets/
@@ -186,7 +187,7 @@ cmd_ios_appium() {
 <?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
 <plist version=\"1.0\"><dict><key>Label</key><string>\$L</string>
-<key>ProgramArguments</key><array><string>/bin/zsh</string><string>-lc</string><string>exec appium --address 127.0.0.1 --port 4723 --log-level warn</string></array>
+<key>ProgramArguments</key><array><string>/bin/zsh</string><string>-lc</string><string>exec appium --address 127.0.0.1 --port 4723 --log-level warn --allow-insecure xcuitest:xctest_screen_record</string></array>
 <key>StandardOutPath</key><string>/tmp/\$L.log</string><key>StandardErrorPath</key><string>/tmp/\$L.log</string>
 <key>RunAtLoad</key><true/></dict></plist>
 PL
@@ -227,6 +228,17 @@ cmd_ios_release() {
   . "$HOME/.mentalmath/asc.env"
   cmd_ios_sync >/dev/null
   mac "~/$MAC_DIR/scripts/mac-gui-run.sh 'NO_UPLOAD=${NO_UPLOAD:-} ~/$MAC_DIR/scripts/ios-release.sh $ASC_KEY_ID $ASC_ISSUER_ID $ASC_TEAM_ID' 2400"
+}
+# ios:review-video [iPhone|iPad]: the screen recording App Review asks new accounts for, made on a
+# real device through Appium (e2e-ios/review-video.mjs), copied to store/ios/review.mp4.
+cmd_ios_review_video() {
+  local want=${2:-iPhone}
+  cd "$REPO"; npx tsx e2e-ios/make-fixtures.ts >/dev/null
+  cmd_ios_device ios:device "$want" | grep -E 'FAILED|error:|EXIT [1-9]' || true
+  cmd_ios_appium ios:appium start >/dev/null || { echo 'appium did not start'; return 1; }
+  mac "zsh -lc 'cd ~/$MAC_DIR/e2e-ios && IOS_DEVICE=$want node review-video.mjs 2>&1'" | tail -5
+  cmd_ios_appium ios:appium stop >/dev/null
+  scp -q "$MAC_HOST:$MAC_DIR/e2e-ios/out/review.mp4" store/ios/review.mp4 && ls -l store/ios/review.mp4
 }
 # ios:store-shots: App Store screenshots (iPhone 6.9" and iPad 13") from the simulators into store/ios/
 cmd_ios_store_shots() {
@@ -297,6 +309,7 @@ case "${1:-}" in
   ios:store-shots) cmd_ios_store_shots ;;
   ios:e2e) cmd_ios_e2e "$@" ;;
   ios:release) cmd_ios_release ;;
+  ios:review-video) cmd_ios_review_video "$@" ;;
   ios:icons) cmd_ios_icons ;;
   docker:build) cmd_docker_build ;;
   docker:run) cmd_docker_run ;;
