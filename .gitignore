@@ -51,3 +51,5 @@ screenshots/ios/
 e2e-ios/node_modules/
 store/ios/iphone/
 store/ios/ipad/
+store/ios/*.mp4
+e2e-ios/out/
