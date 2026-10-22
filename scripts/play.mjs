@@ -53,13 +53,22 @@ if (cmd === 'check') {
     readFileSync(path.join(root, 'store', 'listing.md'), 'utf8').match(
       /## Release notes[^\n]*\n\n([^\n]+)/,
     )?.[1] ?? `Version ${version}`
+  // versionCode = major*10000 + minor*100 + patch; a code already on Play (e.g. on a test track) is
+  // released as is, since Play rejects a second upload of it
+  const [major, minor, patch] = version.split('.').map(Number)
+  const code = major * 10000 + minor * 100 + patch
   await withEdit(async (editId) => {
-    const { data: bundle } = await play.edits.bundles.upload({
-      packageName: PKG,
-      editId,
-      media: { mimeType: 'application/octet-stream', body: createReadStream(aab) },
-    })
-    console.log(`uploaded ${path.basename(aab)} as versionCode ${bundle.versionCode}`)
+    const { data: list } = await play.edits.bundles.list({ packageName: PKG, editId })
+    let bundle = list.bundles?.find((b) => b.versionCode === code)
+    if (bundle) console.log(`versionCode ${code} is already on Play; releasing it`)
+    else {
+      ;({ data: bundle } = await play.edits.bundles.upload({
+        packageName: PKG,
+        editId,
+        media: { mimeType: 'application/octet-stream', body: createReadStream(aab) },
+      }))
+      console.log(`uploaded ${path.basename(aab)} as versionCode ${bundle.versionCode}`)
+    }
     await play.edits.tracks.update({
       packageName: PKG,
       editId,
