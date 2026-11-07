@@ -22,7 +22,9 @@
 #   scripts/mentalmath.sh ios:device [iPhone|iPad]  signed build, install and launch on a connected device
 #   scripts/mentalmath.sh ios:e2e [iPad|iPhone]     install, then run e2e-ios/ on the device through Appium
 #   scripts/mentalmath.sh ios:appium start|stop     the Appium server those tests use (Mac, 127.0.0.1:4723)
+#   scripts/mentalmath.sh ios:review-video [iPhone|iPad]  App Review screen recording into store/ios/review.mp4
 #   scripts/mentalmath.sh ios:store-shots           App Store screenshots from the simulators into store/ios/
+#   scripts/mentalmath.sh ios:release     signed App Store build, uploaded to App Store Connect (TestFlight)
 #   scripts/mentalmath.sh ios:icons   regenerate the iOS icon and splash from assets/
 #
 # Container (Dockerfile + docker-compose.yml; the systemd service above is unaffected):
@@ -144,7 +146,7 @@ mac() { ssh -o BatchMode=yes "$MAC_HOST" "$@"; }
 cmd_ios_sync() {
   cd "$REPO"; sync_version; npm run build && npx cap sync ios
   mac "mkdir -p ~/$MAC_DIR"
-  rsync -a --delete --exclude 'ios/App/build' --exclude 'e2e-ios/node_modules' -R ios node_modules/@capacitor node_modules/@capacitor-community package.json capacitor.config.ts scripts/ios-device.sh scripts/mac-gui-run.sh e2e-ios "$MAC_HOST:$MAC_DIR/"
+  rsync -a --delete --exclude 'ios/App/build' --exclude 'e2e-ios/node_modules' -R ios node_modules/@capacitor node_modules/@capacitor-community package.json capacitor.config.ts scripts/ios-device.sh scripts/ios-release.sh scripts/mac-gui-run.sh e2e-ios "$MAC_HOST:$MAC_DIR/"
   echo "synced to $MAC_HOST:~/$MAC_DIR"
 }
 cmd_ios_sim() {
@@ -185,14 +187,16 @@ cmd_ios_appium() {
 <?xml version=\"1.0\" encoding=\"UTF-8\"?>
 <!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">
 <plist version=\"1.0\"><dict><key>Label</key><string>\$L</string>
-<key>ProgramArguments</key><array><string>/bin/zsh</string><string>-lc</string><string>exec appium --address 127.0.0.1 --port 4723 --log-level warn</string></array>
+<key>ProgramArguments</key><array><string>/bin/zsh</string><string>-lc</string><string>exec appium --address 127.0.0.1 --port 4723 --log-level warn --allow-insecure xcuitest:xctest_screen_record</string></array>
 <key>StandardOutPath</key><string>/tmp/\$L.log</string><key>StandardErrorPath</key><string>/tmp/\$L.log</string>
 <key>RunAtLoad</key><true/></dict></plist>
 PL
       launchctl bootout gui/\$U/\$L 2>/dev/null; launchctl bootstrap gui/\$U \$P
       for i in \$(seq 1 60); do curl -s -m 2 http://127.0.0.1:4723/status | grep -q '\"ready\":true' && { echo 'appium ready'; exit 0; }; sleep 1; done
       echo 'appium did not start'; tail -5 /tmp/\$L.log; exit 1" ;;
-    stop) mac "launchctl bootout gui/\$(id -u)/dev.hbq.mentalmath.appium 2>/dev/null; rm -f /tmp/dev.hbq.mentalmath.appium.plist; echo 'appium stopped'" ;;
+    # Also end the xcodebuild that keeps WebDriverAgent running on the device ("Automation Running").
+    stop) mac "launchctl bootout gui/\$(id -u)/dev.hbq.mentalmath.appium 2>/dev/null; rm -f /tmp/dev.hbq.mentalmath.appium.plist
+      for p in \$(pgrep -x xcodebuild); do ps -o args= -p \$p | grep -q test-without-building && kill \$p; done; echo 'appium stopped'" ;;
   esac
 }
 # ios:wda [iPad|iPhone]: build and sign Apple's WebDriverAgent (the helper Appium drives devices
@@ -215,6 +219,26 @@ cmd_ios_e2e() {
   # Quiet by default: the summary and any failures. VERBOSE=1 shows every test.
   mac "zsh -lc 'cd ~/$MAC_DIR/e2e-ios && { [ -d node_modules/webdriverio ] || npm install --silent --no-audit --no-fund; } && IOS_DEVICE=$want npm test --silent 2>&1'" \
     | if [ "${VERBOSE:-}" = 1 ]; then cat; else grep -E '^\s*✖|^ℹ (tests|pass|fail|skipped)|Error:|AssertionError' | grep -v '^✖ iOS app' | awk '!seen[$0]++' | head -30; fi
+  cmd_ios_appium ios:appium stop >/dev/null   # leave nothing running on the Mac or the device
+}
+# ios:release: archive and upload to App Store Connect with the API key named in ~/.mentalmath/asc.env
+# (the key file itself lives on the Mac in ~/.appstoreconnect/private_keys/).
+cmd_ios_release() {
+  # shellcheck disable=SC1090
+  . "$HOME/.mentalmath/asc.env"
+  cmd_ios_sync >/dev/null
+  mac "~/$MAC_DIR/scripts/mac-gui-run.sh 'NO_UPLOAD=${NO_UPLOAD:-} ~/$MAC_DIR/scripts/ios-release.sh $ASC_KEY_ID $ASC_ISSUER_ID $ASC_TEAM_ID' 2400"
+}
+# ios:review-video [iPhone|iPad]: the screen recording App Review asks new accounts for, made on a
+# real device through Appium (e2e-ios/review-video.mjs), copied to store/ios/review.mp4.
+cmd_ios_review_video() {
+  local want=${2:-iPhone}
+  cd "$REPO"; npx tsx e2e-ios/make-fixtures.ts >/dev/null
+  cmd_ios_device ios:device "$want" | grep -E 'FAILED|error:|EXIT [1-9]' || true
+  cmd_ios_appium ios:appium start >/dev/null || { echo 'appium did not start'; return 1; }
+  mac "zsh -lc 'cd ~/$MAC_DIR/e2e-ios && IOS_DEVICE=$want node review-video.mjs 2>&1'" | tail -5
+  cmd_ios_appium ios:appium stop >/dev/null
+  scp -q "$MAC_HOST:$MAC_DIR/e2e-ios/out/review.mp4" store/ios/review.mp4 && ls -l store/ios/review.mp4
 }
 # ios:store-shots: App Store screenshots (iPhone 6.9" and iPad 13") from the simulators into store/ios/
 cmd_ios_store_shots() {
@@ -284,6 +308,8 @@ case "${1:-}" in
   ios:wda) cmd_ios_wda "$@" ;;
   ios:store-shots) cmd_ios_store_shots ;;
   ios:e2e) cmd_ios_e2e "$@" ;;
+  ios:release) cmd_ios_release ;;
+  ios:review-video) cmd_ios_review_video "$@" ;;
   ios:icons) cmd_ios_icons ;;
   docker:build) cmd_docker_build ;;
   docker:run) cmd_docker_run ;;
